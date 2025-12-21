@@ -1,0 +1,16 @@
+{
+	"name": "@scrumpoker/shared-types",
+	"version": "1.0.0",
+	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"files": [
+		"dist"
+	],
+	"scripts": {
+		"build": "tsc"
+	},
+	"devDependencies": {
+		"typescript": "^5.7.3",
+		"zod": "^4.2.1"
+	}
+}

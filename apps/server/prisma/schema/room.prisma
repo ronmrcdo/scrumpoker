@@ -1,0 +1,26 @@
+model Room {
+  id            String   @id @default(uuid())
+  name          String   @db.VarChar(255)
+  isRevealed    Boolean  @default(false) @map("is_revealed")
+  facilitatorId String   @map("facilitator_id")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  players Player[]
+
+  facilitator User @relation(fields: [facilitatorId], references: [id])
+
+  @@map("rooms")
+}
+
+model Player {
+  id     String @id @default(uuid())
+  roomId String @map("room_id")
+  userId String @map("user_id")
+
+  room Room @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([roomId, userId])
+  @@map("players")
+}

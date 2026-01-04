@@ -7,6 +7,8 @@ export const WEBSOCKET_EVENTS = {
 	RESET: "POKER:RESET",
 	ROOM_STATE: "POKER:ROOM_STATE",
 	LEAVE: "POKER:LEAVE",
+	SIGNAL: "POKER:SIGNAL",
+	CLIENT_JOIN: "POKER:CLIENT_JOIN",
 } as const;
 
 export type WebsocketEventType = typeof WEBSOCKET_EVENTS;

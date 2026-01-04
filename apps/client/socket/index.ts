@@ -12,6 +12,7 @@ export const getSocket = (): Socket => {
 		socket = io(SERVER_URL, {
 			transports: ["websocket"],
 			autoConnect: false,
+			withCredentials: true,
 		});
 	}
 	return socket;

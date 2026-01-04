@@ -14,11 +14,11 @@ import {
 } from "@/schema";
 import { socketCommands } from "@/socket/commands";
 
-import Button from "./shared/button";
-import Card from "./shared/card";
-import { Field, FieldError, FieldLabel } from "./ui/field";
-import { Input } from "./ui/input";
-import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
+import Button from "../shared/button";
+import Card from "../shared/card";
+import { Field, FieldError, FieldLabel } from "../ui/field";
+import { Input } from "../ui/input";
+import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 
 function RoomForm() {
 	const actionRef = useRef<"create" | "join">("create");

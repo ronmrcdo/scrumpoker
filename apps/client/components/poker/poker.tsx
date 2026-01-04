@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { useShallow } from "zustand/react/shallow";
+import { useShallow } from "zustand/shallow";
 
 import { getVoteStats } from "@/lib/utils";
 import { socketCommands } from "@/socket/commands";
@@ -10,7 +10,7 @@ import useBoundStore from "@/stores";
 import Consensus from "./metrics/consensus";
 import OverviewMetrics from "./metrics/overview";
 import PokerCards from "./poker-cards";
-import Card from "./shared/card";
+import Card from "../shared/card";
 import Toolbar from "./toolbar";
 import VoteSelection from "./vote-selection";
 

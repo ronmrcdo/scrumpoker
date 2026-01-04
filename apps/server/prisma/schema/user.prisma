@@ -1,0 +1,17 @@
+enum UserType {
+  GUEST
+  USER
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String   @db.VarChar(255)
+  type      UserType @default(GUEST)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  rooms   Room[]
+  players Player[]
+
+  @@map("users")
+}

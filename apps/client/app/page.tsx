@@ -1,11 +1,17 @@
-"use client";
-
-import Poker from "@/components/poker";
-import RoomForm from "@/components/room-form";
-import useBoundStore from "@/stores";
+import CallToAction from "@/components/landing/content/call-to-action";
+import Features from "@/components/landing/content/features/features";
+import Hero from "@/components/landing/content/hero/hero";
+import LandingLayout from "@/components/layout/landing";
 
 export default function Page() {
-	const room = useBoundStore((state) => state.room);
+	console.log("test");
+	return (
+		<LandingLayout>
+			<Hero />
 
-	return room ? <Poker /> : <RoomForm />;
+			<Features />
+
+			<CallToAction />
+		</LandingLayout>
+	);
 }

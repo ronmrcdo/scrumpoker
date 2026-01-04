@@ -28,3 +28,19 @@ export type RoomResetEvent = Event<
 >;
 
 export type RoomStateEvent = Event<WebsocketEventType["ROOM_STATE"], TRoom>;
+
+export type SignalEvent = Event<
+	WebsocketEventType["SIGNAL"],
+	{
+		targetId: string;
+		signal: unknown;
+		senderId?: string;
+	}
+>;
+
+export type ClientJoinedEvent = Event<
+	WebsocketEventType["CLIENT_JOIN"],
+	{
+		clients: string[];
+	}
+>;

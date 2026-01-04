@@ -1,4 +1,4 @@
-import Badge from "../shared/badge";
+import Badge from "../../shared/badge";
 
 type TConsensusProps = {
 	stats: {

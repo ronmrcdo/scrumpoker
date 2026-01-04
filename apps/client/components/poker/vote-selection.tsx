@@ -2,7 +2,7 @@
 
 import type { TMember } from "@scrumpoker/shared-types";
 
-import Card from "./shared/card";
+import Card from "../shared/card";
 
 const CARD_VALUES = ["1", "2", "3", "5", "8", "13", "21", "☕"];
 

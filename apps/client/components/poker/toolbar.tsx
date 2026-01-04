@@ -6,8 +6,8 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 
-import Badge from "./shared/badge";
-import Button from "./shared/button";
+import Badge from "../shared/badge";
+import Button from "../shared/button";
 
 type TToolbarProps = {
 	code: string;

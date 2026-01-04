@@ -1,46 +1,63 @@
 import {
 	ConnectedSocket,
 	MessageBody,
-	OnGatewayConnection,
-	OnGatewayDisconnect,
 	SubscribeMessage,
+  type OnGatewayConnection,
+	type OnGatewayDisconnect,
 	WebSocketGateway,
 	WebSocketServer,
-	WsException,
 } from "@nestjs/websockets";
-import { Server, Socket } from "socket.io";
-import { v4 as uuidv4 } from "uuid";
-import {
-  type TMember,
-  type TRoom,
-  UserJoinedEvent,
-  UserVotedEvent,
+import type { Server, Socket } from "socket.io";
+import type {
   RoomRevealedEvent,
   RoomResetEvent,
+  TMember,
+  TRoom,
+  UserJoinedEvent,
+  UserVotedEvent,
+  SignalEvent,
 } from "@scrumpoker/shared-types";
+import { v4 as uuidv4 } from "uuid";
+
 import { WEBSOCKET_EVENTS } from "../const/websocket-events";
 
-@WebSocketGateway({ cors: { origin: "*" } })
+@WebSocketGateway({
+	cors: {
+    origin: process.env.POKER_CLIENT_URL,
+    credentials: true
+  },
+})
 export class PokerGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@WebSocketServer()
 	server!: Server;
 
 	private rooms = new Map<string, TRoom>();
+	private connectedClients = new Set<string>();
 
 	handleConnection(client: Socket) {
-		console.log(`Client connected: ${client.id}`);
+		const session = (client.request as any).session;
+		console.log("session", session);
+		console.log(`Client connected: ${client.id} - ${session.id}`);
+
+		this.connectedClients.add(client.id);
+		this.broadcastConnectedClients();
 	}
 
 	handleDisconnect(client: Socket) {
 		console.log(`Client disconnected: ${client.id}`);
+		this.connectedClients.delete(client.id);
+		this.broadcastConnectedClients();
+
 		for (const [code, room] of this.rooms.entries()) {
 			if (room.members.has(client.id)) {
 				room.members.delete(client.id);
-				this.server.to(code).emit(WEBSOCKET_EVENTS.ROOM_STATE, this.serializeRoom(room));
+				this.server
+					.to(code)
+					.emit(WEBSOCKET_EVENTS.ROOM_STATE, this.serializeRoom(room));
 
-        if (room.members.size === 0) {
-          this.rooms.delete(code);
-        }
+				if (room.members.size === 0) {
+					this.rooms.delete(code);
+				}
 				break;
 			}
 		}
@@ -182,10 +199,28 @@ export class PokerGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 	}
 
-  private serializeRoom(room: TRoom) {
-    return {
-      ...room,
-      members: Array.from(room.members.values())
-    };
-  }
+	@SubscribeMessage(WEBSOCKET_EVENTS.SIGNAL)
+	handleSignal(
+		@MessageBody() payload: SignalEvent["payload"],
+		@ConnectedSocket() client: Socket,
+	) {
+		const { targetId, signal } = payload;
+		this.server.to(targetId).emit(WEBSOCKET_EVENTS.SIGNAL, {
+			signal,
+			senderId: client.id,
+		});
+	}
+
+	private serializeRoom(room: TRoom) {
+		return {
+			...room,
+			members: Array.from(room.members.values()),
+		};
+	}
+
+	private broadcastConnectedClients() {
+		this.server.emit(WEBSOCKET_EVENTS.CLIENT_JOIN, {
+			clients: Array.from(this.connectedClients),
+		});
+	}
 }

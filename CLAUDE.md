@@ -10,8 +10,7 @@ MyScrum is a real-time planning poker application for agile teams, built as a Tu
 
 ```
 apps/
-  web/        - Main planning poker application (port 3001)
-  docs/       - Documentation site (port 3000)
+  web/        - Main planning poker application (port 3000)
 packages/
   ui/         - Shared React component library (Radix UI + Tailwind)
   tailwind-config/  - Shared Tailwind CSS configuration
@@ -26,8 +25,7 @@ pnpm install
 
 # Development
 pnpm dev                    # Run all apps in dev mode
-cd apps/web && pnpm dev     # Run only web app (port 3001)
-cd apps/docs && pnpm dev    # Run only docs app (port 3000)
+cd apps/web && pnpm dev     # Run only web app (port 3000)
 
 # Build
 pnpm build                  # Build all apps and packages
@@ -80,10 +78,11 @@ const MyComponent = () => {
 ### Component Organization
 
 **Web App Components** (`apps/web/components/`):
-- `poker/` - Planning poker-specific components (room form, voting cards, etc.)
+- `poker/` - Planning poker-specific components (room form, voting cards, metrics, etc.)
 - `players/` - Player/member management components
 - `chat/` - Chat functionality components
 - `layout/` - Layout components (headers, sidebars)
+- `landing/` - Landing page components (hero, features, demos)
 - `providers/` - Context providers (theme, etc.)
 
 **Shared UI Package** (`packages/ui/src/`):
@@ -155,13 +154,13 @@ import type { Member, Room } from '@/lib/types';
 
 4. **Testing Changes**:
    - Run `pnpm dev` to test locally
-   - Check both apps if changing shared packages
    - Run `pnpm check-types` and `pnpm format-and-lint`
+   - Run `pnpm test` to run unit tests with Vitest
 
 ## Important Notes
 
 - **Package Manager**: Must use `pnpm` (version 10.19.0+)
 - **Node Version**: Requires Node.js 18+
 - **Turborepo Cache**: Uses `.turbo` for build caching
-- **Port Conflicts**: Web (3001), Docs (3000)
+- **Port Conflicts**: Web (3000)
 - **No ESLint**: Project uses Biome exclusively

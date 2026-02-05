@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { render, screen } from "@/test/test-utils";
-import { createMockVoteStats } from "@/test/test-utils";
+import { createMockVoteStats, render, screen } from "@/test/test-utils";
 import { Overview } from "./overview";
 
 describe("Overview", () => {
@@ -118,7 +117,9 @@ describe("Overview", () => {
       const { container } = render(<Overview stats={stats} />);
 
       // Check that animation delays are applied via style attribute
-      const cardsWithDelay = container.querySelectorAll("[style*='animation-delay']");
+      const cardsWithDelay = container.querySelectorAll(
+        "[style*='animation-delay']",
+      );
       expect(cardsWithDelay.length).toBeGreaterThanOrEqual(2);
     });
   });

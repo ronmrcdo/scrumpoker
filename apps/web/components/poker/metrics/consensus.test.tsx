@@ -97,7 +97,9 @@ describe("Consensus", () => {
     it("should have bounce animation on mode value", () => {
       const stats = createMockVoteStats();
       const { container } = render(<Consensus stats={stats} />);
-      expect(container.querySelector(".animate-bounce-once")).toBeInTheDocument();
+      expect(
+        container.querySelector(".animate-bounce-once"),
+      ).toBeInTheDocument();
     });
   });
 
@@ -109,7 +111,9 @@ describe("Consensus", () => {
       const stats = createMockVoteStats({ mode: "5" });
       rerender(<Consensus stats={stats} />);
 
-      expect(screen.queryByText("Waiting for votes...")).not.toBeInTheDocument();
+      expect(
+        screen.queryByText("Waiting for votes..."),
+      ).not.toBeInTheDocument();
       expect(screen.getByText("5")).toBeInTheDocument();
     });
 

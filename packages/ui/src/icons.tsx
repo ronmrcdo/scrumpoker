@@ -1,6 +1,7 @@
 export type { LucideIcon } from "lucide-react";
 export {
   AlertTriangle,
+  BarChart3,
   Check,
   ChevronDown,
   ChevronLeft,
@@ -9,8 +10,10 @@ export {
   Copy,
   Eye,
   EyeOff,
+  Github,
   Hash,
   Home,
+  Lightbulb,
   LogOut,
   Menu,
   MessageSquare,

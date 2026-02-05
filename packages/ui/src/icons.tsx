@@ -1,5 +1,6 @@
 export type { LucideIcon } from "lucide-react";
 export {
+  AlertTriangle,
   Check,
   ChevronDown,
   ChevronLeft,
@@ -9,6 +10,7 @@ export {
   Eye,
   EyeOff,
   Hash,
+  Home,
   LogOut,
   Menu,
   MessageSquare,
@@ -17,8 +19,11 @@ export {
   MoreVertical,
   Plus,
   RotateCcw,
+  Search,
   Send,
   Settings,
+  Share2,
+  Smile,
   Sun,
   User,
   Users,

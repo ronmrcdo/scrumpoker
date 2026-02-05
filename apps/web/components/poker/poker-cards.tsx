@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
+
 import type { Player } from "@/lib/types";
 import { getRadialPosition } from "@/lib/utils";
 import { PokerCard } from "./poker-card";
@@ -32,6 +33,56 @@ function getRadiusForWidth(width: number, scaleFactor: number) {
 
 const SSR_RADIUS = { radiusX: 140, radiusY: 90 };
 
+// Memoized player card to prevent unnecessary re-renders and recalculations
+interface PlayerCardProps {
+  player: Player;
+  index: number;
+  totalPlayers: number;
+  radiusX: number;
+  radiusY: number;
+  isRevealed: boolean;
+  isCurrentUser: boolean;
+  compact: boolean;
+}
+
+const PlayerCard = memo(function PlayerCard({
+  player,
+  index,
+  totalPlayers,
+  radiusX,
+  radiusY,
+  isRevealed,
+  isCurrentUser,
+  compact,
+}: PlayerCardProps) {
+  // Memoize position calculation
+  const position = useMemo(
+    () => getRadialPosition(index, totalPlayers, radiusX, radiusY),
+    [index, totalPlayers, radiusX, radiusY],
+  );
+
+  // Memoize style object to prevent recreation
+  const style = useMemo(
+    () => ({
+      transform: `translate(${position.x}px, ${position.y}px)`,
+      willChange: "transform" as const,
+    }),
+    [position.x, position.y],
+  );
+
+  return (
+    <div className="absolute transition-transform duration-500" style={style}>
+      <PokerCard
+        memberName={player.name}
+        vote={player.vote}
+        isRevealed={isRevealed}
+        isCurrentUser={isCurrentUser}
+        compact={compact}
+      />
+    </div>
+  );
+});
+
 export function PokerCards({
   players,
   currentUserId,
@@ -44,13 +95,29 @@ export function PokerCards({
   const scaleFactor = Math.min(1.8, Math.max(1, count / 6));
 
   const [radius, setRadius] = useState(SSR_RADIUS);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    const update = () =>
-      setRadius(getRadiusForWidth(window.innerWidth, scaleFactor));
-    update();
+    const update = () => {
+      // Debounce resize updates to prevent excessive re-renders
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      timeoutRef.current = setTimeout(() => {
+        setRadius(getRadiusForWidth(window.innerWidth, scaleFactor));
+      }, 150);
+    };
+
+    // Initial update without debounce
+    setRadius(getRadiusForWidth(window.innerWidth, scaleFactor));
+
     window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
+    return () => {
+      window.removeEventListener("resize", update);
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
   }, [scaleFactor]);
 
   const { radiusX, radiusY } = radius;
@@ -68,31 +135,19 @@ export function PokerCards({
       <div className="absolute inset-2 sm:inset-3 rounded-[50px] sm:rounded-[70px] md:rounded-[90px] border border-border/50 bg-muted/30" />
 
       {/* Cards arranged radially */}
-      {players.map((player, index) => {
-        const { x, y } = getRadialPosition(
-          index,
-          players.length,
-          radiusX,
-          radiusY,
-        );
-        return (
-          <div
-            key={player.id}
-            className="absolute transition-all duration-500"
-            style={{
-              transform: `translate(${x}px, ${y}px)`,
-            }}
-          >
-            <PokerCard
-              memberName={player.name}
-              vote={player.vote}
-              isRevealed={isRevealed}
-              isCurrentUser={player.id === currentUserId}
-              compact={compact}
-            />
-          </div>
-        );
-      })}
+      {players.map((player, index) => (
+        <PlayerCard
+          key={player.id}
+          player={player}
+          index={index}
+          totalPlayers={players.length}
+          radiusX={radiusX}
+          radiusY={radiusY}
+          isRevealed={isRevealed}
+          isCurrentUser={player.id === currentUserId}
+          compact={compact}
+        />
+      ))}
     </div>
   );
 }

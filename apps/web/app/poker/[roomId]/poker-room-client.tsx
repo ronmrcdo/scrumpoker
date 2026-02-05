@@ -1,11 +1,13 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 
 import { JoinRoomDialog } from "@/components/poker/join-room-dialog";
 import { Consensus } from "@/components/poker/metrics/consensus";
 import { Overview } from "@/components/poker/metrics/overview";
+import { SuggestedEstimate } from "@/components/poker/metrics/suggested-estimate";
+import { VoteDistribution } from "@/components/poker/metrics/vote-distribution";
 import { PokerCards } from "@/components/poker/poker-cards";
 import { Toolbar } from "@/components/poker/toolbar";
 import { VoteSelection } from "@/components/poker/vote-selection";
@@ -50,7 +52,12 @@ export function PokerRoomClient({ initialRoom }: PokerRoomClientProps) {
   const isFacilitator = activeRoom.facilitatorId === currentUserId;
   const currentVote =
     activeRoom.players.find((p) => p.id === currentUserId)?.vote ?? null;
-  const stats = activeRoom.isRevealed ? getVoteStats(activeRoom.players) : null;
+
+  // Memoize stats calculation to prevent recalculation on every render
+  const stats = useMemo(
+    () => (activeRoom.isRevealed ? getVoteStats(activeRoom.players) : null),
+    [activeRoom.isRevealed, activeRoom.players],
+  );
 
   return (
     <div className="flex flex-col items-center gap-4 sm:gap-6 md:gap-8 p-3 sm:p-4 md:p-6 max-w-4xl mx-auto">
@@ -100,6 +107,8 @@ export function PokerRoomClient({ initialRoom }: PokerRoomClientProps) {
         <div className="w-full max-w-sm px-2 space-y-2 sm:space-y-3">
           <Consensus stats={stats} />
           <Overview stats={stats} />
+          <VoteDistribution stats={stats} />
+          <SuggestedEstimate stats={stats} />
         </div>
       )}
     </div>

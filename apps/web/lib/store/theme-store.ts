@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { useEffect, useState } from "react";
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
-export type ThemeMode = 'light' | 'dark' | 'system';
+export type ThemeMode = "light" | "dark" | "system";
 
 interface ThemeState {
   mode: ThemeMode;
@@ -12,13 +12,13 @@ interface ThemeState {
 export const useThemeStore = create<ThemeState>()(
   persist(
     (set) => ({
-      mode: 'system',
+      mode: "system",
       setMode: (mode) => set({ mode }),
     }),
     {
-      name: 'myscrum-theme',
-    }
-  )
+      name: "myscrum-theme",
+    },
+  ),
 );
 
 export function useHydratedThemeMode(): ThemeMode {
@@ -29,5 +29,5 @@ export function useHydratedThemeMode(): ThemeMode {
     setHydrated(true);
   }, []);
 
-  return hydrated ? mode : 'system';
+  return hydrated ? mode : "system";
 }

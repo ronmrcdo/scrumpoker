@@ -1,26 +1,14 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import { createMemberSlice, type MemberSlice } from './slices/member-slice';
-import { createRoomSlice, type RoomSlice } from './slices/room-slice';
-import { createChatSlice, type ChatSlice } from './slices/chat-slice';
-import { createUISlice, type UISlice } from './slices/ui-slice';
+import { create } from "zustand";
+import { type ChatSlice, createChatSlice } from "./slices/chat-slice";
+import { createRoomSlice, type RoomSlice } from "./slices/room-slice";
+import { createSessionSlice, type SessionSlice } from "./slices/session-slice";
+import { createUISlice, type UISlice } from "./slices/ui-slice";
 
-export type PokerStore = MemberSlice & RoomSlice & ChatSlice & UISlice;
+export type PokerStore = SessionSlice & RoomSlice & ChatSlice & UISlice;
 
-export const usePokerStore = create<PokerStore>()(
-  persist(
-    (...a) => ({
-      ...createMemberSlice(...a),
-      ...createRoomSlice(...a),
-      ...createChatSlice(...a),
-      ...createUISlice(...a),
-    }),
-    {
-      name: 'myscrum-poker',
-      partialize: (state) => ({
-        currentUserId: state.currentUserId,
-        currentUserName: state.currentUserName,
-      }),
-    },
-  ),
-);
+export const usePokerStore = create<PokerStore>()((...a) => ({
+  ...createSessionSlice(...a),
+  ...createRoomSlice(...a),
+  ...createChatSlice(...a),
+  ...createUISlice(...a),
+}));

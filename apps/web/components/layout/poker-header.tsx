@@ -1,26 +1,33 @@
 "use client";
 
-import {
-  Badge,
-  Button,
-  Copy,
-  MessageSquare,
-  Menu,
-} from "@repo/ui";
+import { Button, Check, Menu, MessageSquare, Share2 } from "@repo/ui";
+import { useState } from "react";
 import { ThemeToggle } from "../theme-toggle";
 
 interface PokerHeaderProps {
   roomName: string;
-  roomCode: string;
+  roomId: string;
   isChatOpen: boolean;
   isPlayerListOpen: boolean;
   onToggleChat: () => void;
   onTogglePlayerList: () => void;
 }
 
-export function PokerHeader({ roomName, roomCode, isChatOpen, isPlayerListOpen, onToggleChat, onTogglePlayerList }: PokerHeaderProps) {
-  const copyCode = () => {
-    navigator.clipboard.writeText(roomCode);
+export function PokerHeader({
+  roomName,
+  roomId,
+  isChatOpen,
+  isPlayerListOpen,
+  onToggleChat,
+  onTogglePlayerList,
+}: PokerHeaderProps) {
+  const [copied, setCopied] = useState(false);
+
+  const shareRoom = () => {
+    const url = `${window.location.origin}/poker/${roomId}`;
+    navigator.clipboard.writeText(url);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   return (
@@ -41,14 +48,24 @@ export function PokerHeader({ roomName, roomCode, isChatOpen, isPlayerListOpen, 
       </div>
 
       <div className="flex items-center gap-1 sm:gap-2 shrink-0">
-        <Badge
+        <Button
           variant="outline"
-          className="font-mono cursor-pointer hover:bg-muted gap-1 text-xs sm:text-sm px-2 py-0.5"
-          onClick={copyCode}
+          size="sm"
+          className="h-8 sm:h-9 gap-1.5 text-xs sm:text-sm px-2.5 sm:px-3"
+          onClick={shareRoom}
         >
-          {roomCode}
-          <Copy className="h-3 w-3" />
-        </Badge>
+          {copied ? (
+            <>
+              <Check className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Copied!</span>
+            </>
+          ) : (
+            <>
+              <Share2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Share</span>
+            </>
+          )}
+        </Button>
 
         <ThemeToggle />
 

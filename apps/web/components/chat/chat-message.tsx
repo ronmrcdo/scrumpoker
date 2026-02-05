@@ -20,10 +20,14 @@ export function ChatMessage({ message, isOwnMessage }: ChatMessageProps) {
   }
 
   return (
-    <div className={cn(
-      "flex flex-col gap-0.5",
-      isOwnMessage ? "items-end animate-slide-in-right" : "items-start animate-slide-in-left"
-    )}>
+    <div
+      className={cn(
+        "flex flex-col gap-0.5",
+        isOwnMessage
+          ? "items-end animate-slide-in-right"
+          : "items-start animate-slide-in-left",
+      )}
+    >
       {!isOwnMessage && (
         <span className="text-[10px] text-muted-foreground font-medium ml-3">
           {message.senderName}
@@ -32,11 +36,12 @@ export function ChatMessage({ message, isOwnMessage }: ChatMessageProps) {
       <div
         className={cn(
           "max-w-[85%] px-3 py-2 rounded-2xl text-sm transition-all duration-200",
-          "hover:shadow-md",
+          "hover:shadow-md break-words",
           isOwnMessage
             ? "bg-primary-100 text-primary-800 rounded-br-md"
             : "bg-muted text-foreground rounded-bl-md",
         )}
+        style={{ overflowWrap: "anywhere" }}
       >
         {message.text}
       </div>

@@ -1,4 +1,4 @@
-import type { Member, VoteStats } from "./types";
+import type { Player, VoteStats } from "./types";
 
 export { cn } from "@repo/ui";
 
@@ -6,26 +6,26 @@ export { cn } from "@repo/ui";
  * Generates a UUID with fallback for environments without crypto.randomUUID
  */
 export function generateUUID(): string {
-  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+  if (typeof crypto !== "undefined" && crypto.randomUUID) {
     return crypto.randomUUID();
   }
 
   // Fallback for older browsers or SSR
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
     const r = (Math.random() * 16) | 0;
-    const v = c === 'x' ? r : (r & 0x3) | 0x8;
+    const v = c === "x" ? r : (r & 0x3) | 0x8;
     return v.toString(16);
   });
 }
 
-export function getVoteStats(members: Member[]): VoteStats | null {
-  const votes = members
+export function getVoteStats(players: Player[]): VoteStats | null {
+  const votes = players
     .map((m) => m.vote)
-    .filter((v): v is string => v !== null && v !== '☕');
+    .filter((v): v is string => v !== null && v !== "☕");
 
   if (votes.length === 0) return null;
 
-  const numericVotes = votes.map(Number).filter((n) => !isNaN(n));
+  const numericVotes = votes.map(Number).filter((n) => !Number.isNaN(n));
 
   if (numericVotes.length === 0) return null;
 
@@ -38,9 +38,10 @@ export function getVoteStats(members: Member[]): VoteStats | null {
   }
 
   const maxCount = Math.max(...Object.values(distribution));
-  const mode = Object.entries(distribution).find(
-    ([, count]) => count === maxCount,
-  )?.[0] ?? votes[0];
+  const mode =
+    Object.entries(distribution).find(([, count]) => count === maxCount)?.[0] ??
+    votes[0] ??
+    "0";
 
   const consensus = maxCount >= Math.ceil(votes.length * 0.7);
 

@@ -1,7 +1,6 @@
-import { describe, expect, it, vi } from "vitest";
 import userEvent from "@testing-library/user-event";
-import { render, screen } from "@/test/test-utils";
-import { createMockPlayer } from "@/test/test-utils";
+import { describe, expect, it, vi } from "vitest";
+import { createMockPlayer, render, screen } from "@/test/test-utils";
 import { PlayerItem } from "./player-item";
 
 describe("PlayerItem", () => {
@@ -177,13 +176,11 @@ describe("PlayerItem", () => {
   describe("kick functionality", () => {
     it("should not show kick button for non-facilitators", () => {
       render(
-        <PlayerItem
-          {...defaultProps}
-          isFacilitator={false}
-          onKick={vi.fn()}
-        />,
+        <PlayerItem {...defaultProps} isFacilitator={false} onKick={vi.fn()} />,
       );
-      expect(screen.queryByRole("button", { name: /kick/i })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole("button", { name: /kick/i }),
+      ).not.toBeInTheDocument();
     });
 
     it("should not show kick button for current user", () => {
@@ -195,7 +192,9 @@ describe("PlayerItem", () => {
           onKick={vi.fn()}
         />,
       );
-      expect(screen.queryByRole("button", { name: /kick/i })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole("button", { name: /kick/i }),
+      ).not.toBeInTheDocument();
     });
 
     it("should not show kick button when onKick is not provided", () => {
@@ -206,7 +205,9 @@ describe("PlayerItem", () => {
           onKick={undefined}
         />,
       );
-      expect(screen.queryByRole("button", { name: /kick/i })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole("button", { name: /kick/i }),
+      ).not.toBeInTheDocument();
     });
 
     it("should show kick button for facilitator on other players", () => {
@@ -224,11 +225,7 @@ describe("PlayerItem", () => {
     it("should open confirmation dialog when kick button is clicked", async () => {
       const user = userEvent.setup();
       render(
-        <PlayerItem
-          {...defaultProps}
-          isFacilitator={true}
-          onKick={vi.fn()}
-        />,
+        <PlayerItem {...defaultProps} isFacilitator={true} onKick={vi.fn()} />,
       );
 
       await user.click(screen.getByRole("button", { name: /kick/i }));
@@ -275,11 +272,7 @@ describe("PlayerItem", () => {
     it("should close dialog when cancel is clicked", async () => {
       const user = userEvent.setup();
       render(
-        <PlayerItem
-          {...defaultProps}
-          isFacilitator={true}
-          onKick={vi.fn()}
-        />,
+        <PlayerItem {...defaultProps} isFacilitator={true} onKick={vi.fn()} />,
       );
 
       await user.click(screen.getByRole("button", { name: /kick/i }));
@@ -294,11 +287,7 @@ describe("PlayerItem", () => {
       const onKick = vi.fn();
 
       render(
-        <PlayerItem
-          {...defaultProps}
-          isFacilitator={true}
-          onKick={onKick}
-        />,
+        <PlayerItem {...defaultProps} isFacilitator={true} onKick={onKick} />,
       );
 
       await user.click(screen.getByRole("button", { name: /kick/i }));

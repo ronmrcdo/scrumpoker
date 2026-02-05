@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { render, screen } from "@/test/test-utils";
-import { createMockChatMessage } from "@/test/test-utils";
+import { createMockChatMessage, render, screen } from "@/test/test-utils";
 import { ChatMessage } from "./chat-message";
 
 describe("ChatMessage", () => {
@@ -128,7 +127,9 @@ describe("ChatMessage", () => {
       const { container } = render(
         <ChatMessage message={message} isOwnMessage={true} />,
       );
-      expect(container.querySelector(".animate-slide-in-right")).toBeInTheDocument();
+      expect(
+        container.querySelector(".animate-slide-in-right"),
+      ).toBeInTheDocument();
     });
 
     it("should animate other messages from left", () => {
@@ -136,7 +137,9 @@ describe("ChatMessage", () => {
       const { container } = render(
         <ChatMessage message={message} isOwnMessage={false} />,
       );
-      expect(container.querySelector(".animate-slide-in-left")).toBeInTheDocument();
+      expect(
+        container.querySelector(".animate-slide-in-left"),
+      ).toBeInTheDocument();
     });
 
     it("should fade in system messages", () => {

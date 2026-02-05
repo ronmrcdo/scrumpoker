@@ -1,5 +1,5 @@
-import { describe, expect, it, vi } from "vitest";
 import userEvent from "@testing-library/user-event";
+import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@/test/test-utils";
 import { VoteSelection } from "./vote-selection";
 
@@ -115,7 +115,11 @@ describe("VoteSelection", () => {
 
     it("should have no highlighted card when no vote", () => {
       render(
-        <VoteSelection currentVote={null} isRevealed={false} onVote={vi.fn()} />,
+        <VoteSelection
+          currentVote={null}
+          isRevealed={false}
+          onVote={vi.fn()}
+        />,
       );
 
       const buttons = screen.getAllByRole("button");

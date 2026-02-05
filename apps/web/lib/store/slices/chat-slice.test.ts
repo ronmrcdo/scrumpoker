@@ -1,7 +1,7 @@
-import { describe, expect, it, beforeEach, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { create } from "zustand";
 import type { ChatMessage } from "../../types";
-import { createChatSlice, type ChatSlice } from "./chat-slice";
+import { type ChatSlice, createChatSlice } from "./chat-slice";
 
 describe("ChatSlice", () => {
   let store: ReturnType<typeof create<ChatSlice>>;
@@ -270,7 +270,11 @@ describe("ChatSlice", () => {
     it("should handle messages with special characters", () => {
       store
         .getState()
-        .sendChatMessage("Hello! 🎉 <script>alert(1)</script>", "user-1", "Alice");
+        .sendChatMessage(
+          "Hello! 🎉 <script>alert(1)</script>",
+          "user-1",
+          "Alice",
+        );
       expect(store.getState().chatMessages[0]!.text).toBe(
         "Hello! 🎉 <script>alert(1)</script>",
       );

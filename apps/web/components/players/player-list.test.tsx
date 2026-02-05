@@ -1,7 +1,6 @@
-import { describe, expect, it, vi } from "vitest";
 import userEvent from "@testing-library/user-event";
-import { render, screen } from "@/test/test-utils";
-import { createMockPlayer } from "@/test/test-utils";
+import { describe, expect, it, vi } from "vitest";
+import { createMockPlayer, render, screen } from "@/test/test-utils";
 import { PlayerList } from "./player-list";
 
 describe("PlayerList", () => {
@@ -63,15 +62,23 @@ describe("PlayerList", () => {
     it("should identify current user", () => {
       const players = createPlayers(3);
       const { container } = render(
-        <PlayerList {...defaultProps} players={players} currentUserId="player-1" />,
+        <PlayerList
+          {...defaultProps}
+          players={players}
+          currentUserId="player-1"
+        />,
       );
       // The current user item should have highlighting
-      expect(container.querySelectorAll(".bg-primary-50").length).toBeGreaterThan(0);
+      expect(
+        container.querySelectorAll(".bg-primary-50").length,
+      ).toBeGreaterThan(0);
     });
 
     it("should pass isRevealed to player items", () => {
       const players = createPlayers(2, 2);
-      render(<PlayerList {...defaultProps} players={players} isRevealed={true} />);
+      render(
+        <PlayerList {...defaultProps} players={players} isRevealed={true} />,
+      );
 
       // When revealed, should show the actual votes
       expect(screen.getAllByText(/Voted: 5/).length).toBe(2);
@@ -172,7 +179,9 @@ describe("PlayerList", () => {
         />,
       );
 
-      expect(screen.queryByRole("button", { name: /kick/i })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole("button", { name: /kick/i }),
+      ).not.toBeInTheDocument();
     });
   });
 

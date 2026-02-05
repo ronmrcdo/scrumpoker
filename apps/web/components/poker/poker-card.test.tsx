@@ -152,7 +152,9 @@ describe("PokerCard", () => {
           isCurrentUser={false}
         />,
       );
-      expect(container.querySelector(".text-muted-foreground")).toBeInTheDocument();
+      expect(
+        container.querySelector(".text-muted-foreground"),
+      ).toBeInTheDocument();
     });
   });
 

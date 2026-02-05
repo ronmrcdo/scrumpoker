@@ -46,7 +46,9 @@ describe("PokerHeader", () => {
 
     it("should render share button", () => {
       render(<PokerHeader {...defaultProps} />);
-      expect(screen.getByRole("button", { name: /share/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: /share/i }),
+      ).toBeInTheDocument();
     });
 
     it("should render chat toggle button", () => {
@@ -62,7 +64,10 @@ describe("PokerHeader", () => {
       const onTogglePlayerList = vi.fn();
 
       render(
-        <PokerHeader {...defaultProps} onTogglePlayerList={onTogglePlayerList} />,
+        <PokerHeader
+          {...defaultProps}
+          onTogglePlayerList={onTogglePlayerList}
+        />,
       );
 
       await user.click(

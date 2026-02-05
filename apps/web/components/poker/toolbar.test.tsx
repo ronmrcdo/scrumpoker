@@ -15,8 +15,12 @@ describe("Toolbar", () => {
   describe("visibility", () => {
     it("should render when user is facilitator", () => {
       render(<Toolbar {...defaultProps} />);
-      expect(screen.getByRole("button", { name: /reveal/i })).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: /reset/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: /reveal/i }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: /reset/i }),
+      ).toBeInTheDocument();
     });
 
     it("should not render when user is not facilitator", () => {
@@ -42,7 +46,9 @@ describe("Toolbar", () => {
   describe("reveal button", () => {
     it("should show 'Reveal' text when not revealed", () => {
       render(<Toolbar {...defaultProps} isRevealed={false} />);
-      expect(screen.getByRole("button", { name: /reveal/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: /reveal/i }),
+      ).toBeInTheDocument();
     });
 
     it("should show 'Hide' text when revealed", () => {
@@ -54,9 +60,7 @@ describe("Toolbar", () => {
       const user = userEvent.setup();
       const onToggleReveal = vi.fn();
 
-      render(
-        <Toolbar {...defaultProps} onToggleReveal={onToggleReveal} />,
-      );
+      render(<Toolbar {...defaultProps} onToggleReveal={onToggleReveal} />);
 
       await user.click(screen.getByRole("button", { name: /reveal/i }));
       expect(onToggleReveal).toHaveBeenCalledTimes(1);
@@ -94,7 +98,9 @@ describe("Toolbar", () => {
   describe("reset button", () => {
     it("should render reset button", () => {
       render(<Toolbar {...defaultProps} />);
-      expect(screen.getByRole("button", { name: /reset/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: /reset/i }),
+      ).toBeInTheDocument();
     });
 
     it("should call onReset when reset button is clicked", async () => {
@@ -111,10 +117,14 @@ describe("Toolbar", () => {
       const { rerender } = render(
         <Toolbar {...defaultProps} isRevealed={false} />,
       );
-      expect(screen.getByRole("button", { name: /reset/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: /reset/i }),
+      ).toBeInTheDocument();
 
       rerender(<Toolbar {...defaultProps} isRevealed={true} />);
-      expect(screen.getByRole("button", { name: /reset/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: /reset/i }),
+      ).toBeInTheDocument();
     });
   });
 
@@ -213,7 +223,9 @@ describe("Toolbar", () => {
       const { rerender, container } = render(
         <Toolbar {...defaultProps} isFacilitator={true} />,
       );
-      expect(screen.getByRole("button", { name: /reveal/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: /reveal/i }),
+      ).toBeInTheDocument();
 
       rerender(<Toolbar {...defaultProps} isFacilitator={false} />);
       expect(container).toBeEmptyDOMElement();
@@ -226,7 +238,9 @@ describe("Toolbar", () => {
       expect(container).toBeEmptyDOMElement();
 
       rerender(<Toolbar {...defaultProps} isFacilitator={true} />);
-      expect(screen.getByRole("button", { name: /reveal/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: /reveal/i }),
+      ).toBeInTheDocument();
     });
   });
 });

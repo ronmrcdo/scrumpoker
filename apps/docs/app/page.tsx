@@ -1,5 +1,5 @@
+import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui/card";
 import Image from "next/image";
-import { Card } from "@repo/ui/card";
 
 const LINKS = [
   {
@@ -53,7 +53,7 @@ export default function Page() {
         </div>
       </div>
 
-      <div className="relative flex place-items-center ">
+      <div className="relative flex place-items-center">
         <div className="font-sans w-auto pb-16 pt-[48px] md:pb-24 lg:pb-32 md:pt-16 lg:pt-20 flex justify-between gap-8 items-center flex-col relative z-0">
           <div className="z-50 flex items-center justify-center w-full">
             <div className="absolute min-w-[614px] min-h-[614px]">
@@ -65,22 +65,16 @@ export default function Page() {
               />
             </div>
             <div className="absolute z-50 flex items-center justify-center w-64 h-64">
-              <Gradient
-                className="opacity-90 w-[120px] h-[120px]"
-                conic
-                small
+              <Image
+                alt="Turborepo Logo"
+                height={120}
+                src="turborepo.svg"
+                width={120}
+                className="opacity-90"
               />
             </div>
-
-            <div className="flex justify-center items-center z-50">
-              <TurborepoLogo />
-            </div>
           </div>
-          <Gradient
-            className="top-[-500px] opacity-[0.15] w-[1000px] h-[1000px]"
-            conic
-          />
-          <div className="z-50 flex flex-col items-center justify-center gap-5 px-6 text-center lg:gap-6">
+          <div className="z-50 flex flex-col items-center justify-center gap-5 px-6 text-center lg:gap-6 mt-[300px]">
             <svg
               className="w-[160px] md:w-[200px] fill-black dark:fill-white"
               viewBox="0 0 506 50"
@@ -102,11 +96,29 @@ export default function Page() {
         </div>
       </div>
 
-      <div className="grid mb-32 text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
+      <div className="grid mb-32 text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left gap-4">
         {LINKS.map(({ title, href, description }) => (
-          <Card href={href} key={title} title={title}>
-            {description}
-          </Card>
+          <a
+            key={title}
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group"
+          >
+            <Card className="h-full transition-colors hover:border-neutral-500">
+              <CardHeader>
+                <CardTitle className="group-hover:text-primary-500 transition-colors">
+                  {title}{" "}
+                  <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
+                    →
+                  </span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">{description}</p>
+              </CardContent>
+            </Card>
+          </a>
         ))}
       </div>
     </main>

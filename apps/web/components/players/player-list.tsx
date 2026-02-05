@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import {
   Button,
   Dialog,
@@ -14,12 +13,13 @@ import {
   Separator,
   Users,
 } from "@repo/ui";
+import { useState } from "react";
 
-import type { Member } from "@/lib/types";
+import type { Player } from "@/lib/types";
 import { PlayerItem } from "./player-item";
 
 interface PlayerListProps {
-  members: Member[];
+  players: Player[];
   currentUserId: string;
   isRevealed: boolean;
   isFacilitator: boolean;
@@ -27,9 +27,16 @@ interface PlayerListProps {
   onKick: (playerId: string) => void;
 }
 
-export function PlayerList({ members, currentUserId, isRevealed, isFacilitator, onLeave, onKick }: PlayerListProps) {
+export function PlayerList({
+  players,
+  currentUserId,
+  isRevealed,
+  isFacilitator,
+  onLeave,
+  onKick,
+}: PlayerListProps) {
   const [isLeaveDialogOpen, setIsLeaveDialogOpen] = useState(false);
-  const votedCount = members.filter((m) => m.vote !== null).length;
+  const votedCount = players.filter((p) => p.vote !== null).length;
 
   const handleConfirmLeave = () => {
     setIsLeaveDialogOpen(false);
@@ -42,16 +49,16 @@ export function PlayerList({ members, currentUserId, isRevealed, isFacilitator, 
         <Users className="h-4 w-4 text-muted-foreground" />
         <span className="text-sm font-semibold">Players</span>
         <span className="ml-auto text-xs text-muted-foreground">
-          {votedCount}/{members.length} voted
+          {votedCount}/{players.length} voted
         </span>
       </div>
       <Separator />
       <div className="flex-1 overflow-y-auto p-2 sm:p-2 space-y-1">
-        {members.map((member) => (
+        {players.map((player) => (
           <PlayerItem
-            key={member.id}
-            member={member}
-            isCurrentUser={member.id === currentUserId}
+            key={player.id}
+            player={player}
+            isCurrentUser={player.id === currentUserId}
             isRevealed={isRevealed}
             isFacilitator={isFacilitator}
             onKick={onKick}
@@ -75,7 +82,8 @@ export function PlayerList({ members, currentUserId, isRevealed, isFacilitator, 
             <DialogHeader>
               <DialogTitle>Leave Room?</DialogTitle>
               <DialogDescription>
-                Are you sure you want to leave this room? You'll need the room code to rejoin.
+                Are you sure you want to leave this room? You'll need the room
+                code to rejoin.
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>
@@ -85,10 +93,7 @@ export function PlayerList({ members, currentUserId, isRevealed, isFacilitator, 
               >
                 Cancel
               </Button>
-              <Button
-                variant="destructive"
-                onClick={handleConfirmLeave}
-              >
+              <Button variant="destructive" onClick={handleConfirmLeave}>
                 Leave Room
               </Button>
             </DialogFooter>

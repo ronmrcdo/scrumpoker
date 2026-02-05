@@ -1,59 +1,69 @@
 "use client";
 
-import { useState } from "react";
 import {
   Avatar,
   AvatarFallback,
   Badge,
   Button,
+  cn,
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  cn,
   X,
 } from "@repo/ui";
-import type { Member } from "@/lib/types";
+import { useState } from "react";
+import type { Player } from "@/lib/types";
 
 interface PlayerItemProps {
-  member: Member;
+  player: Player;
   isCurrentUser: boolean;
   isRevealed: boolean;
   isFacilitator?: boolean;
   onKick?: (playerId: string) => void;
 }
 
-export function PlayerItem({ member, isCurrentUser, isRevealed, isFacilitator, onKick }: PlayerItemProps) {
+export function PlayerItem({
+  player,
+  isCurrentUser,
+  isRevealed,
+  isFacilitator,
+  onKick,
+}: PlayerItemProps) {
   const [isKickDialogOpen, setIsKickDialogOpen] = useState(false);
-  const initials = member.name
+  const initials = player.name
     .split(" ")
     .map((n) => n[0])
     .join("")
     .toUpperCase()
     .slice(0, 2);
 
-  const hasVoted = member.vote !== null;
+  const hasVoted = player.vote !== null;
   const canKick = isFacilitator && !isCurrentUser && onKick;
 
   const handleConfirmKick = () => {
     setIsKickDialogOpen(false);
-    onKick?.(member.id);
+    onKick?.(player.id);
   };
 
   return (
     <>
-      <div className={cn(
-        "flex items-center gap-3 px-3 py-2 rounded-lg transition-colors",
-        isCurrentUser && "bg-primary-50",
-      )}>
+      <div
+        className={cn(
+          "flex items-center gap-3 px-3 py-2 rounded-lg transition-colors",
+          isCurrentUser && "bg-primary-50",
+        )}
+      >
         <div className="relative">
           <Avatar className="h-8 w-8">
-            <AvatarFallback className={cn(
-              "text-xs",
-              isCurrentUser && "bg-primary-100 text-primary-700",
-            )}>
+            <AvatarFallback
+              className={cn(
+                "text-xs",
+                isCurrentUser && "bg-primary-100 text-primary-700",
+              )}
+            >
               {initials}
             </AvatarFallback>
           </Avatar>
@@ -67,20 +77,26 @@ export function PlayerItem({ member, isCurrentUser, isRevealed, isFacilitator, o
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <span className={cn(
-              "text-sm font-medium truncate",
-              isCurrentUser && "text-primary-700",
-            )}>
-              {member.name}
+            <span
+              className={cn(
+                "text-sm font-medium truncate",
+                isCurrentUser && "text-primary-700",
+              )}
+            >
+              {player.name}
             </span>
-            {member.role === "FACILITATOR" && (
+            {player.role === "FACILITATOR" && (
               <Badge variant="default" className="text-[10px] px-1.5 py-0">
                 Host
               </Badge>
             )}
           </div>
           <span className="text-xs text-muted-foreground">
-            {!hasVoted ? "Thinking..." : isRevealed ? `Voted: ${member.vote}` : "Voted"}
+            {!hasVoted
+              ? "Thinking..."
+              : isRevealed
+                ? `Voted: ${player.vote}`
+                : "Voted"}
           </span>
         </div>
 
@@ -102,7 +118,8 @@ export function PlayerItem({ member, isCurrentUser, isRevealed, isFacilitator, o
           <DialogHeader>
             <DialogTitle>Kick Player?</DialogTitle>
             <DialogDescription>
-              Are you sure you want to remove {member.name} from the room? They can rejoin with the room code.
+              Are you sure you want to remove {player.name} from the room? They
+              can rejoin with the room code.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -112,10 +129,7 @@ export function PlayerItem({ member, isCurrentUser, isRevealed, isFacilitator, o
             >
               Cancel
             </Button>
-            <Button
-              variant="destructive"
-              onClick={handleConfirmKick}
-            >
+            <Button variant="destructive" onClick={handleConfirmKick}>
               Kick Player
             </Button>
           </DialogFooter>

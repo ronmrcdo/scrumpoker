@@ -1,19 +1,23 @@
 import { Suspense } from "react";
 
+import { FeaturesSection } from "@/components/landing/features-section";
+import { HeroSection } from "@/components/landing/hero-section";
+import { LandingFooter } from "@/components/landing/landing-footer";
+import { LandingHeader } from "@/components/landing/landing-header";
 import { KickedAlert } from "@/components/poker/kicked-alert";
-import { RoomForm } from "@/components/poker/room-form";
-import { ThemeToggle } from "@/components/theme-toggle";
 
-export default function LobbyPage() {
+export default function LandingPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+    <>
       <Suspense fallback={null}>
         <KickedAlert />
       </Suspense>
-      <div className="fixed top-4 right-4 z-50">
-        <ThemeToggle />
-      </div>
-      <RoomForm />
-    </div>
+      <LandingHeader />
+      <main id="top">
+        <HeroSection />
+        <FeaturesSection />
+      </main>
+      <LandingFooter />
+    </>
   );
 }

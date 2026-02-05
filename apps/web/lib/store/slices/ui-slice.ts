@@ -1,4 +1,4 @@
-import type { StateCreator } from 'zustand';
+import type { StateCreator } from "zustand";
 
 export interface UISlice {
   isChatOpen: boolean;
@@ -18,13 +18,14 @@ export const createUISlice: StateCreator<UISlice, [], [], UISlice> = (set) => ({
   isHydrated: false,
 
   toggleChat: () => set((state) => ({ isChatOpen: !state.isChatOpen })),
-  togglePlayerList: () => set((state) => ({ isPlayerListOpen: !state.isPlayerListOpen })),
+  togglePlayerList: () =>
+    set((state) => ({ isPlayerListOpen: !state.isPlayerListOpen })),
   setChatOpen: (open) => set({ isChatOpen: open }),
   setPlayerListOpen: (open) => set({ isPlayerListOpen: open }),
 
   // Initialize UI based on screen size (call this client-side only)
   initializeUI: () => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       const isDesktop = window.innerWidth >= 768;
       set({
         isChatOpen: isDesktop,

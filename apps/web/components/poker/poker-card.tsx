@@ -11,7 +11,13 @@ interface PokerCardProps {
   compact?: boolean;
 }
 
-export function PokerCard({ memberName, vote, isRevealed, isCurrentUser, compact = false }: PokerCardProps) {
+export function PokerCard({
+  memberName,
+  vote,
+  isRevealed,
+  isCurrentUser,
+  compact = false,
+}: PokerCardProps) {
   const hasVoted = vote !== null;
   const [shouldFlip, setShouldFlip] = useState(false);
 
@@ -35,11 +41,15 @@ export function PokerCard({ memberName, vote, isRevealed, isCurrentUser, compact
           shouldFlip && "animate-flip",
           !hasVoted &&
             "border-2 border-dashed border-border bg-card text-muted-foreground",
-          hasVoted && !isRevealed &&
+          hasVoted &&
+            !isRevealed &&
             "bg-primary-500 text-white border border-primary-500 shadow-soft-md scale-105",
-          hasVoted && isRevealed &&
+          hasVoted &&
+            isRevealed &&
             "bg-card border-2 border-primary-500 text-primary-600 shadow-soft-md",
-          isCurrentUser && hasVoted && !isRevealed &&
+          isCurrentUser &&
+            hasVoted &&
+            !isRevealed &&
             "ring-2 ring-primary-300 ring-offset-1 sm:ring-offset-2 ring-offset-background",
         )}
       >
@@ -50,7 +60,9 @@ export function PokerCard({ memberName, vote, isRevealed, isCurrentUser, compact
           compact
             ? "text-[10px] sm:text-xs font-medium truncate max-w-[56px] sm:max-w-[68px] text-center leading-tight transition-colors duration-200"
             : "text-[10px] sm:text-xs font-medium truncate max-w-[64px] sm:max-w-[80px] text-center leading-tight transition-colors duration-200",
-          isCurrentUser ? "text-primary-600 font-semibold" : "text-muted-foreground",
+          isCurrentUser
+            ? "text-primary-600 font-semibold"
+            : "text-muted-foreground",
         )}
       >
         {memberName}

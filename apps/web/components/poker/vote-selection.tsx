@@ -9,7 +9,11 @@ interface VoteSelectionProps {
   onVote: (value: string) => void;
 }
 
-export function VoteSelection({ currentVote, isRevealed, onVote }: VoteSelectionProps) {
+export function VoteSelection({
+  currentVote,
+  isRevealed,
+  onVote,
+}: VoteSelectionProps) {
   return (
     <div>
       <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-2 sm:mb-3 animate-fade-in">

@@ -1,35 +1,59 @@
 "use client";
 
-import type { Member } from "@/lib/types";
+import { useEffect, useState } from "react";
+import type { Player } from "@/lib/types";
 import { getRadialPosition } from "@/lib/utils";
 import { PokerCard } from "./poker-card";
 
 interface PokerCardsProps {
-  members: Member[];
+  players: Player[];
   currentUserId: string;
   isRevealed: boolean;
 }
 
-export function PokerCards({ members, currentUserId, isRevealed }: PokerCardsProps) {
-  const count = members.length;
+function getRadiusForWidth(width: number, scaleFactor: number) {
+  if (width < 640) {
+    return {
+      radiusX: Math.round(120 * scaleFactor),
+      radiusY: Math.round(80 * scaleFactor),
+    };
+  }
+  if (width < 768) {
+    return {
+      radiusX: Math.round(150 * scaleFactor),
+      radiusY: Math.round(100 * scaleFactor),
+    };
+  }
+  return {
+    radiusX: Math.round(180 * scaleFactor),
+    radiusY: Math.round(120 * scaleFactor),
+  };
+}
+
+const SSR_RADIUS = { radiusX: 140, radiusY: 90 };
+
+export function PokerCards({
+  players,
+  currentUserId,
+  isRevealed,
+}: PokerCardsProps) {
+  const count = players.length;
   const compact = count > 8;
 
   // Scale factor grows with member count, capped at 1.8x
   const scaleFactor = Math.min(1.8, Math.max(1, count / 6));
 
-  const getResponsiveRadius = () => {
-    if (typeof window === 'undefined') return { radiusX: 140, radiusY: 90 };
-    const width = window.innerWidth;
-    if (width < 640) {
-      return { radiusX: Math.round(120 * scaleFactor), radiusY: Math.round(80 * scaleFactor) };
-    } else if (width < 768) {
-      return { radiusX: Math.round(150 * scaleFactor), radiusY: Math.round(100 * scaleFactor) };
-    } else {
-      return { radiusX: Math.round(180 * scaleFactor), radiusY: Math.round(120 * scaleFactor) };
-    }
-  };
+  const [radius, setRadius] = useState(SSR_RADIUS);
 
-  const { radiusX, radiusY } = getResponsiveRadius();
+  useEffect(() => {
+    const update = () =>
+      setRadius(getRadiusForWidth(window.innerWidth, scaleFactor));
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, [scaleFactor]);
+
+  const { radiusX, radiusY } = radius;
 
   // Dynamic max-width: base 36rem (xl), scales up with factor
   const tableMaxWidth = `${Math.round(36 * scaleFactor)}rem`;
@@ -44,21 +68,26 @@ export function PokerCards({ members, currentUserId, isRevealed }: PokerCardsPro
       <div className="absolute inset-2 sm:inset-3 rounded-[50px] sm:rounded-[70px] md:rounded-[90px] border border-border/50 bg-muted/30" />
 
       {/* Cards arranged radially */}
-      {members.map((member, index) => {
-        const { x, y } = getRadialPosition(index, members.length, radiusX, radiusY);
+      {players.map((player, index) => {
+        const { x, y } = getRadialPosition(
+          index,
+          players.length,
+          radiusX,
+          radiusY,
+        );
         return (
           <div
-            key={member.id}
+            key={player.id}
             className="absolute transition-all duration-500"
             style={{
               transform: `translate(${x}px, ${y}px)`,
             }}
           >
             <PokerCard
-              memberName={member.name}
-              vote={member.vote}
+              memberName={player.name}
+              vote={player.vote}
               isRevealed={isRevealed}
-              isCurrentUser={member.id === currentUserId}
+              isCurrentUser={player.id === currentUserId}
               compact={compact}
             />
           </div>

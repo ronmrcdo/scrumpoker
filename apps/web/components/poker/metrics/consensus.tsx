@@ -12,7 +12,9 @@ export function Consensus({ stats }: ConsensusProps) {
     return (
       <Card className="animate-fade-in">
         <CardContent className="p-3 sm:p-4 text-center">
-          <span className="text-xs sm:text-sm text-muted-foreground animate-pulse-soft">Waiting for votes...</span>
+          <span className="text-xs sm:text-sm text-muted-foreground animate-pulse-soft">
+            Waiting for votes...
+          </span>
         </CardContent>
       </Card>
     );
@@ -26,9 +28,15 @@ export function Consensus({ stats }: ConsensusProps) {
             <p className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wider">
               Most Common
             </p>
-            <p className="text-2xl sm:text-3xl font-bold text-foreground mt-1 animate-bounce-once">{stats.mode}</p>
+            <p className="text-2xl sm:text-3xl font-bold text-foreground mt-1 animate-bounce-once">
+              {stats.mode}
+            </p>
           </div>
-          <Badge variant={stats.consensus ? "success" : "warning"} className="shrink-0 animate-fade-in" style={{ animationDelay: "100ms" }}>
+          <Badge
+            variant={stats.consensus ? "success" : "warning"}
+            className="shrink-0 animate-fade-in"
+            style={{ animationDelay: "100ms" }}
+          >
             {stats.consensus ? "Consensus" : "Mixed"}
           </Badge>
         </div>

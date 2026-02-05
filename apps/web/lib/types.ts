@@ -1,9 +1,9 @@
-export type MemberRole = 'FACILITATOR' | 'MEMBER';
+export type PlayerRole = "FACILITATOR" | "MEMBER";
 
-export interface Member {
+export interface Player {
   id: string;
   name: string;
-  role: MemberRole;
+  role: PlayerRole;
   vote: string | null;
 }
 
@@ -13,7 +13,7 @@ export interface Room {
   name: string;
   isRevealed: boolean;
   facilitatorId: string;
-  members: Member[];
+  players: Player[];
 }
 
 export interface ChatMessage {
@@ -22,7 +22,25 @@ export interface ChatMessage {
   senderName: string;
   text: string;
   timestamp: string;
-  type: 'User' | 'System';
+  type: "User" | "System";
+}
+
+export interface ChatBroadcastPayload {
+  type: "chat_message";
+  message: ChatMessage;
+}
+
+export interface TypingUser {
+  userId: string;
+  name: string;
+  timestamp: number;
+}
+
+export interface TypingBroadcastPayload {
+  type: "typing_indicator";
+  userId: string;
+  name: string;
+  isTyping: boolean;
 }
 
 export interface VoteStats {

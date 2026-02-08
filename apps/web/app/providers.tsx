@@ -1,5 +1,6 @@
 "use client";
 
+import { Skeleton } from "@repo/ui";
 import { useEffect } from "react";
 
 import { usePokerStore } from "@/lib/store/poker-store";
@@ -19,12 +20,20 @@ export function Providers({ children }: { children: React.ReactNode }) {
       } = await supabase.auth.getSession();
 
       if (session?.user) {
-        setCurrentUserId(session.user.id);
-        setSessionInitialized(true);
-        return;
+        // Validate the session against the DB — it may be stale after a db reset
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        if (user) {
+          setCurrentUserId(user.id);
+          setSessionInitialized(true);
+          return;
+        }
+        // Stale session — sign out to clear invalid cookies
+        await supabase.auth.signOut();
       }
 
-      // No session — sign in anonymously
+      // No session (or stale session cleared) — sign in anonymously
       const { data, error } = await supabase.auth.signInAnonymously();
       if (error) {
         console.error("Anonymous sign-in failed:", error.message);
@@ -48,6 +57,13 @@ export function Providers({ children }: { children: React.ReactNode }) {
     return () => subscription.unsubscribe();
   }, [setCurrentUserId, setSessionInitialized]);
 
-  if (!sessionInitialized) return null;
+  if (!sessionInitialized)
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen gap-4">
+        <Skeleton className="h-8 w-48 rounded-md" />
+        <Skeleton className="h-4 w-32 rounded-md" />
+        <Skeleton className="h-64 w-full max-w-md rounded-lg" />
+      </div>
+    );
   return <>{children}</>;
 }

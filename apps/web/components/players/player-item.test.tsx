@@ -129,24 +129,69 @@ describe("PlayerItem", () => {
   });
 
   describe("facilitator badge", () => {
-    it("should show Host badge for facilitators", () => {
+    it("should show The Dealer badge for facilitators", () => {
       render(
         <PlayerItem
           {...defaultProps}
           player={createMockPlayer({ role: "FACILITATOR" })}
         />,
       );
-      expect(screen.getByText("Host")).toBeInTheDocument();
+      expect(screen.getByText("The Dealer")).toBeInTheDocument();
     });
 
-    it("should not show Host badge for regular members", () => {
+    it("should not show The Dealer badge for regular members", () => {
       render(
         <PlayerItem
           {...defaultProps}
           player={createMockPlayer({ role: "MEMBER" })}
         />,
       );
-      expect(screen.queryByText("Host")).not.toBeInTheDocument();
+      expect(screen.queryByText("The Dealer")).not.toBeInTheDocument();
+    });
+  });
+
+  describe("fold status", () => {
+    it("should show Folded text when player has folded", () => {
+      render(
+        <PlayerItem
+          {...defaultProps}
+          player={createMockPlayer({ vote: "FOLD" })}
+          isRevealed={false}
+        />,
+      );
+      expect(screen.getByText("Folded")).toBeInTheDocument();
+    });
+
+    it("should show Folded with amber styling", () => {
+      render(
+        <PlayerItem
+          {...defaultProps}
+          player={createMockPlayer({ vote: "FOLD" })}
+        />,
+      );
+      const foldedText = screen.getByText("Folded");
+      expect(foldedText).toHaveClass("text-amber-600");
+    });
+
+    it("should show amber indicator dot when folded", () => {
+      const { container } = render(
+        <PlayerItem
+          {...defaultProps}
+          player={createMockPlayer({ vote: "FOLD" })}
+        />,
+      );
+      expect(container.querySelector(".bg-amber-500")).toBeInTheDocument();
+    });
+
+    it("should show Folded even when revealed", () => {
+      render(
+        <PlayerItem
+          {...defaultProps}
+          player={createMockPlayer({ vote: "FOLD" })}
+          isRevealed={true}
+        />,
+      );
+      expect(screen.getByText("Folded")).toBeInTheDocument();
     });
   });
 

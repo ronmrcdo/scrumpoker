@@ -15,6 +15,7 @@ import {
 } from "@repo/ui";
 import { useState } from "react";
 
+import { FOLD_VALUE } from "@/lib/constants/cards";
 import type { Player } from "@/lib/types";
 import { PlayerItem } from "./player-item";
 
@@ -37,6 +38,7 @@ export function PlayerList({
 }: PlayerListProps) {
   const [isLeaveDialogOpen, setIsLeaveDialogOpen] = useState(false);
   const votedCount = players.filter((p) => p.vote !== null).length;
+  const foldCount = players.filter((p) => p.vote === FOLD_VALUE).length;
 
   const handleConfirmLeave = () => {
     setIsLeaveDialogOpen(false);
@@ -50,10 +52,16 @@ export function PlayerList({
         <span className="text-sm font-semibold">Players</span>
         <span className="ml-auto text-xs text-muted-foreground">
           {votedCount}/{players.length} voted
+          {foldCount > 0 && (
+            <span className="text-amber-600 ml-1">({foldCount} folded)</span>
+          )}
         </span>
       </div>
       <Separator />
-      <div className="flex-1 overflow-y-auto p-2 sm:p-2 space-y-1">
+      <ul
+        aria-label="Players"
+        className="flex-1 overflow-y-auto p-2 sm:p-2 space-y-1 list-none"
+      >
         {players.map((player) => (
           <PlayerItem
             key={player.id}
@@ -64,7 +72,7 @@ export function PlayerList({
             onKick={onKick}
           />
         ))}
-      </div>
+      </ul>
       <Separator />
       <div className="p-2 sm:p-3">
         <Dialog open={isLeaveDialogOpen} onOpenChange={setIsLeaveDialogOpen}>

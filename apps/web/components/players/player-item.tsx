@@ -14,7 +14,8 @@ import {
   DialogTitle,
   X,
 } from "@repo/ui";
-import { useState } from "react";
+import { memo, useMemo, useState } from "react";
+import { FOLD_VALUE } from "@/lib/constants/cards";
 import type { Player } from "@/lib/types";
 
 interface PlayerItemProps {
@@ -25,7 +26,7 @@ interface PlayerItemProps {
   onKick?: (playerId: string) => void;
 }
 
-export function PlayerItem({
+export const PlayerItem = memo(function PlayerItem({
   player,
   isCurrentUser,
   isRevealed,
@@ -33,14 +34,19 @@ export function PlayerItem({
   onKick,
 }: PlayerItemProps) {
   const [isKickDialogOpen, setIsKickDialogOpen] = useState(false);
-  const initials = player.name
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
+  const initials = useMemo(
+    () =>
+      player.name
+        .split(" ")
+        .map((n) => n[0])
+        .join("")
+        .toUpperCase()
+        .slice(0, 2),
+    [player.name],
+  );
 
   const hasVoted = player.vote !== null;
+  const hasFolded = player.vote === FOLD_VALUE;
   const canKick = isFacilitator && !isCurrentUser && onKick;
 
   const handleConfirmKick = () => {
@@ -49,7 +55,7 @@ export function PlayerItem({
   };
 
   return (
-    <>
+    <li>
       <div
         className={cn(
           "flex items-center gap-3 px-3 py-2 rounded-lg transition-colors",
@@ -70,7 +76,11 @@ export function PlayerItem({
           <div
             className={cn(
               "absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-card",
-              hasVoted ? "bg-accent-500" : "bg-muted-foreground/40",
+              hasFolded
+                ? "bg-amber-500"
+                : hasVoted
+                  ? "bg-accent-500"
+                  : "bg-muted-foreground/40",
             )}
           />
         </div>
@@ -87,16 +97,25 @@ export function PlayerItem({
             </span>
             {player.role === "FACILITATOR" && (
               <Badge variant="default" className="text-[10px] px-1.5 py-0">
-                Host
+                The Dealer
               </Badge>
             )}
           </div>
-          <span className="text-xs text-muted-foreground">
+          <span
+            className={cn(
+              "text-xs",
+              hasFolded
+                ? "text-amber-600 font-medium"
+                : "text-muted-foreground",
+            )}
+          >
             {!hasVoted
               ? "Thinking..."
-              : isRevealed
-                ? `Voted: ${player.vote}`
-                : "Voted"}
+              : hasFolded
+                ? "Folded"
+                : isRevealed
+                  ? `Voted: ${player.vote}`
+                  : "Voted"}
           </span>
         </div>
 
@@ -135,6 +154,6 @@ export function PlayerItem({
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </>
+    </li>
   );
-}
+});

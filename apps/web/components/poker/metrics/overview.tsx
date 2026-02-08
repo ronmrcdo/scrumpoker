@@ -17,7 +17,7 @@ export function Overview({ stats }: OverviewProps) {
           <p className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wider">
             Average
           </p>
-          <p className="text-xl sm:text-2xl font-bold text-foreground mt-1 transition-all duration-300">
+          <p className="text-xl sm:text-2xl font-bold text-foreground mt-1 transition-colors duration-300">
             {stats.average.toFixed(1)}
           </p>
         </CardContent>
@@ -27,7 +27,7 @@ export function Overview({ stats }: OverviewProps) {
           <p className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wider">
             Spread
           </p>
-          <p className="text-xl sm:text-2xl font-bold text-foreground mt-1 transition-all duration-300">
+          <p className="text-xl sm:text-2xl font-bold text-foreground mt-1 transition-colors duration-300">
             {stats.spread}
           </p>
         </CardContent>

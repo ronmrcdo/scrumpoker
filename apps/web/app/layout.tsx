@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "MySCRUM Poker",
-  description: "Collaborative estimation for agile teams",
+  title: "Ante Up - Real-Time Scrum Poker & Agile Estimation",
+  description: "Real-Time Scrum Poker & Agile Estimation",
 };
 
 export const viewport: Viewport = {
@@ -29,7 +29,14 @@ export const viewport: Viewport = {
 const themeScript = `
 (function() {
   try {
-    var stored = JSON.parse(localStorage.getItem('myscrum-theme') || '{}');
+    // Migrate old theme key to new key (one-time)
+    var oldKey = 'myscrum-theme';
+    var newKey = 'anteup-theme';
+    if (localStorage.getItem(oldKey) && !localStorage.getItem(newKey)) {
+      localStorage.setItem(newKey, localStorage.getItem(oldKey));
+      localStorage.removeItem(oldKey);
+    }
+    var stored = JSON.parse(localStorage.getItem(newKey) || '{}');
     var mode = stored.state && stored.state.mode;
     if (mode === 'system' || !mode) {
       document.documentElement.removeAttribute('data-theme');
@@ -56,6 +63,12 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased`}
       >
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground focus:text-sm focus:font-medium focus:shadow-lg"
+        >
+          Skip to content
+        </a>
         <Providers>
           <ThemeProvider>{children}</ThemeProvider>
         </Providers>

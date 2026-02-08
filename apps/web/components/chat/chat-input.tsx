@@ -1,8 +1,13 @@
 "use client";
 
 import { Button, Input, Send, Smile } from "@repo/ui";
-import EmojiPicker, { type EmojiClickData, Theme } from "emoji-picker-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { type EmojiClickData, Theme } from "emoji-picker-react";
+import dynamic from "next/dynamic";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useShallow } from "zustand/react/shallow";
+
+const emojiPickerImport = () => import("emoji-picker-react");
+const EmojiPicker = dynamic(emojiPickerImport, { ssr: false });
 
 import { usePokerStore } from "@/lib/store/poker-store";
 
@@ -20,11 +25,17 @@ export function ChatInput({ onSend }: ChatInputProps) {
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isTypingRef = useRef(false);
 
-  const broadcastTyping = usePokerStore((s) => s.broadcastTyping);
-  const currentUserId = usePokerStore((s) => s.currentUserId);
-  const room = usePokerStore((s) => s.room);
-  const currentUserName =
-    room?.players.find((p) => p.id === currentUserId)?.name ?? "";
+  const { broadcastTyping, currentUserId, room } = usePokerStore(
+    useShallow((s) => ({
+      broadcastTyping: s.broadcastTyping,
+      currentUserId: s.currentUserId,
+      room: s.room,
+    })),
+  );
+  const currentUserName = useMemo(
+    () => room?.players.find((p) => p.id === currentUserId)?.name ?? "",
+    [room?.players, currentUserId],
+  );
 
   // Send typing indicator with debounce
   const sendTypingIndicator = useCallback(
@@ -78,8 +89,18 @@ export function ChatInput({ onSend }: ChatInputProps) {
       }
     };
 
+    const handleEscapeKey = (event: KeyboardEvent) => {
+      if (showEmojiPicker && event.key === "Escape") {
+        setShowEmojiPicker(false);
+      }
+    };
+
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleEscapeKey);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscapeKey);
+    };
   }, [showEmojiPicker]);
 
   const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -142,7 +163,10 @@ export function ChatInput({ onSend }: ChatInputProps) {
           variant="ghost"
           size="icon"
           className="h-9 w-9 sm:h-10 sm:w-10 shrink-0"
+          onMouseEnter={() => emojiPickerImport()}
           onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+          aria-label="Toggle emoji picker"
+          aria-expanded={showEmojiPicker}
         >
           <Smile className="h-4 w-4" />
         </Button>
@@ -150,6 +174,7 @@ export function ChatInput({ onSend }: ChatInputProps) {
           type="submit"
           size="icon"
           className="h-9 w-9 sm:h-10 sm:w-10 shrink-0"
+          aria-label="Send message"
         >
           <Send className="h-4 w-4" />
         </Button>

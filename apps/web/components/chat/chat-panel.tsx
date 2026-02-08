@@ -1,7 +1,7 @@
 "use client";
 
 import { Button, MessageSquare, Separator, X } from "@repo/ui";
-import { useEffect, useRef } from "react";
+import { memo, useEffect, useMemo, useRef } from "react";
 
 import { usePokerStore } from "@/lib/store/poker-store";
 import type { ChatMessage as ChatMessageType } from "@/lib/types";
@@ -15,9 +15,12 @@ interface ChatPanelProps {
   onClose: () => void;
 }
 
-function TypingIndicator() {
+const TypingIndicator = memo(function TypingIndicator() {
   const typingUsers = usePokerStore((s) => s.typingUsers);
-  const typingUsersArray = Array.from(typingUsers.values());
+  const typingUsersArray = useMemo(
+    () => Array.from(typingUsers.values()),
+    [typingUsers],
+  );
 
   if (typingUsersArray.length === 0) return null;
 
@@ -28,16 +31,19 @@ function TypingIndicator() {
       : "Multiple users are typing";
 
   return (
-    <div className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-muted-foreground animate-fade-in">
+    <output
+      aria-live="polite"
+      className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-muted-foreground animate-fade-in"
+    >
       <span>{text}</span>
       <span className="flex gap-0.5">
         <span className="w-1 h-1 bg-muted-foreground rounded-full animate-bounce [animation-delay:0ms]" />
         <span className="w-1 h-1 bg-muted-foreground rounded-full animate-bounce [animation-delay:150ms]" />
         <span className="w-1 h-1 bg-muted-foreground rounded-full animate-bounce [animation-delay:300ms]" />
       </span>
-    </div>
+    </output>
   );
-}
+});
 
 export function ChatPanel({
   messages,
@@ -45,16 +51,20 @@ export function ChatPanel({
   onSend,
   onClose,
 }: ChatPanelProps) {
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLLIElement>(null);
   const prevLengthRef = useRef(messages.length);
 
   // Scroll to bottom when new messages arrive
+  // Use instant scroll for message bursts to avoid competing smooth-scroll animations
   useEffect(() => {
     if (messages.length > prevLengthRef.current) {
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+      const burst = messages.length - prevLengthRef.current > 3;
+      messagesEndRef.current?.scrollIntoView({
+        behavior: burst ? "instant" : "smooth",
+      });
     }
     prevLengthRef.current = messages.length;
-  });
+  }, [messages.length]);
 
   return (
     <div className="flex flex-col h-full">
@@ -73,7 +83,11 @@ export function ChatPanel({
         </Button>
       </div>
       <Separator />
-      <div className="flex-1 overflow-y-auto overflow-x-hidden p-2 sm:p-3 space-y-2 sm:space-y-3">
+      <ul
+        role="log"
+        aria-label="Chat messages"
+        className="flex-1 overflow-y-auto overflow-x-hidden p-2 sm:p-3 space-y-2 sm:space-y-3 list-none"
+      >
         {messages.map((msg) => (
           <ChatMessage
             key={msg.id}
@@ -81,8 +95,8 @@ export function ChatPanel({
             isOwnMessage={msg.senderId === currentUserId}
           />
         ))}
-        <div ref={messagesEndRef} />
-      </div>
+        <li aria-hidden="true" ref={messagesEndRef} />
+      </ul>
       <TypingIndicator />
       <ChatInput onSend={onSend} />
     </div>

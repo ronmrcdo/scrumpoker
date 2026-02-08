@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@repo/ui";
+import { memo } from "react";
 import type { ChatMessage as ChatMessageType } from "@/lib/types";
 
 interface ChatMessageProps {
@@ -8,19 +9,22 @@ interface ChatMessageProps {
   isOwnMessage: boolean;
 }
 
-export function ChatMessage({ message, isOwnMessage }: ChatMessageProps) {
+export const ChatMessage = memo(function ChatMessage({
+  message,
+  isOwnMessage,
+}: ChatMessageProps) {
   if (message.type === "System") {
     return (
-      <div className="flex justify-center py-1 animate-fade-in">
+      <li className="flex justify-center py-1 animate-fade-in">
         <span className="text-xs text-muted-foreground italic bg-muted px-3 py-1 rounded-full">
           {message.text}
         </span>
-      </div>
+      </li>
     );
   }
 
   return (
-    <div
+    <li
       className={cn(
         "flex flex-col gap-0.5",
         isOwnMessage
@@ -35,7 +39,7 @@ export function ChatMessage({ message, isOwnMessage }: ChatMessageProps) {
       )}
       <div
         className={cn(
-          "max-w-[85%] px-3 py-2 rounded-2xl text-sm transition-all duration-200",
+          "max-w-[85%] px-3 py-2 rounded-2xl text-sm transition-shadow duration-200",
           "hover:shadow-md break-words",
           isOwnMessage
             ? "bg-primary-100 text-primary-800 rounded-br-md"
@@ -48,6 +52,6 @@ export function ChatMessage({ message, isOwnMessage }: ChatMessageProps) {
       <span className="text-[10px] text-muted-foreground mx-3">
         {message.timestamp}
       </span>
-    </div>
+    </li>
   );
-}
+});

@@ -1,22 +1,30 @@
 "use client";
 
 import { cn } from "@repo/ui";
-import { CARD_VALUES } from "@/lib/constants/cards";
+import { memo, useCallback } from "react";
+import { CARD_VALUES, FOLD_VALUE } from "@/lib/constants/cards";
 
 interface VoteSelectionProps {
   currentVote: string | null;
   isRevealed: boolean;
-  onVote: (value: string) => void;
+  onVote: (value: string | null) => void;
 }
 
-export function VoteSelection({
+export const VoteSelection = memo(function VoteSelection({
   currentVote,
   isRevealed,
   onVote,
 }: VoteSelectionProps) {
+  const handleVote = useCallback(
+    (val: string) => {
+      onVote(currentVote === val ? null : val);
+    },
+    [currentVote, onVote],
+  );
+
   return (
     <div>
-      <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-2 sm:mb-3 animate-fade-in">
+      <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-2 sm:mb-3">
         Choose Your Card
       </h3>
       <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 sm:gap-2.5">
@@ -25,13 +33,13 @@ export function VoteSelection({
             key={val}
             type="button"
             disabled={isRevealed}
-            onClick={() => onVote(val)}
+            onClick={() => handleVote(val)}
             style={{ animationDelay: `${index * 50}ms` }}
             className={cn(
               "h-14 sm:h-16 rounded-lg border-2 text-lg sm:text-xl font-bold",
-              "transition-all duration-300 ease-out",
+              "transition-[transform,box-shadow,background-color,border-color] duration-300 ease-out",
               "hover:shadow-soft-md hover:-translate-y-1 hover:scale-105",
-              "active:scale-95 active:transition-transform active:duration-75",
+              "active:scale-95 active:duration-75",
               "disabled:opacity-50 disabled:pointer-events-none touch-manipulation",
               "animate-scale-in",
               currentVote === val
@@ -43,6 +51,24 @@ export function VoteSelection({
           </button>
         ))}
       </div>
+      <button
+        type="button"
+        disabled={isRevealed}
+        onClick={() => handleVote(FOLD_VALUE)}
+        className={cn(
+          "w-full mt-2 sm:mt-3 h-10 sm:h-11 rounded-lg border-2 text-sm font-semibold",
+          "transition-[transform,box-shadow,background-color,border-color] duration-300 ease-out",
+          "hover:shadow-soft-md",
+          "active:scale-[0.98] active:duration-75",
+          "disabled:opacity-50 disabled:pointer-events-none touch-manipulation",
+          "animate-scale-in",
+          currentVote === FOLD_VALUE
+            ? "bg-amber-500 text-white border-amber-500 shadow-soft-md"
+            : "bg-card text-amber-600 border-amber-300 hover:border-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/20",
+        )}
+      >
+        Fold — Need More Info
+      </button>
     </div>
   );
-}
+});

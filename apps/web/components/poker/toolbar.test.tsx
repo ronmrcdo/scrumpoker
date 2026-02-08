@@ -8,6 +8,7 @@ describe("Toolbar", () => {
   const defaultProps = {
     isFacilitator: true,
     isRevealed: false,
+    isCounting: false,
     onToggleReveal: vi.fn(),
     onReset: vi.fn(),
   };
@@ -35,6 +36,7 @@ describe("Toolbar", () => {
         <Toolbar
           isFacilitator={false}
           isRevealed={false}
+          isCounting={false}
           onToggleReveal={vi.fn()}
           onReset={vi.fn()}
         />,
@@ -54,6 +56,16 @@ describe("Toolbar", () => {
     it("should show 'Hide' text when revealed", () => {
       render(<Toolbar {...defaultProps} isRevealed={true} />);
       expect(screen.getByRole("button", { name: /hide/i })).toBeInTheDocument();
+    });
+
+    it("should disable reveal button when counting", () => {
+      render(<Toolbar {...defaultProps} isCounting={true} />);
+      expect(screen.getByRole("button", { name: /reveal/i })).toBeDisabled();
+    });
+
+    it("should enable reveal button when not counting", () => {
+      render(<Toolbar {...defaultProps} isCounting={false} />);
+      expect(screen.getByRole("button", { name: /reveal/i })).toBeEnabled();
     });
 
     it("should call onToggleReveal when reveal button is clicked", async () => {
@@ -184,7 +196,6 @@ describe("Toolbar", () => {
         />,
       );
 
-      // Reveal
       await user.click(screen.getByRole("button", { name: /reveal/i }));
       expect(onToggleReveal).toHaveBeenCalledTimes(1);
 

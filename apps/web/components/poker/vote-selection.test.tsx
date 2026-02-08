@@ -25,10 +25,10 @@ describe("VoteSelection", () => {
       }
     });
 
-    it("should render exactly 8 buttons", () => {
+    it("should render 8 card buttons plus 1 fold button", () => {
       render(<VoteSelection {...defaultProps} />);
       const buttons = screen.getAllByRole("button");
-      expect(buttons).toHaveLength(8);
+      expect(buttons).toHaveLength(9);
     });
   });
 
@@ -180,11 +180,12 @@ describe("VoteSelection", () => {
       expect(container.querySelector(".grid")).toBeInTheDocument();
     });
 
-    it("should apply animation delay to buttons", () => {
+    it("should apply animation delay to card buttons", () => {
       render(<VoteSelection {...defaultProps} />);
 
-      const buttons = screen.getAllByRole("button");
-      buttons.forEach((button, index) => {
+      const cardValues = ["1", "2", "3", "5", "8", "13", "21", "☕"];
+      cardValues.forEach((value, index) => {
+        const button = screen.getByRole("button", { name: value });
         expect(button).toHaveStyle({
           animationDelay: `${index * 50}ms`,
         });

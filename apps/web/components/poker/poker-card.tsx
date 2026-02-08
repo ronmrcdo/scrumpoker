@@ -2,6 +2,7 @@
 
 import { cn } from "@repo/ui";
 import { useEffect, useState } from "react";
+import { FOLD_VALUE } from "@/lib/constants/cards";
 
 interface PokerCardProps {
   memberName: string;
@@ -19,6 +20,7 @@ export function PokerCard({
   compact = false,
 }: PokerCardProps) {
   const hasVoted = vote !== null;
+  const isFold = vote === FOLD_VALUE;
   const [shouldFlip, setShouldFlip] = useState(false);
 
   // Trigger flip animation when card is revealed
@@ -37,14 +39,18 @@ export function PokerCard({
           compact
             ? "w-10 h-14 sm:w-12 sm:h-16 rounded-md flex items-center justify-center text-sm sm:text-base font-bold shadow-soft-sm"
             : "w-12 h-16 sm:w-14 sm:h-20 rounded-md sm:rounded-lg flex items-center justify-center text-base sm:text-lg font-bold shadow-soft-sm",
-          "transition-all duration-300",
+          "transition-[transform,background-color,border-color,box-shadow,color] duration-300",
           shouldFlip && "animate-flip",
           !hasVoted &&
             "border-2 border-dashed border-border bg-card text-muted-foreground",
-          hasVoted &&
+          isFold &&
+            "bg-amber-100 border-2 border-amber-400 text-amber-600 shadow-soft-md dark:bg-amber-950/30",
+          !isFold &&
+            hasVoted &&
             !isRevealed &&
             "bg-primary-500 text-white border border-primary-500 shadow-soft-md scale-105",
-          hasVoted &&
+          !isFold &&
+            hasVoted &&
             isRevealed &&
             "bg-card border-2 border-primary-500 text-primary-600 shadow-soft-md",
           isCurrentUser &&
@@ -53,7 +59,7 @@ export function PokerCard({
             "ring-2 ring-primary-300 ring-offset-1 sm:ring-offset-2 ring-offset-background",
         )}
       >
-        {!hasVoted ? "?" : isRevealed ? vote : "✓"}
+        {!hasVoted ? "?" : isFold ? "✋" : isRevealed ? vote : "✓"}
       </div>
       <span
         className={cn(

@@ -12,6 +12,7 @@ import {
   Input,
   Label,
 } from "@repo/ui";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -28,6 +29,7 @@ interface JoinRoomDialogProps {
 }
 
 export function JoinRoomDialog({ roomCode }: JoinRoomDialogProps) {
+  const router = useRouter();
   const joinRoom = usePokerStore((s) => s.joinRoom);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
@@ -47,16 +49,21 @@ export function JoinRoomDialog({ roomCode }: JoinRoomDialogProps) {
       setFormError(
         error instanceof Error ? error.message : "Failed to join room",
       );
+    } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <Dialog open={true}>
+    <Dialog
+      open={true}
+      onOpenChange={(open) => {
+        if (!open && !isSubmitting) router.push("/");
+      }}
+    >
       <DialogContent
         className="sm:max-w-md"
         onInteractOutside={(e) => e.preventDefault()}
-        onEscapeKeyDown={(e) => e.preventDefault()}
       >
         <DialogHeader>
           <DialogTitle className="text-lg sm:text-xl">Join Room</DialogTitle>
@@ -69,7 +76,10 @@ export function JoinRoomDialog({ roomCode }: JoinRoomDialogProps) {
           className="space-y-3 sm:space-y-4"
         >
           {formError && (
-            <div className="p-3 text-xs sm:text-sm bg-red-50 dark:bg-red-950/20 text-red-600 dark:text-red-400 rounded-md border border-red-200 dark:border-red-900">
+            <div
+              role="alert"
+              className="p-3 text-xs sm:text-sm bg-red-50 dark:bg-red-950/20 text-red-600 dark:text-red-400 rounded-md border border-red-200 dark:border-red-900"
+            >
               {formError}
             </div>
           )}
@@ -82,18 +92,31 @@ export function JoinRoomDialog({ roomCode }: JoinRoomDialogProps) {
               placeholder="Enter your name"
               className="h-10 sm:h-11 text-sm sm:text-base"
               disabled={isSubmitting}
+              aria-invalid={!!form.formState.errors.userName}
+              aria-describedby={
+                form.formState.errors.userName ? "join-name-error" : undefined
+              }
               {...form.register("userName")}
             />
             {form.formState.errors.userName && (
-              <p className="text-xs text-red-500">
+              <p id="join-name-error" className="text-xs text-red-500">
                 {form.formState.errors.userName.message}
               </p>
             )}
           </div>
-          <DialogFooter>
+          <DialogFooter className="flex flex-col-reverse sm:flex-row gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full sm:w-auto h-10 sm:h-11 text-sm sm:text-base"
+              onClick={() => router.push("/")}
+              disabled={isSubmitting}
+            >
+              Go Back
+            </Button>
             <Button
               type="submit"
-              className="w-full h-10 sm:h-11 text-sm sm:text-base"
+              className="w-full sm:w-auto h-10 sm:h-11 text-sm sm:text-base"
               disabled={isSubmitting}
             >
               {isSubmitting ? "Joining..." : "Join Room"}

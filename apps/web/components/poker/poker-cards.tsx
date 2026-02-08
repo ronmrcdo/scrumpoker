@@ -10,6 +10,7 @@ interface PokerCardsProps {
   players: Player[];
   currentUserId: string;
   isRevealed: boolean;
+  countdown?: number | null;
 }
 
 function getRadiusForWidth(width: number, scaleFactor: number) {
@@ -65,7 +66,6 @@ const PlayerCard = memo(function PlayerCard({
   const style = useMemo(
     () => ({
       transform: `translate(${position.x}px, ${position.y}px)`,
-      willChange: "transform" as const,
     }),
     [position.x, position.y],
   );
@@ -87,12 +87,16 @@ export function PokerCards({
   players,
   currentUserId,
   isRevealed,
+  countdown,
 }: PokerCardsProps) {
   const count = players.length;
   const compact = count > 8;
 
   // Scale factor grows with member count, capped at 1.8x
-  const scaleFactor = Math.min(1.8, Math.max(1, count / 6));
+  const scaleFactor = useMemo(
+    () => Math.min(1.8, Math.max(1, count / 6)),
+    [count],
+  );
 
   const [radius, setRadius] = useState(SSR_RADIUS);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -122,17 +126,32 @@ export function PokerCards({
 
   const { radiusX, radiusY } = radius;
 
-  // Dynamic max-width: base 36rem (xl), scales up with factor
-  const tableMaxWidth = `${Math.round(36 * scaleFactor)}rem`;
+  // Memoize style object to prevent new reference on every render
+  const tableStyle = useMemo(
+    () => ({ maxWidth: `${Math.round(36 * scaleFactor)}rem` }),
+    [scaleFactor],
+  );
 
   return (
     <div
       className="relative w-full aspect-[5/3] flex items-center justify-center px-2 sm:px-0"
-      style={{ maxWidth: tableMaxWidth }}
+      style={tableStyle}
     >
       {/* Table surface */}
       <div className="absolute inset-0 rounded-[60px] sm:rounded-[80px] md:rounded-[100px] border-2 border-border bg-card shadow-soft-lg" />
       <div className="absolute inset-2 sm:inset-3 rounded-[50px] sm:rounded-[70px] md:rounded-[90px] border border-border/50 bg-muted/30" />
+
+      {/* Countdown overlay */}
+      {countdown != null && countdown > 0 && (
+        <div className="absolute inset-0 z-10 flex items-center justify-center">
+          <span
+            key={countdown}
+            className="text-6xl sm:text-7xl md:text-8xl font-bold text-foreground/80 animate-countdown-pulse"
+          >
+            {countdown}
+          </span>
+        </div>
+      )}
 
       {/* Cards arranged radially */}
       {players.map((player, index) => (

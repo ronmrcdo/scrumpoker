@@ -44,6 +44,7 @@ export function HeroSection() {
                   className="w-4 h-4 text-accent"
                   fill="currentColor"
                   viewBox="0 0 20 20"
+                  role="presentation"
                 >
                   <path
                     fillRule="evenodd"
@@ -58,6 +59,7 @@ export function HeroSection() {
                   className="w-4 h-4 text-accent"
                   fill="currentColor"
                   viewBox="0 0 20 20"
+                  role="presentation"
                 >
                   <path
                     fillRule="evenodd"
@@ -72,6 +74,7 @@ export function HeroSection() {
                   className="w-4 h-4 text-accent"
                   fill="currentColor"
                   viewBox="0 0 20 20"
+                  role="presentation"
                 >
                   <path
                     fillRule="evenodd"
@@ -127,6 +130,7 @@ export function HeroSection() {
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
+            role="presentation"
           >
             <path
               strokeLinecap="round"

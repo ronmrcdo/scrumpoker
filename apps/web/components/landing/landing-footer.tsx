@@ -8,14 +8,12 @@ export function LandingFooter() {
       <div className="container mx-auto px-4 py-8">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-1.5">
-            <span className="text-sm font-semibold text-primary">MySCRUM</span>
-            <span className="text-sm font-light text-muted-foreground">
-              Poker
-            </span>
+            <span className="text-sm font-semibold text-primary">Ante</span>
+            <span className="text-sm font-light text-muted-foreground">Up</span>
           </div>
 
           <p className="text-sm text-muted-foreground">
-            {currentYear} MySCRUM Poker. Built for agile teams.
+            {currentYear} Ante Up. Built for agile teams.
           </p>
 
           <a

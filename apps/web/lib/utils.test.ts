@@ -164,6 +164,43 @@ describe("getVoteStats", () => {
     expect(result!.mode).toBe("5");
     expect(result!.consensus).toBe(true); // 2/2 numeric votes = 100%
   });
+
+  it("should ignore fold votes in calculations", () => {
+    const players: Player[] = [
+      { id: "1", name: "Alice", role: "FACILITATOR", vote: "5" },
+      { id: "2", name: "Bob", role: "MEMBER", vote: "FOLD" },
+      { id: "3", name: "Charlie", role: "MEMBER", vote: "5" },
+    ];
+    const result = getVoteStats(players);
+
+    expect(result!.average).toBe(5);
+    expect(result!.mode).toBe("5");
+    expect(result!.spread).toBe(0);
+    expect(result!.distribution).toEqual({ "5": 2 });
+  });
+
+  it("should return null when all votes are fold", () => {
+    const players: Player[] = [
+      { id: "1", name: "Alice", role: "MEMBER", vote: "FOLD" },
+      { id: "2", name: "Bob", role: "MEMBER", vote: "FOLD" },
+    ];
+    const result = getVoteStats(players);
+    expect(result).toBeNull();
+  });
+
+  it("should handle mixed fold, coffee, and numeric votes", () => {
+    const players: Player[] = [
+      { id: "1", name: "Alice", role: "FACILITATOR", vote: "3" },
+      { id: "2", name: "Bob", role: "MEMBER", vote: "FOLD" },
+      { id: "3", name: "Charlie", role: "MEMBER", vote: "☕" },
+      { id: "4", name: "Diana", role: "MEMBER", vote: "5" },
+      { id: "5", name: "Eve", role: "MEMBER", vote: null },
+    ];
+    const result = getVoteStats(players);
+
+    expect(result!.average).toBe(4);
+    expect(result!.distribution).toEqual({ "3": 1, "5": 1 });
+  });
 });
 
 describe("getRadialPosition", () => {

@@ -7,26 +7,6 @@ import type { SessionSlice } from "./session-slice";
 
 const supabase = createClient();
 
-function getSecureRandomIndex(max: number): number {
-  const array = new Uint32Array(1);
-  crypto.getRandomValues(array);
-  return (array[0] ?? 0) % max;
-}
-
-function generateRoomCode(): string {
-  const letters = "ABCDEFGHJKLMNPQRSTUVWXYZ";
-  const alphanumeric = "0123456789ABCDEFGHJKLMNPQRSTUVWXYZ";
-  let code = "";
-  for (let i = 0; i < 3; i++) {
-    code += letters[getSecureRandomIndex(letters.length)];
-  }
-  code += "-";
-  for (let i = 0; i < 3; i++) {
-    code += alphanumeric[getSecureRandomIndex(alphanumeric.length)];
-  }
-  return code;
-}
-
 interface DbPlayer {
   user_id: string;
   name: string;
@@ -46,22 +26,27 @@ function mapPlayers(players: DbPlayer[]): Player[] {
 export async function fetchRoomWithPlayers(
   roomId: string,
 ): Promise<Room | null> {
-  const { data: room } = await supabase
-    .from("rooms")
-    .select("*, players(*)")
-    .eq("id", roomId)
-    .gt("expires_at", new Date().toISOString())
-    .single();
+  // Run both queries in parallel to halve latency
+  const [roomResult, playersResult] = await Promise.all([
+    supabase
+      .from("rooms")
+      .select("*")
+      .eq("id", roomId)
+      .gt("expires_at", new Date().toISOString())
+      .single(),
+    supabase.from("players_masked").select("*").eq("room_id", roomId),
+  ]);
 
-  if (!room) return null;
+  if (!roomResult.data) return null;
 
+  const room = roomResult.data;
   return {
     id: room.id,
     code: room.code,
     name: room.name,
     isRevealed: room.is_revealed,
     facilitatorId: room.facilitator_id,
-    players: mapPlayers(room.players),
+    players: mapPlayers(playersResult.data ?? []),
   };
 }
 
@@ -71,9 +56,8 @@ export interface RoomSlice {
   setRoom: (room: Room | null) => void;
   setWasKicked: (kicked: boolean) => void;
   fetchRoom: (roomId: string) => Promise<Room | null>;
-  createRoom: (name: string, userName: string) => Promise<string>;
   joinRoom: (code: string, userName: string) => Promise<string>;
-  castVote: (value: string) => Promise<void>;
+  castVote: (value: string | null) => Promise<void>;
   toggleReveal: () => Promise<void>;
   resetVotes: () => Promise<void>;
   leaveRoom: () => Promise<void>;
@@ -99,79 +83,23 @@ export const createRoomSlice: StateCreator<
     return room;
   },
 
-  createRoom: async (name, userName) => {
-    const userId = get().currentUserId;
-    if (!userId) throw new Error("Not authenticated");
-
-    const code = generateRoomCode();
-
-    const { data: room, error } = await supabase
-      .from("rooms")
-      .insert({ name, code, facilitator_id: userId })
-      .select()
-      .single();
-
-    if (error || !room) {
-      throw new Error(error?.message ?? "Failed to create room");
-    }
-
-    const { error: playerError } = await supabase.from("players").insert({
-      room_id: room.id,
-      user_id: userId,
-      name: userName,
-      role: "FACILITATOR",
-    });
-
-    if (playerError) {
-      throw new Error(playerError.message);
-    }
-
-    const fullRoom = await fetchRoomWithPlayers(room.id);
-    if (fullRoom) set({ room: fullRoom });
-    return room.id;
-  },
-
   joinRoom: async (code, userName) => {
     const userId = get().currentUserId;
     if (!userId) throw new Error("Not authenticated");
 
-    const { data: room } = await supabase
-      .from("rooms")
-      .select("id")
-      .eq("code", code.toUpperCase())
-      .gt("expires_at", new Date().toISOString())
-      .single();
+    const { data: roomId, error } = await supabase.rpc("join_room", {
+      p_room_code: code,
+      p_user_name: userName,
+      p_max_players: MAX_PLAYERS,
+    });
 
-    if (!room) throw new Error("Room not found");
-
-    // Check player count before joining
-    const { count } = await supabase
-      .from("players")
-      .select("*", { count: "exact", head: true })
-      .eq("room_id", room.id);
-
-    // Check if user is already in the room (rejoin case)
-    const { data: existingPlayer } = await supabase
-      .from("players")
-      .select("user_id")
-      .eq("room_id", room.id)
-      .eq("user_id", userId)
-      .single();
-
-    if (!existingPlayer && count !== null && count >= MAX_PLAYERS) {
-      throw new Error(`Room is full (max ${MAX_PLAYERS} players)`);
+    if (error) {
+      throw new Error(error.message);
     }
 
-    await supabase
-      .from("players")
-      .upsert(
-        { room_id: room.id, user_id: userId, name: userName, role: "MEMBER" },
-        { onConflict: "room_id,user_id" },
-      );
-
-    const fullRoom = await fetchRoomWithPlayers(room.id);
+    const fullRoom = await fetchRoomWithPlayers(roomId);
     if (fullRoom) set({ room: fullRoom });
-    return room.id;
+    return roomId;
   },
 
   castVote: async (value) => {
@@ -237,17 +165,11 @@ export const createRoomSlice: StateCreator<
     });
 
     try {
-      const { error: roomError } = await supabase
-        .from("rooms")
-        .update({ is_revealed: false })
-        .eq("id", room.id);
+      const { error } = await supabase.rpc("reset_votes", {
+        p_room_id: room.id,
+      });
 
-      const { error: playersError } = await supabase
-        .from("players")
-        .update({ vote: null })
-        .eq("room_id", room.id);
-
-      if (roomError || playersError) set({ room: previousRoom });
+      if (error) set({ room: previousRoom });
     } catch {
       set({ room: previousRoom });
     }

@@ -16,7 +16,7 @@ export const useThemeStore = create<ThemeState>()(
       setMode: (mode) => set({ mode }),
     }),
     {
-      name: "myscrum-theme",
+      name: "anteup-theme",
     },
   ),
 );

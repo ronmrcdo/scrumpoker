@@ -1,5 +1,5 @@
 {
-  "name": "myscrum",
+  "name": "anteup",
   "private": true,
   "scripts": {
     "build": "turbo run build",
@@ -11,8 +11,6 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.3.13",
-    "prettier": "^3.6.0",
-    "prettier-plugin-tailwindcss": "^0.7.1",
     "supabase": "^2.75.4",
     "turbo": "^2.8.2"
   },

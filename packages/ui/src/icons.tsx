@@ -30,5 +30,7 @@ export {
   Sun,
   User,
   Users,
+  Wifi,
+  WifiOff,
   X,
 } from "lucide-react";

@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { PostHogProvider } from "@/components/providers/posthog-provider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { Providers } from "./providers";
 import "./globals.css";
@@ -69,9 +70,11 @@ export default function RootLayout({
         >
           Skip to content
         </a>
-        <Providers>
-          <ThemeProvider>{children}</ThemeProvider>
-        </Providers>
+        <PostHogProvider>
+          <Providers>
+            <ThemeProvider>{children}</ThemeProvider>
+          </Providers>
+        </PostHogProvider>
       </body>
     </html>
   );

@@ -3,6 +3,7 @@
 import { cn } from "@repo/ui";
 import { useMemo } from "react";
 import { useShallow } from "zustand/react/shallow";
+import { trackEvent } from "@/lib/analytics";
 import { usePokerStore } from "@/lib/store/poker-store";
 import { ChatPanel } from "../chat/chat-panel";
 
@@ -65,9 +66,13 @@ export function ChatSidebar() {
         <ChatPanel
           messages={chatMessages}
           currentUserId={currentUserId}
-          onSend={(text) =>
-            sendChatMessage(text, currentUserId, currentUserName)
-          }
+          onSend={(text) => {
+            sendChatMessage(text, currentUserId, currentUserName);
+            trackEvent("chat_message_sent", {
+              room_id: room.id,
+              message_length: text.length,
+            });
+          }}
           onClose={toggleChat}
         />
       </aside>

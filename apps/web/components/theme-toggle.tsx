@@ -10,6 +10,7 @@ import {
   Moon,
   Sun,
 } from "@repo/ui";
+import { trackEvent } from "@/lib/analytics";
 import { useThemeStore } from "@/lib/store/theme-store";
 
 export function ThemeToggle() {
@@ -26,15 +27,30 @@ export function ThemeToggle() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => setMode("light")}>
+        <DropdownMenuItem
+          onClick={() => {
+            setMode("light");
+            trackEvent("theme_changed", { theme_mode: "light" });
+          }}
+        >
           <Sun className="h-4 w-4 mr-2" />
           Light
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setMode("dark")}>
+        <DropdownMenuItem
+          onClick={() => {
+            setMode("dark");
+            trackEvent("theme_changed", { theme_mode: "dark" });
+          }}
+        >
           <Moon className="h-4 w-4 mr-2" />
           Dark
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setMode("system")}>
+        <DropdownMenuItem
+          onClick={() => {
+            setMode("system");
+            trackEvent("theme_changed", { theme_mode: "system" });
+          }}
+        >
           <Monitor className="h-4 w-4 mr-2" />
           System
         </DropdownMenuItem>

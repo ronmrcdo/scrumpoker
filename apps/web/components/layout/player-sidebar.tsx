@@ -3,6 +3,7 @@
 import { cn } from "@repo/ui";
 import { useRouter } from "next/navigation";
 import { useShallow } from "zustand/react/shallow";
+import { trackEvent } from "@/lib/analytics";
 import { usePokerStore } from "@/lib/store/poker-store";
 import { PlayerList } from "../players/player-list";
 
@@ -31,6 +32,11 @@ export function PlayerSidebar() {
   const isFacilitator = room.facilitatorId === currentUserId;
 
   const handleLeave = async () => {
+    trackEvent("room_left", {
+      room_id: room.id,
+      player_role: isFacilitator ? "FACILITATOR" : "MEMBER",
+      player_count: room.players.length,
+    });
     await leaveRoom();
     router.push("/");
   };
@@ -74,7 +80,13 @@ export function PlayerSidebar() {
           isRevealed={room.isRevealed}
           isFacilitator={isFacilitator}
           onLeave={handleLeave}
-          onKick={kickPlayer}
+          onKick={(playerId) => {
+            trackEvent("player_kicked", {
+              room_id: room.id,
+              player_count_after: room.players.length - 1,
+            });
+            kickPlayer(playerId);
+          }}
         />
       </aside>
     </>

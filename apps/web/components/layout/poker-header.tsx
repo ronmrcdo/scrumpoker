@@ -2,6 +2,7 @@
 
 import { Button, Check, Menu, MessageSquare, Share2 } from "@repo/ui";
 import { useState } from "react";
+import { trackEvent } from "@/lib/analytics";
 import { ThemeToggle } from "../theme-toggle";
 
 interface PokerHeaderProps {
@@ -26,6 +27,7 @@ export function PokerHeader({
   const shareRoom = () => {
     const url = `${window.location.origin}/poker/${roomId}`;
     navigator.clipboard.writeText(url);
+    trackEvent("invite_link_copied", { room_id: roomId, source: "header" });
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -37,7 +39,13 @@ export function PokerHeader({
           variant={isPlayerListOpen ? "default" : "ghost"}
           size="icon"
           className="h-8 w-8 sm:h-9 sm:w-9 shrink-0"
-          onClick={onTogglePlayerList}
+          onClick={() => {
+            trackEvent("player_sidebar_toggled", {
+              is_open: !isPlayerListOpen,
+              room_id: roomId,
+            });
+            onTogglePlayerList();
+          }}
           aria-label="Toggle player list"
         >
           <Menu className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
@@ -73,7 +81,13 @@ export function PokerHeader({
           variant={isChatOpen ? "default" : "ghost"}
           size="icon"
           className="h-8 w-8 sm:h-9 sm:w-9"
-          onClick={onToggleChat}
+          onClick={() => {
+            trackEvent("chat_sidebar_toggled", {
+              is_open: !isChatOpen,
+              room_id: roomId,
+            });
+            onToggleChat();
+          }}
           aria-label={isChatOpen ? "Close chat" : "Open chat"}
         >
           <MessageSquare className="h-3.5 w-3.5 sm:h-4 sm:w-4" />

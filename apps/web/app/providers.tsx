@@ -3,10 +3,16 @@
 import { Skeleton } from "@repo/ui";
 import { useEffect } from "react";
 
+import { useTokenRefresh } from "@/lib/hooks/use-token-refresh";
 import { usePokerStore } from "@/lib/store/poker-store";
 import { createClient } from "@/lib/supabase/client";
 
 const supabase = createClient();
+
+function TokenRefreshManager() {
+  useTokenRefresh();
+  return null;
+}
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const setCurrentUserId = usePokerStore((s) => s.setCurrentUserId);
@@ -65,5 +71,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
         <Skeleton className="h-64 w-full max-w-md rounded-lg" />
       </div>
     );
-  return <>{children}</>;
+  return (
+    <>
+      <TokenRefreshManager />
+      {children}
+    </>
+  );
 }

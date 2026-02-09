@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { useShallow } from "zustand/react/shallow";
 import { InviteBanner } from "@/components/poker/invite-banner";
 import { JoinRoomDialog } from "@/components/poker/join-room-dialog";
@@ -12,6 +12,7 @@ import { VoteDistribution } from "@/components/poker/metrics/vote-distribution";
 import { PokerCards } from "@/components/poker/poker-cards";
 import { Toolbar } from "@/components/poker/toolbar";
 import { VoteSelection } from "@/components/poker/vote-selection";
+import { trackEvent } from "@/lib/analytics";
 import { FOLD_VALUE } from "@/lib/constants/cards";
 import { useChatSync } from "@/lib/hooks/use-chat-sync";
 import { useRevealCountdown } from "@/lib/hooks/use-reveal-countdown";
@@ -84,6 +85,61 @@ export function PokerRoomClient({ initialRoom }: PokerRoomClientProps) {
     [activeRoom.isRevealed, activeRoom.players],
   );
 
+  const handleVote = useCallback(
+    (value: string | null) => {
+      if (value === null) {
+        trackEvent("vote_cleared", {
+          room_id: activeRoom.id,
+          previous_value: currentVote,
+        });
+      } else if (value === FOLD_VALUE) {
+        trackEvent("vote_folded", {
+          room_id: activeRoom.id,
+          player_count: activeRoom.players.length,
+        });
+      } else {
+        trackEvent("vote_cast", {
+          room_id: activeRoom.id,
+          vote_value: value,
+          is_change: currentVote !== null,
+          player_count: activeRoom.players.length,
+        });
+      }
+      castVote(value);
+    },
+    [activeRoom.id, activeRoom.players.length, currentVote, castVote],
+  );
+
+  const handleReveal = useCallback(() => {
+    if (activeRoom.isRevealed) {
+      toggleReveal();
+    } else {
+      trackEvent("votes_revealed", {
+        room_id: activeRoom.id,
+        player_count: activeRoom.players.length,
+        voted_count: activeRoom.players.filter((p) => p.vote !== null).length,
+        fold_count: foldedCount,
+      });
+      startCountdown();
+    }
+  }, [
+    activeRoom.isRevealed,
+    activeRoom.id,
+    activeRoom.players,
+    foldedCount,
+    toggleReveal,
+    startCountdown,
+  ]);
+
+  const handleReset = useCallback(() => {
+    trackEvent("votes_reset", {
+      room_id: activeRoom.id,
+      player_count: activeRoom.players.length,
+      had_consensus: stats?.consensus ?? false,
+    });
+    resetVotes();
+  }, [activeRoom.id, activeRoom.players.length, stats?.consensus, resetVotes]);
+
   return (
     <div className="flex flex-col items-center gap-4 sm:gap-6 md:gap-8 p-3 sm:p-4 md:p-6 max-w-4xl mx-auto">
       {!isPlayerInRoom && currentUserId && (
@@ -124,27 +180,18 @@ export function PokerRoomClient({ initialRoom }: PokerRoomClientProps) {
         <InviteBanner roomId={activeRoom.id} />
       )}
 
-      {/* Vote Selection */}
-      <div className="w-full max-w-sm px-2">
-        <VoteSelection
-          currentVote={currentVote}
-          isRevealed={activeRoom.isRevealed}
-          onVote={castVote}
-        />
-      </div>
+      {/* Vote Selection (hidden when revealed) */}
+      {!activeRoom.isRevealed && (
+        <div className="w-full max-w-sm px-2">
+          <VoteSelection
+            currentVote={currentVote}
+            isRevealed={activeRoom.isRevealed}
+            onVote={handleVote}
+          />
+        </div>
+      )}
 
-      {/* Toolbar */}
-      <div className="w-full max-w-sm px-2">
-        <Toolbar
-          isFacilitator={isFacilitator}
-          isRevealed={activeRoom.isRevealed}
-          isCounting={isCounting}
-          onToggleReveal={activeRoom.isRevealed ? toggleReveal : startCountdown}
-          onReset={resetVotes}
-        />
-      </div>
-
-      {/* Metrics (shown when revealed) */}
+      {/* Metrics (shown when revealed, above toolbar) */}
       {activeRoom.isRevealed && (
         <div className="w-full max-w-sm px-2 space-y-2 sm:space-y-3">
           <Consensus stats={stats} />
@@ -153,6 +200,17 @@ export function PokerRoomClient({ initialRoom }: PokerRoomClientProps) {
           <SuggestedEstimate stats={stats} />
         </div>
       )}
+
+      {/* Toolbar */}
+      <div className="w-full max-w-sm px-2">
+        <Toolbar
+          isFacilitator={isFacilitator}
+          isRevealed={activeRoom.isRevealed}
+          isCounting={isCounting}
+          onToggleReveal={handleReveal}
+          onReset={handleReset}
+        />
+      </div>
     </div>
   );
 }

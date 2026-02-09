@@ -2,6 +2,7 @@
 
 import { Button, Check, Share2, Users } from "@repo/ui";
 import { useState } from "react";
+import { trackEvent } from "@/lib/analytics";
 
 interface InviteBannerProps {
   roomId: string;
@@ -13,6 +14,7 @@ export function InviteBanner({ roomId }: InviteBannerProps) {
   const shareRoom = () => {
     const url = `${window.location.origin}/poker/${roomId}`;
     navigator.clipboard.writeText(url);
+    trackEvent("invite_link_copied", { room_id: roomId, source: "banner" });
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };

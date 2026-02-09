@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { trackEvent } from "@/lib/analytics";
 import { usePokerStore } from "@/lib/store/poker-store";
 
 const createRoomSchema = z.object({
@@ -52,8 +53,15 @@ export function useCreateRoom() {
       }
 
       await fetchRoom(result.roomId);
+      trackEvent("room_created", {
+        room_id: result.roomId,
+        room_name_length: data.roomName.length,
+      });
       router.push(`/poker/${result.roomId}`);
     } catch (error) {
+      trackEvent("room_create_failed", {
+        error_message: error instanceof Error ? error.message : "Unknown error",
+      });
       setFormError(
         error instanceof Error ? error.message : "An unexpected error occurred",
       );

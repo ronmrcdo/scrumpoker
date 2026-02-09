@@ -16,6 +16,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { trackEvent } from "@/lib/analytics";
 import { usePokerStore } from "@/lib/store/poker-store";
 
 const joinSchema = z.object({
@@ -45,7 +46,11 @@ export function JoinRoomDialog({ roomCode }: JoinRoomDialogProps) {
 
     try {
       await joinRoom(roomCode, data.userName);
+      trackEvent("room_joined", { room_id: roomCode });
     } catch (error) {
+      trackEvent("room_join_failed", {
+        error_message: error instanceof Error ? error.message : "Unknown error",
+      });
       setFormError(
         error instanceof Error ? error.message : "Failed to join room",
       );

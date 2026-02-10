@@ -107,7 +107,7 @@ describe("PlayerList", () => {
 
       await user.click(screen.getByRole("button", { name: /leave room/i }));
       expect(
-        screen.getByText(/Are you sure you want to leave this room/),
+        screen.getByText(/You'll need the room link to rejoin/),
       ).toBeInTheDocument();
     });
 

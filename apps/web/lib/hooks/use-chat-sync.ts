@@ -14,7 +14,7 @@ import type {
 const CHAT_EVENT = "chat_message";
 const TYPING_EVENT = "typing_indicator";
 
-export function useChatSync(roomCode: string | null) {
+export function useChatSync(roomId: string | null) {
   const addChatMessage = usePokerStore((s) => s.addChatMessage);
   const setBroadcastCallback = usePokerStore((s) => s.setBroadcastCallback);
   const setTypingBroadcastCallback = usePokerStore(
@@ -58,10 +58,10 @@ export function useChatSync(roomCode: string | null) {
   );
 
   useEffect(() => {
-    if (!roomCode) return;
+    if (!roomId) return;
 
     const supabase = supabaseRef.current;
-    const channelName = `chat:${roomCode}`;
+    const channelName = `chat:${roomId}`;
 
     // Create channel with broadcast configuration
     const channel = supabase.channel(channelName, {
@@ -111,7 +111,7 @@ export function useChatSync(roomCode: string | null) {
       clearChat();
     };
   }, [
-    roomCode,
+    roomId,
     currentUserId,
     addChatMessage,
     setBroadcastCallback,

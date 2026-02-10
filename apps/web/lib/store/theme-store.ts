@@ -16,7 +16,7 @@ export const useThemeStore = create<ThemeState>()(
       setMode: (mode) => set({ mode }),
     }),
     {
-      name: "anteup-theme",
+      name: "scrumpoker-theme",
     },
   ),
 );

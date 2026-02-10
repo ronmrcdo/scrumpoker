@@ -33,7 +33,6 @@ export default async function PokerRoomPage({
 
   const initialRoom = {
     id: room.id,
-    code: room.code,
     name: room.name,
     isRevealed: room.is_revealed,
     facilitatorId: room.facilitator_id,

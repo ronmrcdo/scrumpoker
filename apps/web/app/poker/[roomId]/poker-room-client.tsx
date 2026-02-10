@@ -51,7 +51,7 @@ export function PokerRoomClient({ initialRoom }: PokerRoomClientProps) {
   useRoomSync(initialRoom.id, initialRoom);
 
   // Subscribe to chat broadcast channel
-  useChatSync(room?.code ?? initialRoom.code);
+  useChatSync(room?.id ?? initialRoom.id);
 
   // Countdown timer for reveal
   const {
@@ -143,7 +143,7 @@ export function PokerRoomClient({ initialRoom }: PokerRoomClientProps) {
   return (
     <div className="flex flex-col items-center gap-4 sm:gap-6 md:gap-8 p-3 sm:p-4 md:p-6 max-w-4xl mx-auto">
       {!isPlayerInRoom && currentUserId && (
-        <JoinRoomDialog roomCode={activeRoom.code} />
+        <JoinRoomDialog roomId={activeRoom.id} />
       )}
       {/* Session Info */}
       <div className="text-center px-2">

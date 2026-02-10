@@ -7,6 +7,7 @@ export {
   ChevronLeft,
   ChevronRight,
   Clock,
+  Cookie,
   Copy,
   Eye,
   EyeOff,

@@ -44,7 +44,7 @@ export function FeatureCard({
 
         {/* Content */}
         <div className="space-y-4">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10">
+          <div className="inline-flex items-center justify-center p-3 bg-white dark:bg-white/10 rounded-xl shadow-sm">
             <Icon className="w-6 h-6 text-primary" />
           </div>
           <h3 className="text-2xl sm:text-3xl font-bold text-foreground">

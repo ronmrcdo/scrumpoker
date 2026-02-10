@@ -1,58 +1,93 @@
-# Turborepo Tailwind CSS starter
+# MyScrum
 
-This Turborepo starter is maintained by the Turborepo core team.
+Real-time planning poker for agile teams. Create a room, share the link, and estimate together.
 
-## Using this example
+## Table of Contents
 
-Run the following command:
+- [Tech Stack](#tech-stack)
+- [Project Structure](#project-structure)
+- [Quick Start](#quick-start)
+- [Common Commands](#common-commands)
+- [Documentation](#documentation)
+- [Contributing](#contributing)
 
-```sh
-npx create-turbo@latest -e with-tailwind
+## Tech Stack
+
+| Category | Technology |
+|----------|------------|
+| Build System | Turborepo, pnpm workspaces |
+| Framework | Next.js 16 (App Router) |
+| Backend | Supabase (PostgreSQL, Auth, Realtime) |
+| UI Components | Radix UI |
+| Styling | Tailwind CSS v4 |
+| State Management | Zustand (slice pattern) |
+| Forms | React Hook Form, Zod |
+| Testing | Vitest, Testing Library |
+| Code Quality | Biome, TypeScript 5.9 (strict) |
+| Analytics | PostHog |
+
+## Project Structure
+
+```
+apps/
+  web/                   Next.js planning poker app (port 3000)
+packages/
+  ui/                    Shared React component library (Radix UI + Tailwind)
+  tailwind-config/       Shared Tailwind CSS configuration
+  typescript-config/     Shared TypeScript configuration
+supabase/
+  config.toml            Local Supabase configuration
+  migrations/            Database migrations (SQL)
 ```
 
-## What's inside?
+## Quick Start
 
-This Turborepo includes the following packages/apps:
+```bash
+# 1. Install dependencies
+pnpm install
 
-### Apps and Packages
+# 2. Start local Supabase (requires Docker)
+pnpm supabase start
 
-- `docs`: a [Next.js](https://nextjs.org/) app with [Tailwind CSS](https://tailwindcss.com/)
-- `web`: another [Next.js](https://nextjs.org/) app with [Tailwind CSS](https://tailwindcss.com/)
-- `ui`: a stub React component library with [Tailwind CSS](https://tailwindcss.com/) shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+# 3. Create environment file and add keys from step 2
+cp apps/web/.env.example apps/web/.env.local
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Building packages/ui
-
-This example is set up to produce compiled styles for `ui` components into the `dist` directory. The component `.tsx` files are consumed by the Next.js apps directly using `transpilePackages` in `next.config.ts`. This was chosen for several reasons:
-
-- Make sharing one `tailwind.config.ts` to apps and packages as easy as possible.
-- Make package compilation simple by only depending on the Next.js Compiler and `tailwindcss`.
-- Ensure Tailwind classes do not overwrite each other. The `ui` package uses a `ui-` prefix for it's classes.
-- Maintain clear package export boundaries.
-
-Another option is to consume `packages/ui` directly from source without building. If using this option, you will need to update the `tailwind.config.ts` in your apps to be aware of your package locations, so it can find all usages of the `tailwindcss` class names for CSS compilation.
-
-For example, in [tailwind.config.ts](packages/tailwind-config/tailwind.config.ts):
-
-```js
-  content: [
-    // app content
-    `src/**/*.{js,ts,jsx,tsx}`,
-    // include packages if not transpiling
-    "../../packages/ui/*.{js,ts,jsx,tsx}",
-  ],
+# 4. Start development server
+pnpm dev
 ```
 
-If you choose this strategy, you can remove the `tailwindcss` and `autoprefixer` dependencies from the `ui` package.
+Open [http://localhost:3000](http://localhost:3000). See the [Local Setup Guide](docs/local-setup.md) for detailed instructions.
 
-### Utilities
+## Common Commands
 
-This Turborepo has some additional tools already setup for you:
+| Command | Description |
+|---------|-------------|
+| `pnpm dev` | Start all apps in development mode |
+| `pnpm build` | Build all apps and packages |
+| `pnpm test` | Run tests in watch mode |
+| `pnpm test:run` | Run tests once (CI mode) |
+| `pnpm test:coverage` | Run tests with coverage report |
+| `pnpm check-types` | Type-check all packages |
+| `pnpm format-and-lint` | Check formatting and linting (Biome) |
+| `pnpm format-and-lint:fix` | Auto-fix formatting and linting issues |
+| `pnpm supabase start` | Start local Supabase |
+| `pnpm supabase stop` | Stop local Supabase |
+| `pnpm supabase db reset` | Reset database and re-run migrations |
 
-- [Tailwind CSS](https://tailwindcss.com/) for styles
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+## Documentation
+
+- **[Local Setup](docs/local-setup.md)** — Prerequisites, installation, environment configuration, and troubleshooting
+- **[Database Migrations](docs/migrations.md)** — Creating, running, testing, and pushing migrations
+- **[Testing](docs/testing.md)** — Test framework, writing tests, mock factories, and coverage
+
+## Contributing
+
+1. Create a feature branch
+2. Write code with tests (every change must have tests)
+3. Verify before committing:
+   ```bash
+   pnpm test:run          # All tests pass
+   pnpm check-types       # No type errors
+   pnpm format-and-lint   # Code quality passes
+   ```
+4. Open a pull request

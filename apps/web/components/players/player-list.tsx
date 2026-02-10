@@ -91,7 +91,7 @@ export function PlayerList({
               <DialogTitle>Leave Room?</DialogTitle>
               <DialogDescription>
                 Are you sure you want to leave this room? You'll need the room
-                code to rejoin.
+                link to rejoin.
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>

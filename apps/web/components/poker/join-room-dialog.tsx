@@ -26,10 +26,10 @@ const joinSchema = z.object({
 type JoinFormData = z.infer<typeof joinSchema>;
 
 interface JoinRoomDialogProps {
-  roomCode: string;
+  roomId: string;
 }
 
-export function JoinRoomDialog({ roomCode }: JoinRoomDialogProps) {
+export function JoinRoomDialog({ roomId }: JoinRoomDialogProps) {
   const router = useRouter();
   const joinRoom = usePokerStore((s) => s.joinRoom);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -45,8 +45,8 @@ export function JoinRoomDialog({ roomCode }: JoinRoomDialogProps) {
     setFormError(null);
 
     try {
-      await joinRoom(roomCode, data.userName);
-      trackEvent("room_joined", { room_id: roomCode });
+      await joinRoom(roomId, data.userName);
+      trackEvent("room_joined", { room_id: roomId });
     } catch (error) {
       trackEvent("room_join_failed", {
         error_message: error instanceof Error ? error.message : "Unknown error",

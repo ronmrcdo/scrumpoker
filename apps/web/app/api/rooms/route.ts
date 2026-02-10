@@ -3,7 +3,6 @@ import { z } from "zod";
 
 import { validateAntiBot } from "@/lib/anti-bot";
 import { roomCreationLimiter } from "@/lib/rate-limit";
-import { generateRoomCode } from "@/lib/room-utils";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 const createRoomApiSchema = z.object({
@@ -77,10 +76,8 @@ export async function POST(request: NextRequest) {
   }
 
   // 5. Create room via Supabase RPC
-  const code = generateRoomCode();
   const { data: roomId, error } = await supabase.rpc("create_room", {
     p_name: parsed.data.roomName,
-    p_code: code,
     p_user_id: user.id,
     p_user_name: parsed.data.userName,
   });

@@ -290,7 +290,7 @@ describe("PlayerItem", () => {
 
       await user.click(screen.getByRole("button", { name: /kick/i }));
       expect(
-        screen.getByText(/Are you sure you want to remove Bob/),
+        screen.getByText(/Are you sure you want to remove Bob.*room link/),
       ).toBeInTheDocument();
     });
 

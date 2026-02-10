@@ -6,7 +6,6 @@ import { trackEvent } from "@/lib/analytics";
 import { ThemeToggle } from "../theme-toggle";
 
 interface PokerHeaderProps {
-  roomName: string;
   roomId: string;
   isChatOpen: boolean;
   isPlayerListOpen: boolean;
@@ -15,7 +14,6 @@ interface PokerHeaderProps {
 }
 
 export function PokerHeader({
-  roomName,
   roomId,
   isChatOpen,
   isPlayerListOpen,
@@ -50,8 +48,8 @@ export function PokerHeader({
         >
           <Menu className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
         </Button>
-        <span className="text-xs sm:text-sm font-medium text-foreground truncate max-w-[140px] sm:max-w-[220px] md:max-w-[320px]">
-          {roomName}
+        <span className="text-xs sm:text-sm font-medium text-foreground">
+          Scrum Poker Game
         </span>
       </div>
 

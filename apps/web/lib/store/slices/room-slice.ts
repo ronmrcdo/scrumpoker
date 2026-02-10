@@ -42,7 +42,6 @@ export async function fetchRoomWithPlayers(
   const room = roomResult.data;
   return {
     id: room.id,
-    code: room.code,
     name: room.name,
     isRevealed: room.is_revealed,
     facilitatorId: room.facilitator_id,
@@ -56,7 +55,7 @@ export interface RoomSlice {
   setRoom: (room: Room | null) => void;
   setWasKicked: (kicked: boolean) => void;
   fetchRoom: (roomId: string) => Promise<Room | null>;
-  joinRoom: (code: string, userName: string) => Promise<string>;
+  joinRoom: (roomId: string, userName: string) => Promise<string>;
   castVote: (value: string | null) => Promise<void>;
   toggleReveal: () => Promise<void>;
   resetVotes: () => Promise<void>;
@@ -83,12 +82,12 @@ export const createRoomSlice: StateCreator<
     return room;
   },
 
-  joinRoom: async (code, userName) => {
+  joinRoom: async (roomId, userName) => {
     const userId = get().currentUserId;
     if (!userId) throw new Error("Not authenticated");
 
-    const { data: roomId, error } = await supabase.rpc("join_room", {
-      p_room_code: code,
+    const { error } = await supabase.rpc("join_room", {
+      p_room_id: roomId,
       p_user_name: userName,
       p_max_players: MAX_PLAYERS,
     });

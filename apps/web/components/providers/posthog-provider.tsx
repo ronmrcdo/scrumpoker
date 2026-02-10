@@ -14,6 +14,7 @@ if (typeof window !== "undefined" && process.env.NEXT_PUBLIC_POSTHOG_KEY) {
     capture_pageview: false,
     capture_pageleave: true,
     persistence: "localStorage+cookie",
+    opt_out_capturing_by_default: true,
     disable_session_recording:
       process.env.NEXT_PUBLIC_POSTHOG_SESSION_REPLAY !== "true",
   });
@@ -58,6 +59,17 @@ function PostHogPageviewTracker() {
 }
 
 export function PostHogProvider({ children }: { children: React.ReactNode }) {
+  // Opt in to capturing only when the user has explicitly accepted cookies
+  useEffect(() => {
+    const consent =
+      typeof window !== "undefined"
+        ? localStorage.getItem("cookie-consent")
+        : null;
+    if (consent === "accepted") {
+      posthog.opt_in_capturing();
+    }
+  }, []);
+
   return (
     <PHProvider client={posthog}>
       <Suspense fallback={null}>

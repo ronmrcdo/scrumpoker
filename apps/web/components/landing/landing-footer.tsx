@@ -1,4 +1,5 @@
-import { Github } from "@repo/ui";
+import Image from "next/image";
+import Link from "next/link";
 
 export function LandingFooter() {
   const currentYear = new Date().getFullYear();
@@ -6,25 +7,58 @@ export function LandingFooter() {
   return (
     <footer className="border-t border-border bg-muted/30">
       <div className="container mx-auto px-4 py-8">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-1.5">
-            <span className="text-sm font-semibold text-primary">Ante</span>
-            <span className="text-sm font-light text-muted-foreground">Up</span>
+        <div className="flex flex-col sm:flex-row justify-between gap-8">
+          {/* Left: Branding */}
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <Image
+                src="/scrum-poker.png"
+                alt="Scrum Poker Game"
+                width={24}
+                height={24}
+                className="rounded-sm"
+              />
+              <span className="text-sm font-semibold text-primary">Scrum</span>
+              <span className="text-sm font-light text-muted-foreground">
+                Poker Game
+              </span>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              &copy; {currentYear} Scrum Poker Game. Real-time planning poker
+              for agile teams.
+            </p>
           </div>
 
-          <p className="text-sm text-muted-foreground">
-            {currentYear} Ante Up. Built for agile teams.
-          </p>
-
-          <a
-            href="https://github.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-          >
-            <Github className="h-4 w-4" />
-            <span>GitHub</span>
-          </a>
+          {/* Right: Legal */}
+          <div className="space-y-2">
+            <h4 className="text-sm font-semibold text-foreground">Legal</h4>
+            <ul className="space-y-1">
+              <li>
+                <Link
+                  href="/privacy"
+                  className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Privacy Policy
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/terms"
+                  className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Terms &amp; Use
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/disclaimer"
+                  className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Disclaimer
+                </Link>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </footer>

@@ -19,7 +19,7 @@ export function RoomForm() {
   return (
     <Card className="w-full max-w-md shadow-soft-lg mx-2 sm:mx-0">
       <CardHeader className="text-center px-4 sm:px-6">
-        <CardTitle className="text-xl sm:text-2xl">Ante Up</CardTitle>
+        <CardTitle className="text-xl sm:text-2xl">Scrum Poker Game</CardTitle>
         <CardDescription className="text-xs sm:text-sm">
           Create a new planning poker session
         </CardDescription>

@@ -138,7 +138,7 @@ export const PlayerItem = memo(function PlayerItem({
             <DialogTitle>Kick Player?</DialogTitle>
             <DialogDescription>
               Are you sure you want to remove {player.name} from the room? They
-              can rejoin with the room code.
+              can rejoin with the room link.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

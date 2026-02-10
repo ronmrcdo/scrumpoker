@@ -12,7 +12,7 @@ export function HeroSection() {
       <div className="absolute inset-0 bg-gradient-to-b from-background via-background to-muted/30" />
 
       {/* Decorative grid pattern */}
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(107,125,230,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(107,125,230,0.03)_1px,transparent_1px)] bg-[size:64px_64px]" />
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(107,125,230,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(107,125,230,0.08)_1px,transparent_1px)] bg-[size:64px_64px]" />
 
       <div className="relative z-10 container mx-auto px-4 py-12 sm:py-16 lg:py-20">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">

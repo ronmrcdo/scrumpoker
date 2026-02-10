@@ -9,28 +9,28 @@ export default function NotFound() {
       {/* Decorative background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {/* Floating blobs */}
-        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-primary-500/10 rounded-full blur-3xl animate-pulse-soft" />
+        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-primary-500/30 rounded-full blur-3xl animate-pulse-soft" />
         <div
-          className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-accent/10 rounded-full blur-3xl animate-pulse-soft"
+          className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-accent/30 rounded-full blur-3xl animate-pulse-soft"
           style={{ animationDelay: "1s" }}
         />
         <div
-          className="absolute top-1/2 right-1/3 w-48 h-48 bg-warm-500/10 rounded-full blur-3xl animate-pulse-soft"
+          className="absolute top-1/2 right-1/3 w-48 h-48 bg-warm-500/30 rounded-full blur-3xl animate-pulse-soft"
           style={{ animationDelay: "0.5s" }}
         />
 
         {/* Decorative circles */}
-        <div className="absolute top-20 left-10 w-4 h-4 bg-primary-500/20 rounded-full" />
-        <div className="absolute top-40 right-20 w-3 h-3 bg-accent/30 rounded-full" />
-        <div className="absolute bottom-32 left-1/4 w-2 h-2 bg-warm-500/25 rounded-full" />
-        <div className="absolute bottom-20 right-1/3 w-5 h-5 bg-primary-500/15 rounded-full" />
+        <div className="absolute top-20 left-10 w-4 h-4 bg-primary-500/40 rounded-full" />
+        <div className="absolute top-40 right-20 w-3 h-3 bg-accent/50 rounded-full" />
+        <div className="absolute bottom-32 left-1/4 w-2 h-2 bg-warm-500/45 rounded-full" />
+        <div className="absolute bottom-20 right-1/3 w-5 h-5 bg-primary-500/35 rounded-full" />
       </div>
 
       <div className="relative z-10 w-full max-w-lg text-center animate-fade-in">
         {/* Large 404 Display */}
         <div className="relative mb-8">
           {/* Background 404 */}
-          <div className="text-[180px] sm:text-[220px] font-bold leading-none text-muted/30 select-none">
+          <div className="text-[180px] sm:text-[220px] font-bold leading-none text-muted-foreground/25 select-none">
             404
           </div>
 

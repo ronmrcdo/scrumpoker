@@ -9,7 +9,6 @@ export interface Player {
 
 export interface Room {
   id: string;
-  code: string;
   name: string;
   isRevealed: boolean;
   facilitatorId: string;

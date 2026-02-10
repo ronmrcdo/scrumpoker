@@ -37,7 +37,6 @@ export function createMockRoom(overrides: Partial<Room> = {}): Room {
   const facilitatorId = overrides.facilitatorId ?? `facilitator-${idCounter}`;
   return {
     id: `room-${idCounter}`,
-    code: `ABC-${idCounter.toString().padStart(3, "0")}`,
     name: `Test Room ${idCounter}`,
     isRevealed: false,
     facilitatorId,

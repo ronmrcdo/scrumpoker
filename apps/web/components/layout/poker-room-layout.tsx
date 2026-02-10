@@ -85,7 +85,6 @@ export function PokerRoomLayout({ children }: PokerRoomLayoutProps) {
   return (
     <div className="h-screen flex flex-col bg-background">
       <PokerHeader
-        roomName={room.name}
         roomId={room.id}
         isChatOpen={isChatOpen}
         isPlayerListOpen={isPlayerListOpen}

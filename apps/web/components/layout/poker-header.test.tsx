@@ -6,7 +6,6 @@ import { PokerHeader } from "./poker-header";
 
 describe("PokerHeader", () => {
   const defaultProps = {
-    roomName: "Sprint 42 Planning",
     roomId: "room-123",
     isChatOpen: false,
     isPlayerListOpen: false,
@@ -32,9 +31,9 @@ describe("PokerHeader", () => {
   });
 
   describe("rendering", () => {
-    it("should display room name", () => {
+    it("should display app name", () => {
       render(<PokerHeader {...defaultProps} />);
-      expect(screen.getByText("Sprint 42 Planning")).toBeInTheDocument();
+      expect(screen.getByText("Scrum Poker Game")).toBeInTheDocument();
     });
 
     it("should render player list toggle button", () => {
@@ -130,32 +129,10 @@ describe("PokerHeader", () => {
     });
   });
 
-  describe("room name display", () => {
-    it("should truncate long room names", () => {
-      render(
-        <PokerHeader
-          {...defaultProps}
-          roomName="This is a very long room name that should be truncated for display"
-        />,
-      );
-      const nameElement = screen.getByText(
-        "This is a very long room name that should be truncated for display",
-      );
-      expect(nameElement).toHaveClass("truncate");
-    });
-
-    it("should handle empty room name", () => {
-      render(<PokerHeader {...defaultProps} roomName="" />);
-      expect(
-        screen.getByRole("button", { name: /toggle player list/i }),
-      ).toBeInTheDocument();
-    });
-
-    it("should handle special characters in room name", () => {
-      render(
-        <PokerHeader {...defaultProps} roomName="Sprint <42> & Planning" />,
-      );
-      expect(screen.getByText("Sprint <42> & Planning")).toBeInTheDocument();
+  describe("app name display", () => {
+    it("should always display Scrum Poker Game", () => {
+      render(<PokerHeader {...defaultProps} />);
+      expect(screen.getByText("Scrum Poker Game")).toBeInTheDocument();
     });
   });
 

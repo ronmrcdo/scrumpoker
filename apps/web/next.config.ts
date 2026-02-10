@@ -23,6 +23,9 @@ const cspDirectives = [
 const nextConfig: NextConfig = {
   transpilePackages: ["@repo/ui"],
   devIndicators: false,
+  images: {
+    formats: ["image/avif", "image/webp"],
+  },
   experimental: {
     turbopackFileSystemCacheForDev: false,
   },

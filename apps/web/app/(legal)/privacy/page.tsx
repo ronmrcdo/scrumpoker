@@ -186,16 +186,28 @@ export default function PrivacyPolicyPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border">
-                  <th className="py-2 pr-4 text-left font-medium text-foreground">
+                  <th
+                    scope="col"
+                    className="py-2 pr-4 text-left font-medium text-foreground"
+                  >
                     Name
                   </th>
-                  <th className="py-2 pr-4 text-left font-medium text-foreground">
+                  <th
+                    scope="col"
+                    className="py-2 pr-4 text-left font-medium text-foreground"
+                  >
                     Type
                   </th>
-                  <th className="py-2 pr-4 text-left font-medium text-foreground">
+                  <th
+                    scope="col"
+                    className="py-2 pr-4 text-left font-medium text-foreground"
+                  >
                     Purpose
                   </th>
-                  <th className="py-2 text-left font-medium text-foreground">
+                  <th
+                    scope="col"
+                    className="py-2 text-left font-medium text-foreground"
+                  >
                     Duration
                   </th>
                 </tr>

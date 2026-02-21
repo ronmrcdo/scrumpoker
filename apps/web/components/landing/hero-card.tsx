@@ -27,6 +27,7 @@ export function HeroCard({ value, index, totalCards }: HeroCardProps) {
 
   return (
     <div
+      aria-hidden="true"
       className="card-flip-container absolute cursor-pointer transition-transform duration-400 ease-out"
       style={style}
     >

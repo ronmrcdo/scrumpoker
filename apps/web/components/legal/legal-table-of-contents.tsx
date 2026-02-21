@@ -36,7 +36,10 @@ export function LegalTableOfContents({ items }: LegalTableOfContentsProps) {
                   <span className="w-5 font-mono text-xs text-muted-foreground/50">
                     {String(index + 1).padStart(2, "0")}
                   </span>
-                  <item.icon className="size-3.5 text-muted-foreground/50 transition-colors group-hover:text-primary" />
+                  <item.icon
+                    aria-hidden="true"
+                    className="size-3.5 text-muted-foreground/50 transition-colors group-hover:text-primary"
+                  />
                   <span>{item.title}</span>
                 </a>
               </li>

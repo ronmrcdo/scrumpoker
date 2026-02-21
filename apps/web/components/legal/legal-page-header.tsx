@@ -28,10 +28,10 @@ export function LegalPageHeader({
           href="/"
           className="flex items-center gap-1 transition-colors hover:text-foreground"
         >
-          <Home className="size-3.5" />
+          <Home aria-hidden="true" className="size-3.5" />
           Home
         </Link>
-        <ChevronRight className="size-3.5" />
+        <ChevronRight aria-hidden="true" className="size-3.5" />
         <span className="font-medium text-foreground">{title}</span>
       </nav>
 

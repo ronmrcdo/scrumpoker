@@ -22,7 +22,7 @@ export function InviteBanner({ roomId }: InviteBannerProps) {
   return (
     <div className="w-full max-w-sm px-2 animate-fade-in">
       <div className="flex flex-col items-center gap-2 rounded-lg border border-border bg-card p-4 text-center">
-        <Users className="h-5 w-5 text-muted-foreground" />
+        <Users aria-hidden="true" className="h-5 w-5 text-muted-foreground" />
         <p className="text-sm text-muted-foreground">
           You're the only one here. Share the invite link with your team to
           start estimating.

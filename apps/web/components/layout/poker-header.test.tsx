@@ -39,14 +39,14 @@ describe("PokerHeader", () => {
     it("should render player list toggle button", () => {
       render(<PokerHeader {...defaultProps} />);
       expect(
-        screen.getByRole("button", { name: /toggle player list/i }),
+        screen.getByRole("button", { name: /open player list/i }),
       ).toBeInTheDocument();
     });
 
     it("should render share button", () => {
       render(<PokerHeader {...defaultProps} />);
       expect(
-        screen.getByRole("button", { name: /share/i }),
+        screen.getByRole("button", { name: /copy share link/i }),
       ).toBeInTheDocument();
     });
 
@@ -70,7 +70,7 @@ describe("PokerHeader", () => {
       );
 
       await user.click(
-        screen.getByRole("button", { name: /toggle player list/i }),
+        screen.getByRole("button", { name: /open player list/i }),
       );
       expect(onTogglePlayerList).toHaveBeenCalledTimes(1);
     });
@@ -80,12 +80,12 @@ describe("PokerHeader", () => {
         <PokerHeader {...defaultProps} isPlayerListOpen={false} />,
       );
       expect(
-        screen.getByRole("button", { name: /toggle player list/i }),
+        screen.getByRole("button", { name: /open player list/i }),
       ).toBeInTheDocument();
 
       rerender(<PokerHeader {...defaultProps} isPlayerListOpen={true} />);
       expect(
-        screen.getByRole("button", { name: /toggle player list/i }),
+        screen.getByRole("button", { name: /close player list/i }),
       ).toBeInTheDocument();
     });
   });
@@ -111,7 +111,9 @@ describe("PokerHeader", () => {
 
       render(<PokerHeader {...defaultProps} roomId="room-456" />);
 
-      await user.click(screen.getByRole("button", { name: /share/i }));
+      await user.click(
+        screen.getByRole("button", { name: /copy share link/i }),
+      );
 
       // Verify share action triggered by checking UI state change
       expect(screen.getByText("Copied!")).toBeInTheDocument();
@@ -122,7 +124,9 @@ describe("PokerHeader", () => {
 
       render(<PokerHeader {...defaultProps} />);
 
-      await user.click(screen.getByRole("button", { name: /share/i }));
+      await user.click(
+        screen.getByRole("button", { name: /copy share link/i }),
+      );
 
       // After clicking, the text should change to "Copied!"
       expect(screen.getByText("Copied!")).toBeInTheDocument();

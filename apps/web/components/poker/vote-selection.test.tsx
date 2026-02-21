@@ -3,6 +3,13 @@ import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@/test/test-utils";
 import { VoteSelection } from "./vote-selection";
 
+/** Helper to get a vote button by its card value using the aria-label pattern */
+function getVoteButton(value: string) {
+  return screen.getByRole("button", {
+    name: `Vote ${value} story points`,
+  });
+}
+
 describe("VoteSelection", () => {
   const defaultProps = {
     currentVote: null,
@@ -21,7 +28,7 @@ describe("VoteSelection", () => {
 
       const cardValues = ["1", "2", "3", "5", "8", "13", "21", "☕"];
       for (const value of cardValues) {
-        expect(screen.getByRole("button", { name: value })).toBeInTheDocument();
+        expect(getVoteButton(value)).toBeInTheDocument();
       }
     });
 
@@ -41,7 +48,7 @@ describe("VoteSelection", () => {
         <VoteSelection currentVote={null} isRevealed={false} onVote={onVote} />,
       );
 
-      await user.click(screen.getByRole("button", { name: "5" }));
+      await user.click(getVoteButton("5"));
       expect(onVote).toHaveBeenCalledWith("5");
     });
 
@@ -55,7 +62,7 @@ describe("VoteSelection", () => {
 
       const cardValues = ["1", "2", "3", "5", "8", "13", "21", "☕"];
       for (const value of cardValues) {
-        await user.click(screen.getByRole("button", { name: value }));
+        await user.click(getVoteButton(value));
         expect(onVote).toHaveBeenCalledWith(value);
       }
 
@@ -70,7 +77,7 @@ describe("VoteSelection", () => {
         <VoteSelection currentVote="5" isRevealed={false} onVote={onVote} />,
       );
 
-      await user.click(screen.getByRole("button", { name: "8" }));
+      await user.click(getVoteButton("8"));
       expect(onVote).toHaveBeenCalledWith("8");
 
       // Simulate vote change
@@ -78,7 +85,7 @@ describe("VoteSelection", () => {
         <VoteSelection currentVote="8" isRevealed={false} onVote={onVote} />,
       );
 
-      await user.click(screen.getByRole("button", { name: "3" }));
+      await user.click(getVoteButton("3"));
       expect(onVote).toHaveBeenCalledWith("3");
     });
   });
@@ -89,7 +96,7 @@ describe("VoteSelection", () => {
         <VoteSelection currentVote="5" isRevealed={false} onVote={vi.fn()} />,
       );
 
-      const selectedButton = screen.getByRole("button", { name: "5" });
+      const selectedButton = getVoteButton("5");
       expect(selectedButton).toHaveClass("bg-primary-500");
       expect(selectedButton).toHaveClass("text-white");
     });
@@ -99,7 +106,7 @@ describe("VoteSelection", () => {
         <VoteSelection currentVote="5" isRevealed={false} onVote={vi.fn()} />,
       );
 
-      const unselectedButton = screen.getByRole("button", { name: "3" });
+      const unselectedButton = getVoteButton("3");
       expect(unselectedButton).not.toHaveClass("bg-primary-500");
       expect(unselectedButton).toHaveClass("bg-card");
     });
@@ -109,7 +116,7 @@ describe("VoteSelection", () => {
         <VoteSelection currentVote="☕" isRevealed={false} onVote={vi.fn()} />,
       );
 
-      const coffeeButton = screen.getByRole("button", { name: "☕" });
+      const coffeeButton = getVoteButton("☕");
       expect(coffeeButton).toHaveClass("bg-primary-500");
     });
 
@@ -149,7 +156,7 @@ describe("VoteSelection", () => {
         <VoteSelection currentVote="5" isRevealed={true} onVote={onVote} />,
       );
 
-      await user.click(screen.getByRole("button", { name: "8" }));
+      await user.click(getVoteButton("8"));
       expect(onVote).not.toHaveBeenCalled();
     });
 
@@ -185,7 +192,7 @@ describe("VoteSelection", () => {
 
       const cardValues = ["1", "2", "3", "5", "8", "13", "21", "☕"];
       cardValues.forEach((value, index) => {
-        const button = screen.getByRole("button", { name: value });
+        const button = getVoteButton(value);
         expect(button).toHaveStyle({
           animationDelay: `${index * 50}ms`,
         });
@@ -202,6 +209,15 @@ describe("VoteSelection", () => {
         expect(button).toHaveAttribute("type", "button");
       });
     });
+
+    it("should have aria-pressed on vote buttons", () => {
+      render(
+        <VoteSelection currentVote="5" isRevealed={false} onVote={vi.fn()} />,
+      );
+
+      expect(getVoteButton("5")).toHaveAttribute("aria-pressed", "true");
+      expect(getVoteButton("3")).toHaveAttribute("aria-pressed", "false");
+    });
   });
 
   describe("edge cases", () => {
@@ -213,7 +229,7 @@ describe("VoteSelection", () => {
         <VoteSelection currentVote={null} isRevealed={false} onVote={onVote} />,
       );
 
-      const button = screen.getByRole("button", { name: "5" });
+      const button = getVoteButton("5");
 
       // Rapid clicks
       await user.click(button);
@@ -232,13 +248,13 @@ describe("VoteSelection", () => {
       );
 
       // Click same button
-      await user.click(screen.getByRole("button", { name: "5" }));
+      await user.click(getVoteButton("5"));
 
       rerender(
         <VoteSelection currentVote="5" isRevealed={false} onVote={onVote} />,
       );
 
-      const selectedButton = screen.getByRole("button", { name: "5" });
+      const selectedButton = getVoteButton("5");
       expect(selectedButton).toHaveClass("bg-primary-500");
     });
   });

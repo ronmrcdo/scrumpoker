@@ -82,10 +82,10 @@ export const PlayerItem = memo(function PlayerItem({
               !isOnline
                 ? "bg-gray-400"
                 : hasFolded
-                  ? "bg-amber-700"
+                  ? "bg-amber-500"
                   : hasVoted
                     ? "bg-green-600"
-                    : "bg-green-600",
+                    : "bg-muted-foreground",
             )}
           />
         </div>
@@ -134,7 +134,7 @@ export const PlayerItem = memo(function PlayerItem({
           <Button
             variant="ghost"
             size="icon"
-            className="h-6 w-6 text-muted-foreground hover:text-destructive shrink-0"
+            className="h-7 w-7 text-muted-foreground hover:text-destructive shrink-0"
             onClick={() => setIsKickDialogOpen(true)}
           >
             <X className="h-3.5 w-3.5" />

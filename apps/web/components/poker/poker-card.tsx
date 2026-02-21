@@ -59,7 +59,18 @@ export function PokerCard({
             "ring-2 ring-primary-300 ring-offset-1 sm:ring-offset-2 ring-offset-background",
         )}
       >
-        {!hasVoted ? "?" : isFold ? "✋" : isRevealed ? vote : "✓"}
+        <span aria-hidden="true">
+          {!hasVoted ? "?" : isFold ? "✋" : isRevealed ? vote : "✓"}
+        </span>
+        <span className="sr-only">
+          {!hasVoted
+            ? "No vote yet"
+            : isFold
+              ? "Folded"
+              : isRevealed
+                ? `Voted: ${vote}`
+                : "Voted"}
+        </span>
       </div>
       <span
         className={cn(

@@ -31,7 +31,7 @@ export function LegalSectionCard({
     >
       <CardHeader className="flex-row items-center gap-3 space-y-0">
         <div className="shrink-0 rounded-lg bg-muted p-2">
-          <Icon className="size-4 text-muted-foreground" />
+          <Icon aria-hidden="true" className="size-4 text-muted-foreground" />
         </div>
         <h2 className="text-base font-semibold leading-none tracking-tight sm:text-lg">
           {title}

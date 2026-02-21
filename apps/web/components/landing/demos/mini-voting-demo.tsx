@@ -155,6 +155,8 @@ export function MiniVotingDemo() {
               <button
                 key={value}
                 type="button"
+                aria-label={`Vote ${value} story points`}
+                aria-pressed={selectedCard === value}
                 className={cn(
                   "h-10 rounded-md border-2 text-xs font-bold transition-all duration-200",
                   selectedCard === value

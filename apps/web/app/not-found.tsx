@@ -30,7 +30,10 @@ export default function NotFound() {
         {/* Large 404 Display */}
         <div className="relative mb-8">
           {/* Background 404 */}
-          <div className="text-[180px] sm:text-[220px] font-bold leading-none text-muted-foreground/25 select-none">
+          <div
+            aria-hidden="true"
+            className="text-[180px] sm:text-[220px] font-bold leading-none text-muted-foreground/25 select-none"
+          >
             404
           </div>
 

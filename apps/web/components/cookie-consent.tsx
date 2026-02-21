@@ -3,7 +3,7 @@
 import { Button, Cookie } from "@repo/ui";
 import Link from "next/link";
 import posthog from "posthog-js";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const CONSENT_KEY = "cookie-consent";
 
@@ -18,6 +18,7 @@ function getStoredConsent(): ConsentValue | null {
 
 export function CookieConsent() {
   const [visible, setVisible] = useState(false);
+  const dialogRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const consent = getStoredConsent();
@@ -25,6 +26,12 @@ export function CookieConsent() {
       setVisible(true);
     }
   }, []);
+
+  useEffect(() => {
+    if (visible) {
+      dialogRef.current?.querySelector<HTMLElement>("button")?.focus();
+    }
+  }, [visible]);
 
   const handleConsent = (value: ConsentValue) => {
     try {
@@ -42,8 +49,10 @@ export function CookieConsent() {
 
   return (
     <div
+      ref={dialogRef}
       role="dialog"
-      aria-label="Cookie consent"
+      aria-modal="true"
+      aria-labelledby="cookie-consent-title"
       className="fixed bottom-4 left-4 right-4 sm:right-auto z-50 sm:w-sm rounded-lg border border-border bg-background/95 shadow-lg backdrop-blur-md animate-fade-up"
     >
       <div className="p-4">
@@ -52,7 +61,10 @@ export function CookieConsent() {
             <Cookie className="size-5 text-primary" />
           </div>
           <div className="space-y-2">
-            <p className="text-sm font-semibold text-foreground">
+            <p
+              id="cookie-consent-title"
+              className="text-sm font-semibold text-foreground"
+            >
               Security &amp; Analytics
             </p>
             <p className="text-xs text-muted-foreground">

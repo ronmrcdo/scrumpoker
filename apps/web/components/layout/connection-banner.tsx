@@ -28,9 +28,10 @@ export function ConnectionBanner() {
   return (
     <output
       aria-live="polite"
+      aria-atomic="true"
       className={`flex items-center justify-center gap-2 px-3 py-1.5 text-xs sm:text-sm border-b ${colorClasses} animate-fade-in`}
     >
-      <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
+      <Icon aria-hidden="true" className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
       <span>{message}</span>
     </output>
   );

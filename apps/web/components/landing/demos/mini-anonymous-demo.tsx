@@ -101,9 +101,12 @@ export function MiniAnonymousDemo() {
         </span>
         <div className="flex items-center gap-2">
           {isRevealed ? (
-            <Eye className="h-3.5 w-3.5 text-accent" />
+            <Eye aria-hidden="true" className="h-3.5 w-3.5 text-accent" />
           ) : (
-            <EyeOff className="h-3.5 w-3.5 text-muted-foreground" />
+            <EyeOff
+              aria-hidden="true"
+              className="h-3.5 w-3.5 text-muted-foreground"
+            />
           )}
           <span
             className={cn(
@@ -158,7 +161,7 @@ export function MiniAnonymousDemo() {
           {phase === "hidden" && (
             <div className="space-y-2">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted text-muted-foreground text-xs font-medium">
-                <EyeOff className="w-3.5 h-3.5" />
+                <EyeOff aria-hidden="true" className="w-3.5 h-3.5" />
                 Votes are hidden
               </div>
               <p className="text-[10px] text-muted-foreground">
@@ -181,7 +184,7 @@ export function MiniAnonymousDemo() {
           {phase === "revealed" && (
             <div className="space-y-2">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent/10 text-accent text-xs font-medium">
-                <Eye className="w-3.5 h-3.5" />
+                <Eye aria-hidden="true" className="w-3.5 h-3.5" />
                 Votes revealed!
               </div>
               <p className="text-[10px] text-muted-foreground">

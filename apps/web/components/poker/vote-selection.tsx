@@ -34,6 +34,8 @@ export const VoteSelection = memo(function VoteSelection({
             type="button"
             disabled={isRevealed}
             onClick={() => handleVote(val)}
+            aria-pressed={currentVote === val}
+            aria-label={`Vote ${val} story points`}
             style={{ animationDelay: `${index * 50}ms` }}
             className={cn(
               "h-14 sm:h-16 rounded-lg border-2 text-lg sm:text-xl font-bold",
@@ -41,6 +43,7 @@ export const VoteSelection = memo(function VoteSelection({
               "hover:shadow-soft-md hover:-translate-y-1 hover:scale-105",
               "active:scale-95 active:duration-75",
               "disabled:opacity-50 disabled:pointer-events-none touch-manipulation",
+              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2",
               "animate-scale-in",
               currentVote === val
                 ? "bg-primary-500 text-white border-primary-500 shadow-soft-md -translate-y-1 scale-105 animate-bounce-once"
@@ -55,12 +58,14 @@ export const VoteSelection = memo(function VoteSelection({
         type="button"
         disabled={isRevealed}
         onClick={() => handleVote(FOLD_VALUE)}
+        aria-pressed={currentVote === FOLD_VALUE}
         className={cn(
           "w-full mt-2 sm:mt-3 h-10 sm:h-11 rounded-lg border-2 text-sm font-semibold",
           "transition-[transform,box-shadow,background-color,border-color] duration-300 ease-out",
           "hover:shadow-soft-md",
           "active:scale-[0.98] active:duration-75",
           "disabled:opacity-50 disabled:pointer-events-none touch-manipulation",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2",
           "animate-scale-in",
           currentVote === FOLD_VALUE
             ? "bg-amber-500 text-white border-amber-500 shadow-soft-md"

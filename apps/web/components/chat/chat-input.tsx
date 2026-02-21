@@ -95,10 +95,10 @@ export function ChatInput({ onSend }: ChatInputProps) {
       }
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("click", handleClickOutside);
     document.addEventListener("keydown", handleEscapeKey);
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("click", handleClickOutside);
       document.removeEventListener("keydown", handleEscapeKey);
     };
   }, [showEmojiPicker]);
@@ -155,6 +155,7 @@ export function ChatInput({ onSend }: ChatInputProps) {
           value={text}
           onChange={handleTextChange}
           placeholder="Type a message..."
+          aria-label="Chat message"
           className="h-9 sm:h-10 text-sm"
         />
         <Button

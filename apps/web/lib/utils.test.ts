@@ -1,6 +1,11 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import type { Player } from "./types";
-import { generateUUID, getRadialPosition, getVoteStats } from "./utils";
+import {
+  followRedirectParam,
+  generateUUID,
+  getRadialPosition,
+  getVoteStats,
+} from "./utils";
 
 describe("generateUUID", () => {
   it("should generate a valid UUID format", () => {
@@ -269,5 +274,81 @@ describe("getRadialPosition", () => {
     const { x, y } = getRadialPosition(0, 4, 0, 0);
     expect(x).toBeCloseTo(0, 5);
     expect(y).toBeCloseTo(0, 5);
+  });
+});
+
+describe("followRedirectParam", () => {
+  const replaceSpy = vi.fn();
+
+  afterEach(() => {
+    replaceSpy.mockReset();
+    // Restore default location (no query params)
+    Object.defineProperty(window, "location", {
+      writable: true,
+      value: { search: "", replace: replaceSpy },
+    });
+  });
+
+  function setSearch(search: string) {
+    Object.defineProperty(window, "location", {
+      writable: true,
+      value: { search, replace: replaceSpy },
+    });
+  }
+
+  it("should redirect to the poker room when redirect param is a valid poker path", () => {
+    setSearch("?redirect=/poker/a1b2c3d4-e5f6-7890-abcd-ef1234567890");
+    followRedirectParam();
+    expect(replaceSpy).toHaveBeenCalledWith(
+      "/poker/a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    );
+  });
+
+  it("should do nothing when there is no redirect param", () => {
+    setSearch("");
+    followRedirectParam();
+    expect(replaceSpy).not.toHaveBeenCalled();
+  });
+
+  it("should do nothing when redirect param does not start with /poker/", () => {
+    setSearch("?redirect=/admin/settings");
+    followRedirectParam();
+    expect(replaceSpy).not.toHaveBeenCalled();
+  });
+
+  it("should do nothing for an external URL disguised as redirect", () => {
+    setSearch("?redirect=https://evil.com/poker/room");
+    followRedirectParam();
+    expect(replaceSpy).not.toHaveBeenCalled();
+  });
+
+  it("should do nothing for protocol-relative redirect", () => {
+    setSearch("?redirect=//evil.com/poker/room");
+    followRedirectParam();
+    expect(replaceSpy).not.toHaveBeenCalled();
+  });
+
+  it("should reject path traversal attempts", () => {
+    setSearch("?redirect=/poker/../../admin");
+    followRedirectParam();
+    expect(replaceSpy).not.toHaveBeenCalled();
+  });
+
+  it("should reject URL-encoded path traversal", () => {
+    setSearch("?redirect=/poker/%2e%2e%2fadmin");
+    followRedirectParam();
+    expect(replaceSpy).not.toHaveBeenCalled();
+  });
+
+  it("should reject poker path without valid UUID segment", () => {
+    setSearch("?redirect=/poker/not-a-uuid");
+    followRedirectParam();
+    expect(replaceSpy).not.toHaveBeenCalled();
+  });
+
+  it("should reject bare /poker/ with no room segment", () => {
+    setSearch("?redirect=/poker/");
+    followRedirectParam();
+    expect(replaceSpy).not.toHaveBeenCalled();
   });
 });

@@ -105,16 +105,14 @@ describe("PlayerItem", () => {
   });
 
   describe("vote indicator dot", () => {
-    it("should show inactive dot when not voted", () => {
+    it("should show green dot when online and not voted", () => {
       const { container } = render(
         <PlayerItem
           {...defaultProps}
           player={createMockPlayer({ vote: null })}
         />,
       );
-      expect(
-        container.querySelector(".bg-muted-foreground\\/40"),
-      ).toBeInTheDocument();
+      expect(container.querySelector(".bg-green-600")).toBeInTheDocument();
     });
 
     it("should show active dot when voted", () => {
@@ -124,7 +122,7 @@ describe("PlayerItem", () => {
           player={createMockPlayer({ vote: "5" })}
         />,
       );
-      expect(container.querySelector(".bg-accent-500")).toBeInTheDocument();
+      expect(container.querySelector(".bg-green-600")).toBeInTheDocument();
     });
   });
 
@@ -170,7 +168,7 @@ describe("PlayerItem", () => {
         />,
       );
       const foldedText = screen.getByText("Folded");
-      expect(foldedText).toHaveClass("text-amber-600");
+      expect(foldedText).toHaveClass("text-amber-700");
     });
 
     it("should show amber indicator dot when folded", () => {
@@ -180,7 +178,7 @@ describe("PlayerItem", () => {
           player={createMockPlayer({ vote: "FOLD" })}
         />,
       );
-      expect(container.querySelector(".bg-amber-500")).toBeInTheDocument();
+      expect(container.querySelector(".bg-amber-700")).toBeInTheDocument();
     });
 
     it("should show Folded even when revealed", () => {
@@ -339,6 +337,90 @@ describe("PlayerItem", () => {
       await user.click(screen.getByRole("button", { name: "Cancel" }));
 
       expect(onKick).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("online/offline status", () => {
+    it("should show gray dot when player is offline", () => {
+      const { container } = render(
+        <PlayerItem
+          {...defaultProps}
+          player={createMockPlayer({ vote: null })}
+          isOnline={false}
+        />,
+      );
+      expect(container.querySelector(".bg-gray-400")).toBeInTheDocument();
+    });
+
+    it("should show 'Offline' text when player is offline", () => {
+      render(
+        <PlayerItem
+          {...defaultProps}
+          player={createMockPlayer({ vote: null })}
+          isOnline={false}
+        />,
+      );
+      expect(screen.getByText("Offline")).toBeInTheDocument();
+      expect(screen.queryByText("Thinking...")).not.toBeInTheDocument();
+    });
+
+    it("should show 'Offline' text even when player has voted", () => {
+      render(
+        <PlayerItem
+          {...defaultProps}
+          player={createMockPlayer({ vote: "5" })}
+          isOnline={false}
+        />,
+      );
+      expect(screen.getByText("Offline")).toBeInTheDocument();
+      expect(screen.queryByText("Voted")).not.toBeInTheDocument();
+    });
+
+    it("should show gray dot when offline even if player voted", () => {
+      const { container } = render(
+        <PlayerItem
+          {...defaultProps}
+          player={createMockPlayer({ vote: "5" })}
+          isOnline={false}
+        />,
+      );
+      expect(container.querySelector(".bg-gray-400")).toBeInTheDocument();
+      expect(container.querySelector(".bg-green-600")).not.toBeInTheDocument();
+    });
+
+    it("should show normal vote dot when online", () => {
+      const { container } = render(
+        <PlayerItem
+          {...defaultProps}
+          player={createMockPlayer({ vote: "5" })}
+          isOnline={true}
+        />,
+      );
+      expect(container.querySelector(".bg-green-600")).toBeInTheDocument();
+      expect(container.querySelector(".bg-gray-400")).not.toBeInTheDocument();
+    });
+
+    it("should default to online when isOnline is not provided", () => {
+      render(
+        <PlayerItem
+          {...defaultProps}
+          player={createMockPlayer({ vote: null })}
+        />,
+      );
+      expect(screen.getByText("Thinking...")).toBeInTheDocument();
+      expect(screen.queryByText("Offline")).not.toBeInTheDocument();
+    });
+
+    it("should apply gray text styling when offline", () => {
+      render(
+        <PlayerItem
+          {...defaultProps}
+          player={createMockPlayer({ vote: null })}
+          isOnline={false}
+        />,
+      );
+      const offlineText = screen.getByText("Offline");
+      expect(offlineText).toHaveClass("text-neutral-500");
     });
   });
 

@@ -8,11 +8,13 @@ import { createClient } from "@/lib/supabase/client";
 import type {
   ChatBroadcastPayload,
   ChatMessage,
+  CountdownBroadcastPayload,
   TypingBroadcastPayload,
 } from "@/lib/types";
 
 const CHAT_EVENT = "chat_message";
 const TYPING_EVENT = "typing_indicator";
+const COUNTDOWN_EVENT = "countdown_start";
 
 export function useChatSync(roomId: string | null) {
   const addChatMessage = usePokerStore((s) => s.addChatMessage);
@@ -20,6 +22,10 @@ export function useChatSync(roomId: string | null) {
   const setTypingBroadcastCallback = usePokerStore(
     (s) => s.setTypingBroadcastCallback,
   );
+  const setCountdownBroadcastCallback = usePokerStore(
+    (s) => s.setCountdownBroadcastCallback,
+  );
+  const triggerRemoteCountdown = usePokerStore((s) => s.triggerRemoteCountdown);
   const setUserTyping = usePokerStore((s) => s.setUserTyping);
   const clearChat = usePokerStore((s) => s.clearChat);
   const currentUserId = usePokerStore((s) => s.currentUserId);
@@ -57,6 +63,17 @@ export function useChatSync(roomId: string | null) {
     [],
   );
 
+  // Broadcast countdown start to all other clients
+  const broadcastCountdown = useCallback(() => {
+    if (channelRef.current) {
+      channelRef.current.send({
+        type: "broadcast",
+        event: COUNTDOWN_EVENT,
+        payload: { type: "countdown_start" } as CountdownBroadcastPayload,
+      });
+    }
+  }, []);
+
   useEffect(() => {
     if (!roomId) return;
 
@@ -92,6 +109,14 @@ export function useChatSync(roomId: string | null) {
       }
     });
 
+    // Listen for countdown start events
+    channel.on("broadcast", { event: COUNTDOWN_EVENT }, (payload) => {
+      const data = payload.payload as CountdownBroadcastPayload;
+      if (data.type === "countdown_start") {
+        triggerRemoteCountdown();
+      }
+    });
+
     // Subscribe to the channel
     channel.subscribe((status) => {
       if (status === "SUBSCRIBED") {
@@ -99,6 +124,7 @@ export function useChatSync(roomId: string | null) {
         // Set the broadcast callbacks in the store
         setBroadcastCallback(broadcast);
         setTypingBroadcastCallback(broadcastTyping);
+        setCountdownBroadcastCallback(broadcastCountdown);
       }
     });
 
@@ -106,6 +132,7 @@ export function useChatSync(roomId: string | null) {
     return () => {
       setBroadcastCallback(null);
       setTypingBroadcastCallback(null);
+      setCountdownBroadcastCallback(null);
       channelRef.current = null;
       supabase.removeChannel(channel);
       clearChat();
@@ -116,9 +143,12 @@ export function useChatSync(roomId: string | null) {
     addChatMessage,
     setBroadcastCallback,
     setTypingBroadcastCallback,
+    setCountdownBroadcastCallback,
+    triggerRemoteCountdown,
     setUserTyping,
     clearChat,
     broadcast,
     broadcastTyping,
+    broadcastCountdown,
   ]);
 }

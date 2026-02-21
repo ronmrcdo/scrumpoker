@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useShallow } from "zustand/react/shallow";
 import { InviteBanner } from "@/components/poker/invite-banner";
 import { JoinRoomDialog } from "@/components/poker/join-room-dialog";
@@ -15,6 +15,7 @@ import { VoteSelection } from "@/components/poker/vote-selection";
 import { trackEvent } from "@/lib/analytics";
 import { FOLD_VALUE } from "@/lib/constants/cards";
 import { useChatSync } from "@/lib/hooks/use-chat-sync";
+import { usePresenceSync } from "@/lib/hooks/use-presence-sync";
 import { useRevealCountdown } from "@/lib/hooks/use-reveal-countdown";
 import { useRoomSync } from "@/lib/hooks/use-room-sync";
 import { usePokerStore } from "@/lib/store/poker-store";
@@ -35,6 +36,8 @@ export function PokerRoomClient({ initialRoom }: PokerRoomClientProps) {
     toggleReveal,
     resetVotes,
     currentUserId,
+    broadcastCountdown,
+    remoteCountdownTrigger,
   } = usePokerStore(
     useShallow((s) => ({
       room: s.room,
@@ -44,6 +47,8 @@ export function PokerRoomClient({ initialRoom }: PokerRoomClientProps) {
       toggleReveal: s.toggleReveal,
       resetVotes: s.resetVotes,
       currentUserId: s.currentUserId,
+      broadcastCountdown: s.broadcastCountdown,
+      remoteCountdownTrigger: s.remoteCountdownTrigger,
     })),
   );
 
@@ -53,12 +58,36 @@ export function PokerRoomClient({ initialRoom }: PokerRoomClientProps) {
   // Subscribe to chat broadcast channel
   useChatSync(room?.id ?? initialRoom.id);
 
-  // Countdown timer for reveal
+  // Subscribe to presence channel for online/offline detection
+  usePresenceSync(room?.id ?? initialRoom.id);
+
+  // Local countdown for facilitator (triggers toggleReveal on completion)
   const {
-    countdown,
-    isCounting,
-    start: startCountdown,
+    countdown: localCountdown,
+    isCounting: isLocalCounting,
+    start: startLocalCountdown,
   } = useRevealCountdown(toggleReveal);
+
+  // Remote countdown for non-facilitators (visual only)
+  const noop = useCallback(() => {}, []);
+  const {
+    countdown: remoteCountdown,
+    isCounting: isRemoteCounting,
+    start: startRemoteCountdown,
+  } = useRevealCountdown(noop);
+
+  // Start remote countdown when a broadcast is received
+  const remoteCountdownTriggerRef = useRef(0);
+  useEffect(() => {
+    if (remoteCountdownTrigger === 0) return;
+    if (remoteCountdownTrigger === remoteCountdownTriggerRef.current) return;
+    remoteCountdownTriggerRef.current = remoteCountdownTrigger;
+    startRemoteCountdown();
+  }, [remoteCountdownTrigger, startRemoteCountdown]);
+
+  // Merge local and remote countdown for display
+  const countdown = localCountdown ?? remoteCountdown;
+  const isCounting = isLocalCounting || isRemoteCounting;
 
   // Redirect to home if kicked
   useEffect(() => {
@@ -120,7 +149,8 @@ export function PokerRoomClient({ initialRoom }: PokerRoomClientProps) {
         voted_count: activeRoom.players.filter((p) => p.vote !== null).length,
         fold_count: foldedCount,
       });
-      startCountdown();
+      startLocalCountdown();
+      broadcastCountdown();
     }
   }, [
     activeRoom.isRevealed,
@@ -128,7 +158,8 @@ export function PokerRoomClient({ initialRoom }: PokerRoomClientProps) {
     activeRoom.players,
     foldedCount,
     toggleReveal,
-    startCountdown,
+    startLocalCountdown,
+    broadcastCountdown,
   ]);
 
   const handleReset = useCallback(() => {

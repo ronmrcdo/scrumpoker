@@ -66,6 +66,36 @@ export function getVoteStats(players: Player[]): VoteStats | null {
   return { average, mode, spread, consensus, distribution };
 }
 
+/**
+ * If the URL contains a `?redirect=/poker/...` param (set by middleware for
+ * first-time visitors), perform a full-page navigation so the middleware
+ * re-runs with the newly-created session cookie.
+ */
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+export function followRedirectParam(): void {
+  const redirect = new URLSearchParams(window.location.search).get("redirect");
+  if (!redirect) return;
+
+  // Decode to catch encoded traversal attacks (e.g. %2e%2e)
+  let decoded: string;
+  try {
+    decoded = decodeURIComponent(redirect);
+  } catch {
+    return;
+  }
+
+  if (!decoded.startsWith("/poker/")) return;
+  if (decoded.includes("..")) return;
+
+  // Validate the room ID segment is a well-formed UUID
+  const uuidSegment = decoded.slice("/poker/".length).split("/")[0];
+  if (!uuidSegment || !UUID_RE.test(uuidSegment)) return;
+
+  window.location.replace(redirect);
+}
+
 export function getRadialPosition(
   index: number,
   total: number,

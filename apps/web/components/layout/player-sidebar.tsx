@@ -16,6 +16,7 @@ export function PlayerSidebar() {
     leaveRoom,
     kickPlayer,
     currentUserId,
+    onlinePlayerIds,
   } = usePokerStore(
     useShallow((s) => ({
       room: s.room,
@@ -24,6 +25,7 @@ export function PlayerSidebar() {
       leaveRoom: s.leaveRoom,
       kickPlayer: s.kickPlayer,
       currentUserId: s.currentUserId,
+      onlinePlayerIds: s.onlinePlayerIds,
     })),
   );
 
@@ -79,6 +81,7 @@ export function PlayerSidebar() {
           currentUserId={currentUserId}
           isRevealed={room.isRevealed}
           isFacilitator={isFacilitator}
+          onlinePlayerIds={onlinePlayerIds}
           onLeave={handleLeave}
           onKick={(playerId) => {
             trackEvent("player_kicked", {

@@ -42,6 +42,10 @@ export interface TypingBroadcastPayload {
   isTyping: boolean;
 }
 
+export interface CountdownBroadcastPayload {
+  type: "countdown_start";
+}
+
 export interface VoteStats {
   average: number;
   mode: string;

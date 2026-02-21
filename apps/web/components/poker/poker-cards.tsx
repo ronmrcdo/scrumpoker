@@ -146,9 +146,13 @@ export function PokerCards({
         <div className="absolute inset-0 z-10 flex items-center justify-center">
           <span
             key={countdown}
+            aria-hidden="true"
             className="text-6xl sm:text-7xl md:text-8xl font-bold text-foreground/80 animate-countdown-pulse"
           >
             {countdown}
+          </span>
+          <span className="sr-only" aria-live="assertive" aria-atomic="true">
+            {`Revealing cards in ${countdown}`}
           </span>
         </div>
       )}

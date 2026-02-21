@@ -24,6 +24,7 @@ interface PlayerListProps {
   currentUserId: string;
   isRevealed: boolean;
   isFacilitator: boolean;
+  onlinePlayerIds?: Set<string>;
   onLeave: () => void;
   onKick: (playerId: string) => void;
 }
@@ -33,12 +34,19 @@ export function PlayerList({
   currentUserId,
   isRevealed,
   isFacilitator,
+  onlinePlayerIds,
   onLeave,
   onKick,
 }: PlayerListProps) {
   const [isLeaveDialogOpen, setIsLeaveDialogOpen] = useState(false);
-  const votedCount = players.filter((p) => p.vote !== null).length;
-  const foldCount = players.filter((p) => p.vote === FOLD_VALUE).length;
+  let votedCount = 0;
+  let foldCount = 0;
+  let onlineCount = 0;
+  for (const p of players) {
+    if (p.vote !== null) votedCount++;
+    if (p.vote === FOLD_VALUE) foldCount++;
+    if (!onlinePlayerIds || onlinePlayerIds.has(p.id)) onlineCount++;
+  }
 
   const handleConfirmLeave = () => {
     setIsLeaveDialogOpen(false);
@@ -48,18 +56,25 @@ export function PlayerList({
   return (
     <div className="flex flex-col h-full">
       <div className="flex items-center gap-2 px-3 sm:px-4 py-2.5 sm:py-3">
-        <Users className="h-4 w-4 text-muted-foreground" />
-        <span className="text-sm font-semibold">Players</span>
-        <span className="ml-auto text-xs text-muted-foreground">
-          {votedCount}/{players.length} voted
+        <Users className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+        <h2 id="players-heading" className="text-sm font-semibold">
+          Players
+        </h2>
+        <output
+          aria-label={`${onlineCount} of ${players.length} online, ${votedCount} voted${foldCount > 0 ? `, ${foldCount} folded` : ""}`}
+          className="ml-auto text-xs text-muted-foreground"
+        >
+          {onlineCount}/{players.length} online · {votedCount} voted
           {foldCount > 0 && (
-            <span className="text-amber-600 ml-1">({foldCount} folded)</span>
+            <span aria-hidden="true" className="text-amber-700 ml-1">
+              ({foldCount} folded)
+            </span>
           )}
-        </span>
+        </output>
       </div>
       <Separator />
       <ul
-        aria-label="Players"
+        aria-labelledby="players-heading"
         className="flex-1 overflow-y-auto p-2 sm:p-2 space-y-1 list-none"
       >
         {players.map((player) => (
@@ -69,6 +84,7 @@ export function PlayerList({
             isCurrentUser={player.id === currentUserId}
             isRevealed={isRevealed}
             isFacilitator={isFacilitator}
+            isOnline={onlinePlayerIds ? onlinePlayerIds.has(player.id) : true}
             onKick={onKick}
           />
         ))}

@@ -23,6 +23,7 @@ interface PlayerItemProps {
   isCurrentUser: boolean;
   isRevealed: boolean;
   isFacilitator?: boolean;
+  isOnline?: boolean;
   onKick?: (playerId: string) => void;
 }
 
@@ -31,6 +32,7 @@ export const PlayerItem = memo(function PlayerItem({
   isCurrentUser,
   isRevealed,
   isFacilitator,
+  isOnline = true,
   onKick,
 }: PlayerItemProps) {
   const [isKickDialogOpen, setIsKickDialogOpen] = useState(false);
@@ -74,13 +76,16 @@ export const PlayerItem = memo(function PlayerItem({
             </AvatarFallback>
           </Avatar>
           <div
+            aria-hidden="true"
             className={cn(
               "absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-card",
-              hasFolded
-                ? "bg-amber-500"
-                : hasVoted
-                  ? "bg-accent-500"
-                  : "bg-muted-foreground/40",
+              !isOnline
+                ? "bg-gray-400"
+                : hasFolded
+                  ? "bg-amber-700"
+                  : hasVoted
+                    ? "bg-green-600"
+                    : "bg-green-600",
             )}
           />
         </div>
@@ -102,20 +107,26 @@ export const PlayerItem = memo(function PlayerItem({
             )}
           </div>
           <span
+            aria-live="polite"
+            aria-atomic="true"
             className={cn(
               "text-xs",
-              hasFolded
-                ? "text-amber-600 font-medium"
-                : "text-muted-foreground",
+              !isOnline
+                ? "text-neutral-500 font-medium"
+                : hasFolded
+                  ? "text-amber-700 font-medium"
+                  : "text-muted-foreground",
             )}
           >
-            {!hasVoted
-              ? "Thinking..."
-              : hasFolded
-                ? "Folded"
-                : isRevealed
-                  ? `Voted: ${player.vote}`
-                  : "Voted"}
+            {!isOnline
+              ? "Offline"
+              : !hasVoted
+                ? "Thinking..."
+                : hasFolded
+                  ? "Folded"
+                  : isRevealed
+                    ? `Voted: ${player.vote}`
+                    : "Voted"}
           </span>
         </div>
 

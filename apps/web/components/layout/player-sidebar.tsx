@@ -89,21 +89,23 @@ export function PlayerSidebar() {
             : "-translate-x-full md:translate-x-0",
         )}
       >
-        <PlayerList
-          players={room.players}
-          currentUserId={currentUserId}
-          isRevealed={room.isRevealed}
-          isFacilitator={isFacilitator}
-          onlinePlayerIds={onlinePlayerIds}
-          onLeave={handleLeave}
-          onKick={(playerId) => {
-            trackEvent("player_kicked", {
-              room_id: room.id,
-              player_count_after: room.players.length - 1,
-            });
-            kickPlayer(playerId);
-          }}
-        />
+        <div className="h-full overflow-y-auto pb-safe">
+          <PlayerList
+            players={room.players}
+            currentUserId={currentUserId}
+            isRevealed={room.isRevealed}
+            isFacilitator={isFacilitator}
+            onlinePlayerIds={onlinePlayerIds}
+            onLeave={handleLeave}
+            onKick={(playerId) => {
+              trackEvent("player_kicked", {
+                room_id: room.id,
+                player_count_after: room.players.length - 1,
+              });
+              kickPlayer(playerId);
+            }}
+          />
+        </div>
       </aside>
     </>
   );

@@ -18,9 +18,10 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { trackEvent } from "@/lib/analytics";
 import { usePokerStore } from "@/lib/store/poker-store";
+import { userNameSchema } from "@/lib/validation";
 
 const joinSchema = z.object({
-  userName: z.string().min(1, "Your name is required").max(50),
+  userName: userNameSchema,
 });
 
 type JoinFormData = z.infer<typeof joinSchema>;
@@ -95,6 +96,7 @@ export function JoinRoomDialog({ roomId }: JoinRoomDialogProps) {
             <Input
               id="join-name"
               placeholder="Enter your name"
+              maxLength={50}
               className="h-10 sm:h-11 text-sm sm:text-base"
               disabled={isSubmitting}
               aria-invalid={!!form.formState.errors.userName}

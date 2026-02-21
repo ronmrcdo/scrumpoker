@@ -75,18 +75,20 @@ export function ChatSidebar() {
           isChatOpen ? "translate-x-0" : "translate-x-full md:translate-x-0",
         )}
       >
-        <ChatPanel
-          messages={chatMessages}
-          currentUserId={currentUserId}
-          onSend={(text) => {
-            sendChatMessage(text, currentUserId, currentUserName);
-            trackEvent("chat_message_sent", {
-              room_id: room.id,
-              message_length: text.length,
-            });
-          }}
-          onClose={toggleChat}
-        />
+        <div className="h-full overflow-hidden pb-safe">
+          <ChatPanel
+            messages={chatMessages}
+            currentUserId={currentUserId}
+            onSend={(text) => {
+              sendChatMessage(text, currentUserId, currentUserName);
+              trackEvent("chat_message_sent", {
+                room_id: room.id,
+                message_length: text.length,
+              });
+            }}
+            onClose={toggleChat}
+          />
+        </div>
       </aside>
     </>
   );

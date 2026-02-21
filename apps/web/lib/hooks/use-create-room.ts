@@ -2,15 +2,16 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { trackEvent } from "@/lib/analytics";
 import { usePokerStore } from "@/lib/store/poker-store";
+import { roomNameSchema, userNameSchema } from "@/lib/validation";
 
 const createRoomSchema = z.object({
-  roomName: z.string().min(1, "Room name is required").max(100),
-  userName: z.string().min(1, "Your name is required").max(50),
+  roomName: roomNameSchema,
+  userName: userNameSchema,
   hp: z.string(),
 });
 
@@ -22,7 +23,18 @@ export function useCreateRoom() {
   const currentUserId = usePokerStore((s) => s.currentUserId);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const formLoadedAt = useRef(Date.now());
+
+  const hasTurnstile = !!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+
+  const onTurnstileSuccess = useCallback((token: string) => {
+    setTurnstileToken(token);
+  }, []);
+
+  const onTurnstileError = useCallback(() => {
+    setTurnstileToken(null);
+  }, []);
 
   const form = useForm<CreateRoomFormData>({
     resolver: zodResolver(createRoomSchema),
@@ -43,6 +55,7 @@ export function useCreateRoom() {
           userName: data.userName,
           hp: data.hp,
           formLoadedAt: formLoadedAt.current,
+          turnstileToken: turnstileToken ?? "",
         }),
       });
 
@@ -74,7 +87,10 @@ export function useCreateRoom() {
     form,
     formError,
     isSubmitting,
-    isDisabled: isSubmitting || !currentUserId,
+    isDisabled:
+      isSubmitting || !currentUserId || (hasTurnstile && !turnstileToken),
     handleSubmit: form.handleSubmit(onSubmit),
+    onTurnstileSuccess,
+    onTurnstileError,
   };
 }

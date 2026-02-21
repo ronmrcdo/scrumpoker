@@ -49,7 +49,7 @@ export function CookieConsent() {
       role="dialog"
       aria-modal="true"
       aria-labelledby="cookie-consent-title"
-      className="fixed bottom-4 left-4 right-4 sm:right-auto z-50 sm:w-sm rounded-lg border border-border bg-background/95 shadow-lg backdrop-blur-md animate-fade-up"
+      className="fixed bottom-[calc(1rem+env(safe-area-inset-bottom))] left-4 right-4 sm:right-auto z-50 sm:w-sm rounded-lg border border-border bg-background/95 shadow-lg backdrop-blur-md animate-fade-up"
     >
       <div className="p-4">
         <div className="flex items-start gap-3">

@@ -5,7 +5,7 @@ export function LandingFooter() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-border bg-muted/30">
+    <footer className="border-t border-border bg-muted/30 pb-safe">
       <div className="container mx-auto px-4 py-8">
         <div className="flex flex-col sm:flex-row justify-between gap-8">
           {/* Left: Branding */}

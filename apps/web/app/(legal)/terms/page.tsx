@@ -24,6 +24,9 @@ export const metadata: Metadata = {
   title: "Terms of Service - Scrum Poker Game",
   description:
     "Terms and conditions for using Scrum Poker Game, a free real-time planning poker tool for agile teams.",
+  alternates: {
+    canonical: "/terms",
+  },
 };
 
 const tocItems = [

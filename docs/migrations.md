@@ -98,7 +98,7 @@ pnpm supabase migration list
 
 ## Pushing to Production
 
-### First-Time Setup
+### Option 1: Linked Project (Supabase Cloud)
 
 Link your local project to the remote Supabase project:
 
@@ -108,13 +108,27 @@ pnpm supabase link --project-ref <your-project-ref>
 
 Find your project ref in the Supabase Dashboard under **Project Settings > General**.
 
-### Push Migrations
+Then push migrations:
 
 ```bash
 pnpm supabase db push
 ```
 
-This applies any pending migrations to the remote database. **Always test locally with `db reset` before pushing.**
+### Option 2: Direct Database URL (Self-Hosted / VPS)
+
+Push migrations directly to a database using a connection string:
+
+```bash
+supabase db push --db-url "postgresql://postgres:<password>@<host>:<port>/postgres?sslmode=disable"
+```
+
+Replace `<password>`, `<host>`, and `<port>` with your database credentials. Use `sslmode=require` if your server supports SSL.
+
+> **Warning:** Never commit database credentials to version control. Use environment variables or a secrets manager for the connection string.
+
+---
+
+**Always test locally with `db reset` before pushing to any environment.**
 
 ## Common Patterns
 
@@ -179,4 +193,5 @@ WHERE created_at > now() - interval '30 days';
 | `pnpm supabase migration new <name>` | Create a new migration file |
 | `pnpm supabase migration list` | List migration status |
 | `pnpm supabase link --project-ref <ref>` | Link to remote project |
-| `pnpm supabase db push` | Push migrations to production |
+| `pnpm supabase db push` | Push migrations to linked project |
+| `supabase db push --db-url <url>` | Push migrations to a specific database |

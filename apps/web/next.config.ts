@@ -7,13 +7,17 @@ const plausibleHost = process.env.NEXT_PUBLIC_PLAUSIBLE_SCRIPT_URL
   ? new URL(process.env.NEXT_PUBLIC_PLAUSIBLE_SCRIPT_URL).origin
   : "";
 
+const turnstileOrigin = "https://challenges.cloudflare.com";
+const cloudflareInsights = "https://static.cloudflareinsights.com";
+
 const cspDirectives = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline' ${plausibleHost}${process.env.NODE_ENV === "development" ? " 'unsafe-eval'" : ""}`,
+  `script-src 'self' 'unsafe-inline' ${plausibleHost} ${turnstileOrigin} ${cloudflareInsights}${process.env.NODE_ENV === "development" ? " 'unsafe-eval'" : ""}`,
   "style-src 'self' 'unsafe-inline'",
-  `connect-src 'self' ${supabaseUrl} ${supabaseWs} ${plausibleHost}`,
+  `connect-src 'self' ${supabaseUrl} ${supabaseWs} ${plausibleHost} ${turnstileOrigin} ${cloudflareInsights}`,
   "font-src 'self' data:",
   "img-src 'self' data: blob: https://cdn.jsdelivr.net",
+  `frame-src ${turnstileOrigin}`,
   "frame-ancestors 'none'",
   "base-uri 'self'",
   "form-action 'self'",

@@ -4,12 +4,15 @@ import { z } from "zod";
 import { validateAntiBot } from "@/lib/anti-bot";
 import { roomCreationLimiter } from "@/lib/rate-limit";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { verifyTurnstileToken } from "@/lib/turnstile";
+import { roomNameSchema, userNameSchema } from "@/lib/validation";
 
 const createRoomApiSchema = z.object({
-  roomName: z.string().min(1).max(100),
-  userName: z.string().min(1).max(50),
+  roomName: roomNameSchema,
+  userName: userNameSchema,
   hp: z.string().max(500).default(""),
   formLoadedAt: z.number().int().positive(),
+  turnstileToken: z.string().min(1, "Missing security token"),
 });
 
 function getClientIp(request: NextRequest): string {
@@ -61,6 +64,19 @@ export async function POST(request: NextRequest) {
   if (!antiBotResult.passed) {
     return NextResponse.json(
       { error: "Unable to create room" },
+      { status: 422 },
+    );
+  }
+
+  // 3b. Verify Turnstile token
+  const turnstileResult = await verifyTurnstileToken(
+    parsed.data.turnstileToken,
+    ip,
+  );
+
+  if (!turnstileResult.success) {
+    return NextResponse.json(
+      { error: "Security check failed. Please try again." },
       { status: 422 },
     );
   }

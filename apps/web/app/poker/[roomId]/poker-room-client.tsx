@@ -172,7 +172,7 @@ export function PokerRoomClient({ initialRoom }: PokerRoomClientProps) {
   }, [activeRoom.id, activeRoom.players.length, stats?.consensus, resetVotes]);
 
   return (
-    <div className="flex flex-col items-center gap-4 sm:gap-6 md:gap-8 p-3 sm:p-4 md:p-6 max-w-4xl mx-auto">
+    <div className="flex flex-col items-center gap-4 sm:gap-6 md:gap-8 p-3 sm:p-4 md:p-6 pb-safe max-w-4xl mx-auto">
       {!isPlayerInRoom && currentUserId && (
         <JoinRoomDialog roomId={activeRoom.id} />
       )}

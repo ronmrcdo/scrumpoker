@@ -21,6 +21,7 @@ const cspDirectives = [
 ];
 
 const nextConfig: NextConfig = {
+  output: "standalone",
   transpilePackages: ["@repo/ui"],
   devIndicators: false,
   images: {

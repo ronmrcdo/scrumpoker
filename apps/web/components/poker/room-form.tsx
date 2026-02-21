@@ -1,5 +1,6 @@
 "use client";
 
+import { Turnstile } from "@marsidev/react-turnstile";
 import {
   Button,
   Card,
@@ -13,8 +14,15 @@ import {
 import { useCreateRoom } from "@/lib/hooks/use-create-room";
 
 export function RoomForm() {
-  const { form, formError, isSubmitting, isDisabled, handleSubmit } =
-    useCreateRoom();
+  const {
+    form,
+    formError,
+    isSubmitting,
+    isDisabled,
+    handleSubmit,
+    onTurnstileSuccess,
+    onTurnstileError,
+  } = useCreateRoom();
 
   return (
     <Card className="w-full max-w-md shadow-soft-lg mx-2 sm:mx-0">
@@ -41,6 +49,7 @@ export function RoomForm() {
             <Input
               id="create-name"
               placeholder="Enter your name"
+              maxLength={50}
               className="h-10 sm:h-11 text-sm sm:text-base"
               disabled={isSubmitting}
               aria-invalid={!!form.formState.errors.userName}
@@ -66,6 +75,7 @@ export function RoomForm() {
             <Input
               id="create-room"
               placeholder="e.g., Sprint 42: API Refactoring"
+              maxLength={100}
               className="h-10 sm:h-11 text-sm sm:text-base"
               disabled={isSubmitting}
               aria-invalid={!!form.formState.errors.roomName}
@@ -104,6 +114,15 @@ export function RoomForm() {
               {...form.register("hp")}
             />
           </div>
+          {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
+            <Turnstile
+              siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY}
+              onSuccess={onTurnstileSuccess}
+              onError={onTurnstileError}
+              onExpire={onTurnstileError}
+              options={{ theme: "auto", size: "normal" }}
+            />
+          )}
           <Button
             type="submit"
             className="w-full h-10 sm:h-11 text-sm sm:text-base"

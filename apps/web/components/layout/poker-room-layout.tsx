@@ -76,14 +76,14 @@ export function PokerRoomLayout({ children }: PokerRoomLayoutProps) {
 
   if (!room) {
     return (
-      <div className="h-screen flex flex-col bg-background">
+      <div className="h-dvh flex flex-col bg-background">
         <main className="flex-1 overflow-y-auto">{children}</main>
       </div>
     );
   }
 
   return (
-    <div className="h-screen flex flex-col bg-background">
+    <div className="h-dvh flex flex-col bg-background">
       <PokerHeader
         roomId={room.id}
         isChatOpen={isChatOpen}

@@ -104,6 +104,11 @@
 }
 
 @layer utilities {
+  /* Safe area padding for iOS Safari bottom bar */
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
   /* Flip animation for card reveal */
   @keyframes flip {
     0% {

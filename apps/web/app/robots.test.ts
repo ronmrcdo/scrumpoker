@@ -22,4 +22,9 @@ describe("robots", () => {
     const mainRule = rules.find((r) => r.userAgent === "*");
     expect(mainRule?.disallow).toContain("/api/");
   });
+
+  it("includes a sitemap URL", () => {
+    const result = robots();
+    expect(result.sitemap).toBe("https://scrumpokergame.com/sitemap.xml");
+  });
 });

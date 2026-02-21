@@ -24,6 +24,9 @@ export const metadata: Metadata = {
   title: "Privacy Policy - Scrum Poker Game",
   description:
     "Learn how Scrum Poker Game collects, uses, and protects your information. We prioritize minimal data collection and privacy by design.",
+  alternates: {
+    canonical: "/privacy",
+  },
 };
 
 const tocItems = [

@@ -74,6 +74,9 @@ export const metadata: Metadata = {
       "Free real-time planning poker for agile teams. Estimate stories together — no sign-up required.",
     images: ["/scrum-poker.png"],
   },
+  alternates: {
+    canonical: "/",
+  },
   robots: {
     index: true,
     follow: true,

@@ -21,6 +21,9 @@ export const metadata: Metadata = {
   title: "Disclaimer - Scrum Poker Game",
   description:
     "Important disclaimers about the Scrum Poker Game service, including limitation of liability and third-party service information.",
+  alternates: {
+    canonical: "/disclaimer",
+  },
 };
 
 const tocItems = [

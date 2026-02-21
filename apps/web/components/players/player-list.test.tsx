@@ -30,22 +30,42 @@ describe("PlayerList", () => {
       expect(screen.getByText("Players")).toBeInTheDocument();
     });
 
-    it("should display vote count", () => {
+    it("should display online and vote count", () => {
       const players = createPlayers(5, 2); // 2 voted out of 5
       render(<PlayerList {...defaultProps} players={players} />);
-      expect(screen.getByText("2/5 voted")).toBeInTheDocument();
+      expect(screen.getByText(/5\/5 online/)).toBeInTheDocument();
+      expect(screen.getByText(/2 voted/)).toBeInTheDocument();
     });
 
     it("should display 0 voted when no one voted", () => {
       const players = createPlayers(3, 0);
       render(<PlayerList {...defaultProps} players={players} />);
-      expect(screen.getByText("0/3 voted")).toBeInTheDocument();
+      expect(screen.getByText(/0 voted/)).toBeInTheDocument();
     });
 
     it("should display all voted", () => {
       const players = createPlayers(4, 4);
       render(<PlayerList {...defaultProps} players={players} />);
-      expect(screen.getByText("4/4 voted")).toBeInTheDocument();
+      expect(screen.getByText(/4 voted/)).toBeInTheDocument();
+    });
+
+    it("should show correct online count when onlinePlayerIds is provided", () => {
+      const players = createPlayers(3);
+      const onlinePlayerIds = new Set(["player-0", "player-1"]);
+      render(
+        <PlayerList
+          {...defaultProps}
+          players={players}
+          onlinePlayerIds={onlinePlayerIds}
+        />,
+      );
+      expect(screen.getByText(/2\/3 online/)).toBeInTheDocument();
+    });
+
+    it("should assume all online when onlinePlayerIds is not provided", () => {
+      const players = createPlayers(3);
+      render(<PlayerList {...defaultProps} players={players} />);
+      expect(screen.getByText(/3\/3 online/)).toBeInTheDocument();
     });
   });
 
@@ -195,7 +215,7 @@ describe("PlayerList", () => {
       ];
 
       render(<PlayerList {...defaultProps} players={players} />);
-      expect(screen.getByText("2/4 voted")).toBeInTheDocument();
+      expect(screen.getByText(/2 voted/)).toBeInTheDocument();
     });
 
     it("should count coffee break as a vote", () => {
@@ -206,14 +226,14 @@ describe("PlayerList", () => {
       ];
 
       render(<PlayerList {...defaultProps} players={players} />);
-      expect(screen.getByText("2/3 voted")).toBeInTheDocument();
+      expect(screen.getByText(/2 voted/)).toBeInTheDocument();
     });
   });
 
   describe("empty state", () => {
     it("should handle empty players array", () => {
       render(<PlayerList {...defaultProps} players={[]} />);
-      expect(screen.getByText("0/0 voted")).toBeInTheDocument();
+      expect(screen.getByText(/0\/0 online/)).toBeInTheDocument();
     });
   });
 

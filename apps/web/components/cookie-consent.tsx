@@ -2,7 +2,6 @@
 
 import { Button, Cookie } from "@repo/ui";
 import Link from "next/link";
-import posthog from "posthog-js";
 import { useEffect, useRef, useState } from "react";
 
 const CONSENT_KEY = "cookie-consent";
@@ -38,9 +37,6 @@ export function CookieConsent() {
       localStorage.setItem(CONSENT_KEY, value);
     } catch {
       // localStorage unavailable (private browsing, quota exceeded)
-    }
-    if (value === "accepted") {
-      posthog.opt_in_capturing();
     }
     setVisible(false);
   };

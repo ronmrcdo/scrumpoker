@@ -176,17 +176,17 @@ export default function DisclaimerPage() {
               </a>
             </li>
             <li>
-              <strong className="text-foreground">PostHog</strong> — Provides
-              optional, consent-based analytics. Only active when users
-              explicitly opt in via the cookie consent banner.{" "}
+              <strong className="text-foreground">Plausible Analytics</strong> —
+              Provides privacy-focused, cookie-free website analytics. No
+              personal data is collected or shared.{" "}
               <a
-                href="https://posthog.com/privacy"
+                href="https://plausible.io/privacy"
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="PostHog Privacy Policy (opens in new tab)"
+                aria-label="Plausible Analytics Privacy Policy (opens in new tab)"
                 className="text-primary underline hover:text-primary-700 dark:hover:text-primary-300"
               >
-                PostHog Privacy Policy
+                Plausible Privacy Policy
               </a>
             </li>
           </ul>
@@ -290,9 +290,7 @@ export default function DisclaimerPage() {
             contact us at:
           </p>
           <p>
-            <strong className="text-foreground">
-              legal@scrumpokergame.com
-            </strong>
+            <strong className="text-foreground">info@scrumpokergame.com</strong>
           </p>
           <p>
             We welcome feedback and will make reasonable efforts to respond to

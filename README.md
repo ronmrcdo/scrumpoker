@@ -24,7 +24,7 @@ Real-time planning poker for agile teams. Create a room, share the link, and est
 | Forms | React Hook Form, Zod |
 | Testing | Vitest, Testing Library |
 | Code Quality | Biome, TypeScript 5.9 (strict) |
-| Analytics | PostHog |
+| Analytics | Plausible (self-hosted) |
 
 ## Project Structure
 

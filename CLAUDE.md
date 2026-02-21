@@ -59,7 +59,7 @@ turbo run check-types       # Type-check all packages
 - **Testing**: Vitest + @testing-library/react
 - **Code Quality**: Biome (replaces ESLint + Prettier)
 - **Language**: TypeScript 5.9
-- **Analytics**: PostHog
+- **Analytics**: Plausible (self-hosted, privacy-focused, cookie-free)
 - **Icons**: Lucide React
 
 ## Architecture Patterns
@@ -95,7 +95,7 @@ const MyComponent = () => {
 - `layout/` - Layout components (headers, sidebars, room layout)
 - `landing/` - Landing page components (hero, features, demos)
 - `error/` - Error boundary and error layout components
-- `providers/` - Context providers (PostHog analytics)
+- `providers/` - Context providers (theme)
 - `cookie-consent.tsx` - Cookie consent banner
 
 **Shared UI Package** (`packages/ui/src/`):

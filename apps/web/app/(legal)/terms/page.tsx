@@ -392,7 +392,7 @@ export default function TermsPage() {
       <div className="rounded-lg border border-border/50 bg-muted/30 p-6 text-center text-sm text-muted-foreground">
         <p>
           For questions about these terms, please contact us at{" "}
-          <strong className="text-foreground">legal@scrumpokergame.com</strong>
+          <strong className="text-foreground">info@scrumpokergame.com</strong>
         </p>
       </div>
     </>

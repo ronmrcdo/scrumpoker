@@ -12,7 +12,7 @@ const createRoomApiSchema = z.object({
   userName: userNameSchema,
   hp: z.string().max(500).default(""),
   formLoadedAt: z.number().int().positive(),
-  turnstileToken: z.string().min(1, "Missing security token"),
+  turnstileToken: z.string().default(""),
 });
 
 function getClientIp(request: NextRequest): string {
@@ -68,16 +68,24 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // 3b. Verify Turnstile token
-  const turnstileResult = await verifyTurnstileToken(
-    parsed.data.turnstileToken,
-    ip,
-  );
+  // 3b. Verify Turnstile token (only when configured)
+  if (parsed.data.turnstileToken) {
+    const turnstileResult = await verifyTurnstileToken(
+      parsed.data.turnstileToken,
+      ip,
+    );
 
-  if (!turnstileResult.success) {
+    if (!turnstileResult.success) {
+      return NextResponse.json(
+        { error: "Security check failed. Please try again." },
+        { status: 422 },
+      );
+    }
+  } else if (process.env.TURNSTILE_SECRET_KEY) {
+    // Token is required when Turnstile is configured on the server
     return NextResponse.json(
-      { error: "Security check failed. Please try again." },
-      { status: 422 },
+      { error: "Missing security token" },
+      { status: 400 },
     );
   }
 

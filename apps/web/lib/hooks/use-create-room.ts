@@ -43,6 +43,10 @@ export function useCreateRoom() {
 
   const onSubmit = async (data: CreateRoomFormData) => {
     if (!currentUserId) return;
+    if (hasTurnstile && !turnstileToken) {
+      setFormError("Security check not completed. Please wait and try again.");
+      return;
+    }
     setIsSubmitting(true);
     setFormError(null);
 
@@ -87,8 +91,7 @@ export function useCreateRoom() {
     form,
     formError,
     isSubmitting,
-    isDisabled:
-      isSubmitting || !currentUserId || (hasTurnstile && !turnstileToken),
+    isDisabled: isSubmitting || !currentUserId,
     handleSubmit: form.handleSubmit(onSubmit),
     onTurnstileSuccess,
     onTurnstileError,

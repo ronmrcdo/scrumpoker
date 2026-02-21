@@ -72,8 +72,16 @@ export function VoteDistribution({ stats }: VoteDistributionProps) {
                 <span className="w-6 sm:w-8 text-sm sm:text-base font-semibold text-foreground text-right shrink-0">
                   {vote}
                 </span>
-                <div className="flex-1 h-5 sm:h-6 bg-muted rounded-md overflow-hidden">
+                <div className="flex-1 h-5 sm:h-6 bg-muted rounded-md overflow-hidden relative">
+                  <meter
+                    value={count}
+                    min={0}
+                    max={maxCount}
+                    aria-label={`${vote} points: ${count} vote(s), ${votePercentage}%`}
+                    className="sr-only"
+                  />
                   <div
+                    aria-hidden="true"
                     className="h-full bg-primary-500 rounded-md transition-all duration-500 ease-out"
                     style={{ width: `${percentage}%` }}
                   />

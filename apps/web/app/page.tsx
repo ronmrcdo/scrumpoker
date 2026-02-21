@@ -13,7 +13,7 @@ export default function LandingPage() {
         <KickedAlert />
       </Suspense>
       <LandingHeader />
-      <main id="top">
+      <main id="main-content">
         <HeroSection />
         <FeaturesSection />
       </main>

@@ -104,7 +104,11 @@ export function JoinRoomDialog({ roomId }: JoinRoomDialogProps) {
               {...form.register("userName")}
             />
             {form.formState.errors.userName && (
-              <p id="join-name-error" className="text-xs text-red-500">
+              <p
+                id="join-name-error"
+                role="alert"
+                className="text-xs text-red-500"
+              >
                 {form.formState.errors.userName.message}
               </p>
             )}

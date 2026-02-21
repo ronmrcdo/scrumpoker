@@ -163,15 +163,17 @@ export function MiniChatDemo() {
         </div>
         <button
           type="button"
+          aria-label="Open emoji picker"
           className="h-9 w-9 rounded-md flex items-center justify-center hover:bg-muted transition-colors"
         >
-          <Smile className="h-4 w-4 text-muted-foreground" />
+          <Smile aria-hidden="true" className="h-4 w-4 text-muted-foreground" />
         </button>
         <button
           type="button"
+          aria-label="Send message"
           className="h-9 w-9 rounded-md bg-primary-500 flex items-center justify-center"
         >
-          <Send className="h-4 w-4 text-white" />
+          <Send aria-hidden="true" className="h-4 w-4 text-white" />
         </button>
       </div>
     </div>

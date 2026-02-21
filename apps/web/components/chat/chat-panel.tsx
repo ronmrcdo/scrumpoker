@@ -33,6 +33,7 @@ const TypingIndicator = memo(function TypingIndicator() {
   return (
     <output
       aria-live="polite"
+      aria-atomic="true"
       className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-muted-foreground animate-fade-in"
     >
       <span>{text}</span>
@@ -78,8 +79,9 @@ export function ChatPanel({
           size="icon"
           className="h-7 w-7 md:hidden"
           onClick={onClose}
+          aria-label="Close chat"
         >
-          <X className="h-4 w-4" />
+          <X aria-hidden="true" className="h-4 w-4" />
         </Button>
       </div>
       <Separator />

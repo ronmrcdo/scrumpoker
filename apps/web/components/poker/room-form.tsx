@@ -50,7 +50,11 @@ export function RoomForm() {
               {...form.register("userName")}
             />
             {form.formState.errors.userName && (
-              <p id="create-name-error" className="text-xs text-red-500">
+              <p
+                id="create-name-error"
+                role="alert"
+                className="text-xs text-red-500"
+              >
                 {form.formState.errors.userName.message}
               </p>
             )}
@@ -71,7 +75,11 @@ export function RoomForm() {
               {...form.register("roomName")}
             />
             {form.formState.errors.roomName && (
-              <p id="create-room-error" className="text-xs text-red-500">
+              <p
+                id="create-room-error"
+                role="alert"
+                className="text-xs text-red-500"
+              >
                 {form.formState.errors.roomName.message}
               </p>
             )}

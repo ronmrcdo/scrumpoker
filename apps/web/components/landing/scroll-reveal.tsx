@@ -15,7 +15,8 @@ export function ScrollReveal({
   className,
 }: ScrollRevealProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
+  const [shouldAnimate, setShouldAnimate] = useState(false);
 
   useEffect(() => {
     // Check for reduced motion preference
@@ -24,9 +25,12 @@ export function ScrollReveal({
     ).matches;
 
     if (prefersReducedMotion) {
-      setIsVisible(true);
       return;
     }
+
+    // JS is available and motion is allowed — enable animation
+    setIsVisible(false);
+    setShouldAnimate(true);
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -54,7 +58,11 @@ export function ScrollReveal({
       ref={ref}
       style={{ animationDelay: `${delay}ms` }}
       className={cn(
-        isVisible ? "animate-fade-up opacity-100" : "opacity-0 translate-y-8",
+        !shouldAnimate
+          ? "opacity-100"
+          : isVisible
+            ? "animate-fade-up opacity-100"
+            : "opacity-0 translate-y-8",
         className,
       )}
     >

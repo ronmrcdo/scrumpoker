@@ -2,6 +2,7 @@
 
 import { cn } from "@repo/ui";
 import { useRouter } from "next/navigation";
+import { useEffect, useRef } from "react";
 import { useShallow } from "zustand/react/shallow";
 import { trackEvent } from "@/lib/analytics";
 import { usePokerStore } from "@/lib/store/poker-store";
@@ -28,6 +29,17 @@ export function PlayerSidebar() {
       onlinePlayerIds: s.onlinePlayerIds,
     })),
   );
+
+  const sidebarRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    if (isPlayerListOpen) {
+      const focusTarget = sidebarRef.current?.querySelector<HTMLElement>(
+        "button, a, input, [tabindex]",
+      );
+      focusTarget?.focus();
+    }
+  }, [isPlayerListOpen]);
 
   if (!room) return null;
 
@@ -63,6 +75,7 @@ export function PlayerSidebar() {
         tabIndex={-1}
       />
       <aside
+        ref={sidebarRef}
         className={cn(
           "border-r border-border bg-card shrink-0 overflow-hidden",
           "transition-all duration-300 ease-in-out",

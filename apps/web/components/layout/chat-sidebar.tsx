@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@repo/ui";
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useShallow } from "zustand/react/shallow";
 import { trackEvent } from "@/lib/analytics";
 import { usePokerStore } from "@/lib/store/poker-store";
@@ -30,6 +30,17 @@ export function ChatSidebar() {
     [room?.players, currentUserId],
   );
 
+  const sidebarRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    if (isChatOpen) {
+      const focusTarget = sidebarRef.current?.querySelector<HTMLElement>(
+        "button, a, input, [tabindex]",
+      );
+      focusTarget?.focus();
+    }
+  }, [isChatOpen]);
+
   if (!room) return null;
 
   return (
@@ -52,6 +63,7 @@ export function ChatSidebar() {
         tabIndex={-1}
       />
       <aside
+        ref={sidebarRef}
         className={cn(
           "border-l border-border bg-card shrink-0 overflow-hidden",
           "transition-all duration-300 ease-in-out",

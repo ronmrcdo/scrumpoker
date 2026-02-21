@@ -44,7 +44,10 @@ export function PokerHeader({
             });
             onTogglePlayerList();
           }}
-          aria-label="Toggle player list"
+          aria-label={
+            isPlayerListOpen ? "Close player list" : "Open player list"
+          }
+          aria-expanded={isPlayerListOpen}
         >
           <Menu className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
         </Button>
@@ -59,6 +62,7 @@ export function PokerHeader({
           size="sm"
           className="h-8 sm:h-9 gap-1.5 text-xs sm:text-sm px-2.5 sm:px-3"
           onClick={shareRoom}
+          aria-label={copied ? "Link copied to clipboard" : "Copy share link"}
         >
           {copied ? (
             <>

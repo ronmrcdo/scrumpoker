@@ -37,7 +37,11 @@ export function HeroForm() {
             {...form.register("userName")}
           />
           {form.formState.errors.userName && (
-            <p id="hero-user-name-error" className="text-xs text-red-500">
+            <p
+              id="hero-user-name-error"
+              role="alert"
+              className="text-xs text-red-500"
+            >
               {form.formState.errors.userName.message}
             </p>
           )}
@@ -61,7 +65,11 @@ export function HeroForm() {
             {...form.register("roomName")}
           />
           {form.formState.errors.roomName && (
-            <p id="hero-room-name-error" className="text-xs text-red-500">
+            <p
+              id="hero-room-name-error"
+              role="alert"
+              className="text-xs text-red-500"
+            >
               {form.formState.errors.roomName.message}
             </p>
           )}

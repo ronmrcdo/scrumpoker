@@ -105,14 +105,16 @@ describe("PlayerItem", () => {
   });
 
   describe("vote indicator dot", () => {
-    it("should show green dot when online and not voted", () => {
+    it("should show muted dot when online and not voted", () => {
       const { container } = render(
         <PlayerItem
           {...defaultProps}
           player={createMockPlayer({ vote: null })}
         />,
       );
-      expect(container.querySelector(".bg-green-600")).toBeInTheDocument();
+      expect(
+        container.querySelector(".bg-muted-foreground"),
+      ).toBeInTheDocument();
     });
 
     it("should show active dot when voted", () => {
@@ -178,7 +180,7 @@ describe("PlayerItem", () => {
           player={createMockPlayer({ vote: "FOLD" })}
         />,
       );
-      expect(container.querySelector(".bg-amber-700")).toBeInTheDocument();
+      expect(container.querySelector(".bg-amber-500")).toBeInTheDocument();
     });
 
     it("should show Folded even when revealed", () => {

@@ -25,7 +25,7 @@ describe("CookieConsent", () => {
     it("should render banner when no consent is stored", () => {
       render(<CookieConsent />);
       expect(
-        screen.getByRole("dialog", { name: /cookie consent/i }),
+        screen.getByRole("dialog", { name: /security & analytics/i }),
       ).toBeInTheDocument();
     });
 
@@ -33,7 +33,7 @@ describe("CookieConsent", () => {
       localStorage.setItem("cookie-consent", "accepted");
       render(<CookieConsent />);
       expect(
-        screen.queryByRole("dialog", { name: /cookie consent/i }),
+        screen.queryByRole("dialog", { name: /security & analytics/i }),
       ).not.toBeInTheDocument();
     });
 
@@ -41,7 +41,7 @@ describe("CookieConsent", () => {
       localStorage.setItem("cookie-consent", "necessary");
       render(<CookieConsent />);
       expect(
-        screen.queryByRole("dialog", { name: /cookie consent/i }),
+        screen.queryByRole("dialog", { name: /security & analytics/i }),
       ).not.toBeInTheDocument();
     });
   });
@@ -53,7 +53,7 @@ describe("CookieConsent", () => {
 
       await user.click(screen.getByRole("button", { name: /accept all/i }));
       expect(
-        screen.queryByRole("dialog", { name: /cookie consent/i }),
+        screen.queryByRole("dialog", { name: /security & analytics/i }),
       ).not.toBeInTheDocument();
     });
 
@@ -81,7 +81,7 @@ describe("CookieConsent", () => {
 
       await user.click(screen.getByRole("button", { name: /necessary only/i }));
       expect(
-        screen.queryByRole("dialog", { name: /cookie consent/i }),
+        screen.queryByRole("dialog", { name: /security & analytics/i }),
       ).not.toBeInTheDocument();
     });
 

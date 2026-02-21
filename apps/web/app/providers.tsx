@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import { useTokenRefresh } from "@/lib/hooks/use-token-refresh";
 import { usePokerStore } from "@/lib/store/poker-store";
 import { createClient } from "@/lib/supabase/client";
+import { followRedirectParam } from "@/lib/utils";
 
 const supabase = createClient();
 
@@ -33,6 +34,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
         if (user) {
           setCurrentUserId(user.id);
           setSessionInitialized(true);
+          followRedirectParam();
           return;
         }
         // Stale session — sign out to clear invalid cookies
@@ -48,6 +50,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
         setCurrentUserId(data.user.id);
       }
       setSessionInitialized(true);
+      followRedirectParam();
     }
 
     initAuth();

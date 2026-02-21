@@ -15,7 +15,7 @@ export default async function PokerRoomPage({
 
   const supabase = await createServerSupabaseClient();
 
-  // Run both queries in parallel to halve latency
+  // Try full fetch first — RLS restricts SELECT to room members only
   const [roomResult, playersResult] = await Promise.all([
     supabase
       .from("rooms")
@@ -26,30 +26,54 @@ export default async function PokerRoomPage({
     supabase.from("players_masked").select("*").eq("room_id", roomId),
   ]);
 
-  const room = roomResult.data;
-  if (!room) notFound();
+  if (roomResult.data) {
+    const room = roomResult.data;
+    const players = playersResult.data;
 
-  const players = playersResult.data;
+    return (
+      <PokerRoomClient
+        initialRoom={{
+          id: room.id,
+          name: room.name,
+          isRevealed: room.is_revealed,
+          facilitatorId: room.facilitator_id,
+          players: (players ?? []).map(
+            (p: {
+              user_id: string;
+              name: string;
+              role: string;
+              vote: string | null;
+            }) => ({
+              id: p.user_id,
+              name: p.name,
+              role: p.role as "FACILITATOR" | "MEMBER",
+              vote: p.vote,
+            }),
+          ),
+        }}
+      />
+    );
+  }
 
-  const initialRoom = {
-    id: room.id,
-    name: room.name,
-    isRevealed: room.is_revealed,
-    facilitatorId: room.facilitator_id,
-    players: (players ?? []).map(
-      (p: {
-        user_id: string;
-        name: string;
-        role: string;
-        vote: string | null;
-      }) => ({
-        id: p.user_id,
-        name: p.name,
-        role: p.role as "FACILITATOR" | "MEMBER",
-        vote: p.vote,
-      }),
-    ),
-  };
+  // Not a member yet — use preview RPC to check if room exists
+  const previewResult = await supabase.rpc("get_room_preview", {
+    p_room_id: roomId,
+  });
 
-  return <PokerRoomClient initialRoom={initialRoom} />;
+  const preview = previewResult.data?.[0];
+  if (!preview || preview.is_expired) notFound();
+
+  // Room exists but user hasn't joined — render with minimal data
+  // so the JoinRoomDialog can be shown
+  return (
+    <PokerRoomClient
+      initialRoom={{
+        id: roomId,
+        name: preview.name,
+        isRevealed: false,
+        facilitatorId: "",
+        players: [],
+      }}
+    />
+  );
 }

@@ -119,7 +119,7 @@ export function PokerRoomClient({ initialRoom }: PokerRoomClientProps) {
       if (value === null) {
         trackEvent("vote_cleared", {
           room_id: activeRoom.id,
-          previous_value: currentVote,
+          previous_value: currentVote ?? "",
         });
       } else if (value === FOLD_VALUE) {
         trackEvent("vote_folded", {

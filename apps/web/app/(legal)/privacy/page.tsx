@@ -162,8 +162,9 @@ export default function PrivacyPolicyPage() {
             </li>
             <li>
               <strong className="text-foreground">Service Improvement</strong> —
-              If you opt in to analytics, aggregated and anonymized usage data
-              helps us understand how the service is used and where to improve.
+              Aggregated, anonymized analytics data (via Plausible) helps us
+              understand how the service is used and where to improve. No opt-in
+              is required as Plausible does not collect personal data.
             </li>
           </ul>
           <p>
@@ -243,23 +244,13 @@ export default function PrivacyPolicyPage() {
                   </td>
                   <td className="py-2">Persistent</td>
                 </tr>
-                <tr>
-                  <td className="py-2 pr-4 font-mono text-xs">
-                    PostHog cookies
-                  </td>
-                  <td className="py-2 pr-4">Cookie (Opt-in)</td>
-                  <td className="py-2 pr-4">
-                    Analytics tracking (only if you accept)
-                  </td>
-                  <td className="py-2">Session</td>
-                </tr>
               </tbody>
             </table>
           </div>
           <p>
-            You can manage your cookie preferences at any time through the
-            cookie consent banner. Selecting &ldquo;Necessary only&rdquo;
-            disables all analytics cookies.
+            Our analytics provider (Plausible) does not use cookies. You can
+            manage your storage preferences at any time through the consent
+            banner.
           </p>
         </LegalSectionCard>
 
@@ -270,28 +261,32 @@ export default function PrivacyPolicyPage() {
           accentColor="accent"
         >
           <p>
-            We use <strong className="text-foreground">PostHog</strong> for
-            analytics, which is{" "}
-            <strong className="text-foreground">opt-in only</strong>. Analytics
-            are disabled by default and only activated when you explicitly
-            accept analytics cookies through our consent banner.
+            We use{" "}
+            <strong className="text-foreground">Plausible Analytics</strong> for
+            website analytics, which is a{" "}
+            <strong className="text-foreground">
+              privacy-focused, cookie-free
+            </strong>{" "}
+            analytics tool. Plausible does not use cookies, does not collect
+            personal data, and is fully compliant with GDPR, CCPA, and PECR
+            without requiring cookie consent.
           </p>
-          <p>When analytics are enabled, we may collect:</p>
+          <p>Plausible collects only aggregate, anonymized data including:</p>
           <ul className="ml-1 list-inside list-disc space-y-1.5">
-            <li>Page views and navigation patterns</li>
+            <li>Page views and referral sources</li>
             <li>
-              Feature usage events (room creation, joining, voting) — all
-              anonymized
+              Country-level location (derived from IP, which is never stored)
             </li>
-            <li>General browser and device information</li>
+            <li>Browser and operating system type</li>
+            <li>Device type (desktop, mobile, tablet)</li>
           </ul>
           <p>
             <strong className="text-foreground">
-              Session replay is disabled.
+              No personal data is collected.
             </strong>{" "}
-            We do not record your screen activity. Person profiles are only
-            created for users who opt in, and all data is associated with
-            anonymous UUIDs, not personal identities.
+            Plausible does not track individual users across sessions, does not
+            create user profiles, and does not use fingerprinting. All data is
+            aggregated and cannot be used to identify individual visitors.
           </p>
         </LegalSectionCard>
 
@@ -360,16 +355,17 @@ export default function PrivacyPolicyPage() {
               </a>
             </li>
             <li>
-              <strong className="text-foreground">PostHog</strong> — Provides
-              opt-in analytics. Only active when you accept analytics cookies.{" "}
+              <strong className="text-foreground">Plausible Analytics</strong> —
+              Provides privacy-focused, cookie-free website analytics. No
+              personal data is collected or shared.{" "}
               <a
-                href="https://posthog.com/privacy"
+                href="https://plausible.io/privacy"
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="PostHog Privacy Policy (opens in new tab)"
+                aria-label="Plausible Analytics Privacy Policy (opens in new tab)"
                 className="text-primary underline hover:text-primary-700 dark:hover:text-primary-300"
               >
-                PostHog Privacy Policy
+                Plausible Privacy Policy
               </a>
             </li>
           </ul>
@@ -401,8 +397,9 @@ export default function PrivacyPolicyPage() {
             </li>
             <li>
               <strong className="text-foreground">Right to Opt Out</strong> —
-              Opt out of analytics tracking at any time through the cookie
-              consent banner.
+              Our analytics provider (Plausible) does not use cookies and does
+              not track individual users. You can block the analytics script
+              using any ad blocker or browser privacy extension.
             </li>
             <li>
               <strong className="text-foreground">Right to Portability</strong>{" "}
@@ -498,9 +495,7 @@ export default function PrivacyPolicyPage() {
       <div className="rounded-lg border border-border/50 bg-muted/30 p-6 text-center text-sm text-muted-foreground">
         <p>
           For privacy inquiries, please contact us at{" "}
-          <strong className="text-foreground">
-            privacy@scrumpokergame.com
-          </strong>
+          <strong className="text-foreground">info@scrumpokergame.com</strong>
         </p>
       </div>
     </>

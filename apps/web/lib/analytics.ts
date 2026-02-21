@@ -1,10 +1,8 @@
-import posthog from "posthog-js";
-
 export function trackEvent(
   event: string,
-  properties?: Record<string, unknown>,
+  properties?: Record<string, string | number | boolean>,
 ) {
-  if (typeof window !== "undefined") {
-    posthog.capture(event, properties);
+  if (typeof window !== "undefined" && window.plausible) {
+    window.plausible(event, { props: properties });
   }
 }

@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Script from "next/script";
 import { CookieConsent } from "@/components/cookie-consent";
-import { PostHogProvider } from "@/components/providers/posthog-provider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { Providers } from "./providers";
 import "./globals.css";
@@ -133,6 +133,24 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        {process.env.NEXT_PUBLIC_PLAUSIBLE_SCRIPT_URL && (
+          <>
+            <Script
+              async
+              defer
+              data-domain={new URL(siteUrl).hostname}
+              src={process.env.NEXT_PUBLIC_PLAUSIBLE_SCRIPT_URL}
+              strategy="afterInteractive"
+            />
+            <Script
+              id="plausible-init"
+              strategy="afterInteractive"
+              dangerouslySetInnerHTML={{
+                __html: `window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};plausible.init()`,
+              }}
+            />
+          </>
+        )}
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased`}
@@ -143,14 +161,12 @@ export default function RootLayout({
         >
           Skip to content
         </a>
-        <PostHogProvider>
-          <Providers>
-            <ThemeProvider>
-              {children}
-              <CookieConsent />
-            </ThemeProvider>
-          </Providers>
-        </PostHogProvider>
+        <Providers>
+          <ThemeProvider>
+            {children}
+            <CookieConsent />
+          </ThemeProvider>
+        </Providers>
       </body>
     </html>
   );

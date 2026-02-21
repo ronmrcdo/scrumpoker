@@ -51,10 +51,8 @@ Edit `apps/web/.env.local` and fill in the Supabase values:
 NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
 NEXT_PUBLIC_SUPABASE_ANON_KEY=<paste-anon-key-from-step-2>
 
-# PostHog Analytics (optional for local dev)
-NEXT_PUBLIC_POSTHOG_KEY=
-NEXT_PUBLIC_POSTHOG_HOST=https://us.i.posthog.com
-NEXT_PUBLIC_POSTHOG_SESSION_REPLAY=false
+# Plausible Analytics (optional for local dev)
+NEXT_PUBLIC_PLAUSIBLE_SCRIPT_URL=https://plausible.scrumpokergame.com/js/pa-YOUR_KEY.js
 ```
 
 ## Step 4: Start Development Server

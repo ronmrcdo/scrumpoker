@@ -62,7 +62,6 @@ export function MiniChatDemo() {
   }, []);
 
   useEffect(() => {
-    // Don't run animations when not visible
     if (!isVisible) return;
 
     if (currentIndex >= DEMO_MESSAGES.length) {

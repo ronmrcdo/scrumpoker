@@ -44,7 +44,6 @@ export function MiniVotingDemo() {
   }, []);
 
   useEffect(() => {
-    // Don't run animations when not visible
     if (!isVisible) return;
 
     if (isRevealed) {

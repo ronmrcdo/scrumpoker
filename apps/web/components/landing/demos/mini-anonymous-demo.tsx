@@ -39,7 +39,6 @@ export function MiniAnonymousDemo() {
   }, []);
 
   useEffect(() => {
-    // Don't run animations when not visible
     if (!isVisible) return;
 
     const cycle = () => {

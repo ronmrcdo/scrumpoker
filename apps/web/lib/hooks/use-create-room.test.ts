@@ -46,10 +46,11 @@ describe("useCreateRoom", () => {
     expect(result.current.isDisabled).toBe(true);
   });
 
-  it("should show form error when submitting without turnstile token", async () => {
-    // Temporarily set the env var to simulate turnstile being enabled
-    const original = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
-    process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY = "test-site-key";
+  it("should submit to server without turnstile token and let server validate", async () => {
+    (globalThis.fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
+      ok: false,
+      json: async () => ({ error: "Missing security token" }),
+    });
 
     const { result } = renderHook(() => useCreateRoom());
 
@@ -59,24 +60,24 @@ describe("useCreateRoom", () => {
       result.current.form.setValue("roomName", "Test Room");
     });
 
-    // Submit without turnstile token
+    // Submit without turnstile token — should reach the server
     await act(async () => {
       await result.current.handleSubmit();
     });
 
     await waitFor(() => {
-      expect(result.current.formError).toBe(
-        "Security check not completed. Please wait and try again.",
+      expect(globalThis.fetch).toHaveBeenCalledWith(
+        "/api/rooms",
+        expect.objectContaining({
+          method: "POST",
+          body: expect.stringContaining('"turnstileToken":""'),
+        }),
       );
+      expect(result.current.formError).toBe("Missing security token");
     });
-
-    process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY = original;
   });
 
   it("should submit successfully with a valid turnstile token", async () => {
-    const original = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
-    process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY = "test-site-key";
-
     (globalThis.fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
       ok: true,
       json: async () => ({ roomId: "room-abc" }),
@@ -109,8 +110,6 @@ describe("useCreateRoom", () => {
         }),
       );
     });
-
-    process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY = original;
   });
 
   it("should clear turnstile token on error callback", () => {

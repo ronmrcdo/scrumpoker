@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  AlertTriangle,
   Button,
   Dialog,
   DialogContent,
@@ -102,23 +103,30 @@ export function PlayerList({
               Leave Room
             </Button>
           </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Leave Room?</DialogTitle>
+          <DialogContent className="max-w-sm gap-0">
+            <DialogHeader className="items-center text-center pb-2">
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10 mb-2">
+                <AlertTriangle className="h-6 w-6 text-destructive/80" />
+              </div>
+              <DialogTitle>Leave this room?</DialogTitle>
               <DialogDescription>
-                Are you sure you want to leave this room? You'll need the room
-                link to rejoin.
+                You'll need the room link to rejoin.
               </DialogDescription>
             </DialogHeader>
-            <DialogFooter>
+            <DialogFooter className="flex-row gap-3 pt-4">
               <Button
                 variant="outline"
+                className="flex-1"
                 onClick={() => setIsLeaveDialogOpen(false)}
               >
-                Cancel
+                Stay
               </Button>
-              <Button variant="destructive" onClick={handleConfirmLeave}>
-                Leave Room
+              <Button
+                variant="destructive"
+                className="flex-1"
+                onClick={handleConfirmLeave}
+              >
+                Leave
               </Button>
             </DialogFooter>
           </DialogContent>

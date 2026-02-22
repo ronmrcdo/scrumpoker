@@ -274,7 +274,7 @@ describe("PlayerItem", () => {
       );
 
       await user.click(screen.getByRole("button", { name: /kick/i }));
-      expect(screen.getByText("Kick Player?")).toBeInTheDocument();
+      expect(screen.getByText(/Remove Alice\?/)).toBeInTheDocument();
     });
 
     it("should show player name in confirmation dialog", async () => {
@@ -289,8 +289,9 @@ describe("PlayerItem", () => {
       );
 
       await user.click(screen.getByRole("button", { name: /kick/i }));
+      expect(screen.getByText("Remove Bob?")).toBeInTheDocument();
       expect(
-        screen.getByText(/Are you sure you want to remove Bob.*room link/),
+        screen.getByText(/removed from the room.*rejoin with the room link/),
       ).toBeInTheDocument();
     });
 
@@ -309,7 +310,7 @@ describe("PlayerItem", () => {
       );
 
       await user.click(screen.getByRole("button", { name: /kick/i }));
-      await user.click(screen.getByRole("button", { name: "Kick Player" }));
+      await user.click(screen.getByRole("button", { name: "Remove" }));
 
       expect(onKick).toHaveBeenCalledWith("player-123");
     });
@@ -321,10 +322,10 @@ describe("PlayerItem", () => {
       );
 
       await user.click(screen.getByRole("button", { name: /kick/i }));
-      expect(screen.getByText("Kick Player?")).toBeInTheDocument();
+      expect(screen.getByText(/Remove Alice\?/)).toBeInTheDocument();
 
       await user.click(screen.getByRole("button", { name: "Cancel" }));
-      expect(screen.queryByText("Kick Player?")).not.toBeInTheDocument();
+      expect(screen.queryByText(/Remove Alice\?/)).not.toBeInTheDocument();
     });
 
     it("should not call onKick when cancelled", async () => {

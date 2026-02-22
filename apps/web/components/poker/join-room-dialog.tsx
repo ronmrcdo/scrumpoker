@@ -11,6 +11,7 @@ import {
   DialogTitle,
   Input,
   Label,
+  Users,
 } from "@repo/ui";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -68,36 +69,39 @@ export function JoinRoomDialog({ roomId }: JoinRoomDialogProps) {
       }}
     >
       <DialogContent
-        className="sm:max-w-md"
+        className="max-w-sm gap-0"
         onInteractOutside={(e) => e.preventDefault()}
       >
-        <DialogHeader>
-          <DialogTitle className="text-lg sm:text-xl">Join Room</DialogTitle>
-          <DialogDescription className="text-xs sm:text-sm">
+        <DialogHeader className="items-center text-center pb-2">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/15 mb-2">
+            <Users className="h-6 w-6 text-primary/80" />
+          </div>
+          <DialogTitle>Join Room</DialogTitle>
+          <DialogDescription>
             Enter your name to join this poker session.
           </DialogDescription>
         </DialogHeader>
         <form
           onSubmit={form.handleSubmit(handleJoin)}
-          className="space-y-3 sm:space-y-4"
+          className="space-y-3 pt-4"
         >
           {formError && (
             <div
               role="alert"
-              className="p-3 text-xs sm:text-sm bg-red-50 dark:bg-red-950/20 text-red-600 dark:text-red-400 rounded-md border border-red-200 dark:border-red-900"
+              className="p-3 text-sm bg-destructive/10 text-destructive rounded-lg border border-destructive/20"
             >
               {formError}
             </div>
           )}
-          <div className="space-y-1.5 sm:space-y-2">
-            <Label htmlFor="join-name" className="text-xs sm:text-sm">
+          <div className="space-y-1.5">
+            <Label htmlFor="join-name" className="text-sm">
               Your Name
             </Label>
             <Input
               id="join-name"
               placeholder="Enter your name"
               maxLength={50}
-              className="h-10 sm:h-11 text-sm sm:text-base"
+              className="h-10 text-sm"
               disabled={isSubmitting}
               aria-invalid={!!form.formState.errors.userName}
               aria-describedby={
@@ -109,27 +113,23 @@ export function JoinRoomDialog({ roomId }: JoinRoomDialogProps) {
               <p
                 id="join-name-error"
                 role="alert"
-                className="text-xs text-red-500"
+                className="text-xs text-destructive"
               >
                 {form.formState.errors.userName.message}
               </p>
             )}
           </div>
-          <DialogFooter className="flex flex-col-reverse sm:flex-row gap-2">
+          <DialogFooter className="flex-row gap-3 pt-4">
             <Button
               type="button"
               variant="outline"
-              className="w-full sm:w-auto h-10 sm:h-11 text-sm sm:text-base"
+              className="flex-1"
               onClick={() => router.push("/")}
               disabled={isSubmitting}
             >
               Go Back
             </Button>
-            <Button
-              type="submit"
-              className="w-full sm:w-auto h-10 sm:h-11 text-sm sm:text-base"
-              disabled={isSubmitting}
-            >
+            <Button type="submit" className="flex-1" disabled={isSubmitting}>
               {isSubmitting ? "Joining..." : "Join Room"}
             </Button>
           </DialogFooter>

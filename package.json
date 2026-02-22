@@ -1,5 +1,5 @@
 {
-  "name": "anteup",
+  "name": "scrumpokergame",
   "private": true,
   "scripts": {
     "build": "turbo run build",

@@ -26,8 +26,6 @@ export function useCreateRoom() {
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const formLoadedAt = useRef(Date.now());
 
-  const hasTurnstile = !!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
-
   const onTurnstileSuccess = useCallback((token: string) => {
     setTurnstileToken(token);
   }, []);
@@ -43,10 +41,6 @@ export function useCreateRoom() {
 
   const onSubmit = async (data: CreateRoomFormData) => {
     if (!currentUserId) return;
-    if (hasTurnstile && !turnstileToken) {
-      setFormError("Security check not completed. Please wait and try again.");
-      return;
-    }
     setIsSubmitting(true);
     setFormError(null);
 

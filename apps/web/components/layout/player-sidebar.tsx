@@ -76,6 +76,13 @@ export function PlayerSidebar() {
       />
       <aside
         ref={sidebarRef}
+        id="player-sidebar"
+        aria-label="Player list"
+        aria-hidden={!isPlayerListOpen}
+        inert={!isPlayerListOpen}
+        onKeyDown={(e) => {
+          if (e.key === "Escape") togglePlayerList();
+        }}
         className={cn(
           "border-r border-border bg-card shrink-0 overflow-hidden",
           "transition-all duration-300 ease-in-out",

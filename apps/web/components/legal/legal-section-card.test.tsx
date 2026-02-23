@@ -35,39 +35,14 @@ describe("LegalSectionCard", () => {
     expect(container.querySelector("#my-section")).toBeInTheDocument();
   });
 
-  it("should apply primary accent by default", () => {
+  it("should apply uniform primary border", () => {
     const { container } = render(
       <LegalSectionCard id="test" icon={Shield} title="Test">
         <p>Content</p>
       </LegalSectionCard>,
     );
     const card = container.querySelector("#test");
-    expect(card?.className).toContain("border-l-primary-300");
-  });
-
-  it("should apply accent color variant", () => {
-    const { container } = render(
-      <LegalSectionCard
-        id="test"
-        icon={Shield}
-        title="Test"
-        accentColor="accent"
-      >
-        <p>Content</p>
-      </LegalSectionCard>,
-    );
-    const card = container.querySelector("#test");
-    expect(card?.className).toContain("border-l-accent-300");
-  });
-
-  it("should apply warm color variant", () => {
-    const { container } = render(
-      <LegalSectionCard id="test" icon={Shield} title="Test" accentColor="warm">
-        <p>Content</p>
-      </LegalSectionCard>,
-    );
-    const card = container.querySelector("#test");
-    expect(card?.className).toContain("border-l-warm-300");
+    expect(card?.className).toContain("border-l-primary/30");
   });
 
   it("should have scroll-mt for fixed header offset", () => {
@@ -87,5 +62,15 @@ describe("LegalSectionCard", () => {
       </LegalSectionCard>,
     );
     expect(container.querySelector("svg")).toBeInTheDocument();
+  });
+
+  it("should apply tinted primary icon badge", () => {
+    const { container } = render(
+      <LegalSectionCard id="test" icon={Shield} title="Test">
+        <p>Content</p>
+      </LegalSectionCard>,
+    );
+    const iconBadge = container.querySelector("svg")?.parentElement;
+    expect(iconBadge?.className).toContain("bg-primary");
   });
 });

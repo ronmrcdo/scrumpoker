@@ -44,7 +44,7 @@ export function PokerCard({
           !hasVoted &&
             "border-2 border-dashed border-border bg-card text-muted-foreground",
           isFold &&
-            "bg-amber-100 border-2 border-amber-400 text-amber-600 shadow-soft-md dark:bg-amber-950/30",
+            "bg-warm-100 border-2 border-warm-400 text-warm-600 shadow-soft-md dark:bg-warm-950/30",
           !isFold &&
             hasVoted &&
             !isRevealed &&
@@ -75,8 +75,8 @@ export function PokerCard({
       <span
         className={cn(
           compact
-            ? "text-[10px] sm:text-xs font-medium truncate max-w-[56px] sm:max-w-[68px] text-center leading-tight transition-colors duration-200"
-            : "text-[10px] sm:text-xs font-medium truncate max-w-[64px] sm:max-w-[80px] text-center leading-tight transition-colors duration-200",
+            ? "text-xs font-medium truncate max-w-[56px] sm:max-w-[68px] text-center leading-tight transition-colors duration-200"
+            : "text-xs font-medium truncate max-w-[64px] sm:max-w-[80px] text-center leading-tight transition-colors duration-200",
           isCurrentUser
             ? "text-primary-600 font-semibold"
             : "text-muted-foreground",

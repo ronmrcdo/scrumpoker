@@ -118,7 +118,7 @@ describe("PlayerList", () => {
       render(<PlayerList {...defaultProps} />);
 
       await user.click(screen.getByRole("button", { name: /leave room/i }));
-      expect(screen.getByText("Leave Room?")).toBeInTheDocument();
+      expect(screen.getByText("Leave this room?")).toBeInTheDocument();
     });
 
     it("should show leave confirmation message", async () => {
@@ -138,30 +138,30 @@ describe("PlayerList", () => {
       render(<PlayerList {...defaultProps} onLeave={onLeave} />);
 
       await user.click(screen.getByRole("button", { name: /leave room/i }));
-      await user.click(screen.getByRole("button", { name: "Leave Room" }));
+      await user.click(screen.getByRole("button", { name: "Leave" }));
 
       expect(onLeave).toHaveBeenCalledTimes(1);
     });
 
-    it("should close dialog when cancel is clicked", async () => {
+    it("should close dialog when Stay is clicked", async () => {
       const user = userEvent.setup();
       render(<PlayerList {...defaultProps} />);
 
       await user.click(screen.getByRole("button", { name: /leave room/i }));
-      expect(screen.getByText("Leave Room?")).toBeInTheDocument();
+      expect(screen.getByText("Leave this room?")).toBeInTheDocument();
 
-      await user.click(screen.getByRole("button", { name: "Cancel" }));
-      expect(screen.queryByText("Leave Room?")).not.toBeInTheDocument();
+      await user.click(screen.getByRole("button", { name: "Stay" }));
+      expect(screen.queryByText("Leave this room?")).not.toBeInTheDocument();
     });
 
-    it("should not call onLeave when cancelled", async () => {
+    it("should not call onLeave when Stay is clicked", async () => {
       const user = userEvent.setup();
       const onLeave = vi.fn();
 
       render(<PlayerList {...defaultProps} onLeave={onLeave} />);
 
       await user.click(screen.getByRole("button", { name: /leave room/i }));
-      await user.click(screen.getByRole("button", { name: "Cancel" }));
+      await user.click(screen.getByRole("button", { name: "Stay" }));
 
       expect(onLeave).not.toHaveBeenCalled();
     });

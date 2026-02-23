@@ -64,6 +64,13 @@ export function ChatSidebar() {
       />
       <aside
         ref={sidebarRef}
+        id="chat-sidebar"
+        aria-label="Chat"
+        aria-hidden={!isChatOpen}
+        inert={!isChatOpen}
+        onKeyDown={(e) => {
+          if (e.key === "Escape") toggleChat();
+        }}
         className={cn(
           "border-l border-border bg-card shrink-0 overflow-hidden",
           "transition-all duration-300 ease-in-out",

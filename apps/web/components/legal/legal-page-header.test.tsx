@@ -65,4 +65,14 @@ describe("LegalPageHeader", () => {
     const { container } = render(<LegalPageHeader {...defaultProps} />);
     expect(container.querySelector("svg")).toBeInTheDocument();
   });
+
+  it("should render reading time badge when provided", () => {
+    render(<LegalPageHeader {...defaultProps} readingTimeMinutes={5} />);
+    expect(screen.getByText(/~5 min read/)).toBeInTheDocument();
+  });
+
+  it("should not render reading time badge when omitted", () => {
+    render(<LegalPageHeader {...defaultProps} />);
+    expect(screen.queryByText(/min read/)).not.toBeInTheDocument();
+  });
 });

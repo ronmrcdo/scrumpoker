@@ -41,7 +41,7 @@ export function VoteDistribution({ stats }: VoteDistributionProps) {
     return (
       <Card className="animate-scale-in" style={{ animationDelay: "200ms" }}>
         <CardContent className="p-3 sm:p-4">
-          <p className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">
             Vote Distribution
           </p>
           <p className="text-sm text-muted-foreground text-center py-4">
@@ -55,7 +55,7 @@ export function VoteDistribution({ stats }: VoteDistributionProps) {
   return (
     <Card className="animate-scale-in" style={{ animationDelay: "200ms" }}>
       <CardContent className="p-3 sm:p-4">
-        <p className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">
           Vote Distribution
         </p>
         <div className="space-y-2">

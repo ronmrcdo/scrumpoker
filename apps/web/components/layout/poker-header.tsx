@@ -7,6 +7,7 @@ import { ThemeToggle } from "../theme-toggle";
 
 interface PokerHeaderProps {
   roomId: string;
+  roomName: string;
   isChatOpen: boolean;
   isPlayerListOpen: boolean;
   onToggleChat: () => void;
@@ -15,6 +16,7 @@ interface PokerHeaderProps {
 
 export function PokerHeader({
   roomId,
+  roomName,
   isChatOpen,
   isPlayerListOpen,
   onToggleChat,
@@ -48,11 +50,12 @@ export function PokerHeader({
             isPlayerListOpen ? "Close player list" : "Open player list"
           }
           aria-expanded={isPlayerListOpen}
+          aria-controls="player-sidebar"
         >
           <Menu className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
         </Button>
-        <span className="text-xs sm:text-sm font-medium text-foreground">
-          Scrum Poker Game
+        <span className="text-xs sm:text-sm font-medium text-foreground truncate">
+          {roomName || "Scrum Poker Game"}
         </span>
       </div>
 
@@ -91,6 +94,8 @@ export function PokerHeader({
             onToggleChat();
           }}
           aria-label={isChatOpen ? "Close chat" : "Open chat"}
+          aria-expanded={isChatOpen}
+          aria-controls="chat-sidebar"
         >
           <MessageSquare className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
         </Button>

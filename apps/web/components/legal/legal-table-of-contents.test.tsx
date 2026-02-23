@@ -41,10 +41,10 @@ describe("LegalTableOfContents", () => {
     ).toBeInTheDocument();
   });
 
-  it("should render icons for each item", () => {
+  it("should not render icons in TOC items", () => {
     const { container } = render(<LegalTableOfContents items={items} />);
     const svgs = container.querySelectorAll("nav svg");
-    expect(svgs).toHaveLength(2);
+    expect(svgs).toHaveLength(0);
   });
 
   it("should handle empty items array", () => {

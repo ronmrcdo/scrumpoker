@@ -12,6 +12,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  UserX,
   X,
 } from "@repo/ui";
 import { memo, useMemo, useState } from "react";
@@ -80,11 +81,11 @@ export const PlayerItem = memo(function PlayerItem({
             className={cn(
               "absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-card",
               !isOnline
-                ? "bg-gray-400"
+                ? "bg-muted-foreground"
                 : hasFolded
-                  ? "bg-amber-500"
+                  ? "bg-warm-400"
                   : hasVoted
-                    ? "bg-green-600"
+                    ? "bg-accent-500"
                     : "bg-muted-foreground",
             )}
           />
@@ -101,7 +102,7 @@ export const PlayerItem = memo(function PlayerItem({
               {player.name}
             </span>
             {player.role === "FACILITATOR" && (
-              <Badge variant="default" className="text-[10px] px-1.5 py-0">
+              <Badge variant="default" className="text-xs px-1.5 py-0">
                 The Dealer
               </Badge>
             )}
@@ -112,9 +113,9 @@ export const PlayerItem = memo(function PlayerItem({
             className={cn(
               "text-xs",
               !isOnline
-                ? "text-neutral-500 font-medium"
+                ? "text-muted-foreground font-medium"
                 : hasFolded
-                  ? "text-amber-700 font-medium"
+                  ? "text-warm-700 font-medium"
                   : "text-muted-foreground",
             )}
           >
@@ -144,23 +145,31 @@ export const PlayerItem = memo(function PlayerItem({
       </div>
 
       <Dialog open={isKickDialogOpen} onOpenChange={setIsKickDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Kick Player?</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to remove {player.name} from the room? They
-              can rejoin with the room link.
+        <DialogContent className="max-w-sm gap-0">
+          <DialogHeader className="items-center text-center pb-2">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-destructive/15 mb-2">
+              <UserX className="h-6 w-6 text-destructive/80" />
+            </div>
+            <DialogTitle>Remove {player.name}?</DialogTitle>
+            <DialogDescription className="text-balance">
+              They will be removed from the room but can rejoin with the room
+              link.
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter>
+          <DialogFooter className="flex-row gap-3 pt-4">
             <Button
               variant="outline"
+              className="flex-1"
               onClick={() => setIsKickDialogOpen(false)}
             >
               Cancel
             </Button>
-            <Button variant="destructive" onClick={handleConfirmKick}>
-              Kick Player
+            <Button
+              variant="destructive"
+              className="flex-1"
+              onClick={handleConfirmKick}
+            >
+              Remove
             </Button>
           </DialogFooter>
         </DialogContent>

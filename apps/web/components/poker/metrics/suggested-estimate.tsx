@@ -75,11 +75,14 @@ export function SuggestedEstimate({ stats }: SuggestedEstimateProps) {
         : "destructive";
 
   return (
-    <Card className="animate-scale-in" style={{ animationDelay: "250ms" }}>
-      <CardContent className="p-3 sm:p-4">
+    <Card
+      className="animate-scale-in shadow-soft-md border-primary-200"
+      style={{ animationDelay: "250ms" }}
+    >
+      <CardContent className="p-4 sm:p-5">
         <div className="flex items-center gap-2 mb-2">
           <Lightbulb aria-hidden="true" className="w-4 h-4 text-amber-500" />
-          <p className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wider">
+          <p className="text-xs sm:text-sm font-medium text-muted-foreground uppercase tracking-wider">
             Suggested Estimate
           </p>
         </div>

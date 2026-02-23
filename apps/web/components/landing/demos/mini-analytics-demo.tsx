@@ -42,7 +42,6 @@ export function MiniAnalyticsDemo() {
   }, []);
 
   useEffect(() => {
-    // Don't run animations when not visible
     if (!isVisible) return;
 
     const cycle = () => {
@@ -77,6 +76,7 @@ export function MiniAnalyticsDemo() {
   return (
     <div
       ref={containerRef}
+      aria-hidden="true"
       className="relative rounded-xl overflow-hidden h-[340px] bg-background border border-border shadow-soft-lg"
     >
       {/* Header */}
@@ -85,10 +85,7 @@ export function MiniAnalyticsDemo() {
           Vote Analytics
         </span>
         {showConsensus && (
-          <Badge
-            variant="success"
-            className="animate-in fade-in slide-in-from-right-2"
-          >
+          <Badge variant="success" className="animate-in fade-in">
             Consensus
           </Badge>
         )}
@@ -137,8 +134,8 @@ export function MiniAnalyticsDemo() {
         {/* Stats Grid - matches Overview component */}
         <div
           className={cn(
-            "grid grid-cols-2 gap-2 transition-all duration-500",
-            showStats ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2",
+            "grid grid-cols-2 gap-2 transition-opacity duration-500",
+            showStats ? "opacity-100" : "opacity-0",
           )}
         >
           <Card>
@@ -166,8 +163,8 @@ export function MiniAnalyticsDemo() {
         {/* Consensus Card - matches Consensus component */}
         <Card
           className={cn(
-            "transition-all duration-500 delay-200",
-            showStats ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2",
+            "transition-opacity duration-500 delay-200",
+            showStats ? "opacity-100" : "opacity-0",
           )}
         >
           <CardContent className="p-3">

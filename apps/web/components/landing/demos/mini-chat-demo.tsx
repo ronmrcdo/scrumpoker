@@ -62,7 +62,6 @@ export function MiniChatDemo() {
   }, []);
 
   useEffect(() => {
-    // Don't run animations when not visible
     if (!isVisible) return;
 
     if (currentIndex >= DEMO_MESSAGES.length) {
@@ -91,6 +90,7 @@ export function MiniChatDemo() {
   return (
     <div
       ref={containerRef}
+      aria-hidden="true"
       className="relative rounded-xl overflow-hidden h-[340px] bg-background border border-border shadow-soft-lg flex flex-col"
     >
       {/* Chat Header */}
@@ -163,6 +163,7 @@ export function MiniChatDemo() {
         </div>
         <button
           type="button"
+          tabIndex={-1}
           aria-label="Open emoji picker"
           className="h-9 w-9 rounded-md flex items-center justify-center hover:bg-muted transition-colors"
         >
@@ -170,6 +171,7 @@ export function MiniChatDemo() {
         </button>
         <button
           type="button"
+          tabIndex={-1}
           aria-label="Send message"
           className="h-9 w-9 rounded-md bg-primary-500 flex items-center justify-center"
         >

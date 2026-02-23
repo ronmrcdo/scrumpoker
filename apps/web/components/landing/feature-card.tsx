@@ -22,39 +22,39 @@ export function FeatureCard({
   delay = 0,
 }: FeatureCardProps) {
   return (
-    <ScrollReveal delay={delay}>
-      <div
-        className={cn(
-          "grid md:grid-cols-2 gap-8 md:gap-12 items-center",
-          reverse && "md:[&>*:first-child]:order-2",
-        )}
-      >
-        {/* Demo or Icon Display */}
-        <div className="relative">
-          {demo ? (
-            demo
-          ) : (
-            <div className="flex items-center justify-center h-64 rounded-xl bg-gradient-to-br from-primary/5 to-primary/10 border border-border/50">
-              <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center">
-                <Icon className="w-10 h-10 text-primary" />
-              </div>
+    <div
+      className={cn(
+        "grid md:grid-cols-2 gap-10 md:gap-16 items-center",
+        reverse && "md:[&>*:first-child]:order-2",
+      )}
+    >
+      {/* Demo or Icon Display — no ScrollReveal, demos handle their own animations */}
+      <div className="relative">
+        {demo ? (
+          demo
+        ) : (
+          <div className="flex items-center justify-center h-64 rounded-xl bg-gradient-to-br from-primary/5 to-primary/10 border border-border/50">
+            <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center">
+              <Icon aria-hidden="true" className="w-10 h-10 text-primary" />
             </div>
-          )}
-        </div>
-
-        {/* Content */}
-        <div className="space-y-4">
-          <div className="inline-flex items-center justify-center p-3 bg-white dark:bg-white/10 rounded-xl shadow-sm">
-            <Icon className="w-6 h-6 text-primary" />
           </div>
-          <h3 className="text-2xl sm:text-3xl font-bold text-foreground">
+        )}
+      </div>
+
+      {/* Content — ScrollReveal for the text side only */}
+      <ScrollReveal delay={delay}>
+        <div className="space-y-4">
+          <div className="inline-flex items-center justify-center p-2.5 bg-primary/[0.08] rounded-xl">
+            <Icon aria-hidden="true" className="w-5 h-5 text-primary" />
+          </div>
+          <h3 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">
             {title}
           </h3>
           <p className="text-base sm:text-lg text-muted-foreground leading-relaxed">
             {description}
           </p>
         </div>
-      </div>
-    </ScrollReveal>
+      </ScrollReveal>
+    </div>
   );
 }

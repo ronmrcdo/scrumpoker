@@ -124,7 +124,7 @@ describe("PlayerItem", () => {
           player={createMockPlayer({ vote: "5" })}
         />,
       );
-      expect(container.querySelector(".bg-green-600")).toBeInTheDocument();
+      expect(container.querySelector(".bg-accent-500")).toBeInTheDocument();
     });
   });
 
@@ -170,7 +170,7 @@ describe("PlayerItem", () => {
         />,
       );
       const foldedText = screen.getByText("Folded");
-      expect(foldedText).toHaveClass("text-amber-700");
+      expect(foldedText).toHaveClass("text-warm-700");
     });
 
     it("should show amber indicator dot when folded", () => {
@@ -180,7 +180,7 @@ describe("PlayerItem", () => {
           player={createMockPlayer({ vote: "FOLD" })}
         />,
       );
-      expect(container.querySelector(".bg-amber-500")).toBeInTheDocument();
+      expect(container.querySelector(".bg-warm-400")).toBeInTheDocument();
     });
 
     it("should show Folded even when revealed", () => {
@@ -274,7 +274,7 @@ describe("PlayerItem", () => {
       );
 
       await user.click(screen.getByRole("button", { name: /kick/i }));
-      expect(screen.getByText("Kick Player?")).toBeInTheDocument();
+      expect(screen.getByText(/Remove Alice\?/)).toBeInTheDocument();
     });
 
     it("should show player name in confirmation dialog", async () => {
@@ -289,8 +289,9 @@ describe("PlayerItem", () => {
       );
 
       await user.click(screen.getByRole("button", { name: /kick/i }));
+      expect(screen.getByText("Remove Bob?")).toBeInTheDocument();
       expect(
-        screen.getByText(/Are you sure you want to remove Bob.*room link/),
+        screen.getByText(/removed from the room.*rejoin with the room link/),
       ).toBeInTheDocument();
     });
 
@@ -309,7 +310,7 @@ describe("PlayerItem", () => {
       );
 
       await user.click(screen.getByRole("button", { name: /kick/i }));
-      await user.click(screen.getByRole("button", { name: "Kick Player" }));
+      await user.click(screen.getByRole("button", { name: "Remove" }));
 
       expect(onKick).toHaveBeenCalledWith("player-123");
     });
@@ -321,10 +322,10 @@ describe("PlayerItem", () => {
       );
 
       await user.click(screen.getByRole("button", { name: /kick/i }));
-      expect(screen.getByText("Kick Player?")).toBeInTheDocument();
+      expect(screen.getByText(/Remove Alice\?/)).toBeInTheDocument();
 
       await user.click(screen.getByRole("button", { name: "Cancel" }));
-      expect(screen.queryByText("Kick Player?")).not.toBeInTheDocument();
+      expect(screen.queryByText(/Remove Alice\?/)).not.toBeInTheDocument();
     });
 
     it("should not call onKick when cancelled", async () => {
@@ -351,7 +352,7 @@ describe("PlayerItem", () => {
           isOnline={false}
         />,
       );
-      expect(container.querySelector(".bg-gray-400")).toBeInTheDocument();
+      expect(container.querySelector(".bg-muted-foreground")).toBeInTheDocument();
     });
 
     it("should show 'Offline' text when player is offline", () => {
@@ -386,8 +387,8 @@ describe("PlayerItem", () => {
           isOnline={false}
         />,
       );
-      expect(container.querySelector(".bg-gray-400")).toBeInTheDocument();
-      expect(container.querySelector(".bg-green-600")).not.toBeInTheDocument();
+      expect(container.querySelector(".bg-muted-foreground")).toBeInTheDocument();
+      expect(container.querySelector(".bg-accent-500")).not.toBeInTheDocument();
     });
 
     it("should show normal vote dot when online", () => {
@@ -398,8 +399,8 @@ describe("PlayerItem", () => {
           isOnline={true}
         />,
       );
-      expect(container.querySelector(".bg-green-600")).toBeInTheDocument();
-      expect(container.querySelector(".bg-gray-400")).not.toBeInTheDocument();
+      expect(container.querySelector(".bg-accent-500")).toBeInTheDocument();
+      expect(container.querySelector(".bg-muted-foreground")).not.toBeInTheDocument();
     });
 
     it("should default to online when isOnline is not provided", () => {
@@ -422,7 +423,7 @@ describe("PlayerItem", () => {
         />,
       );
       const offlineText = screen.getByText("Offline");
-      expect(offlineText).toHaveClass("text-neutral-500");
+      expect(offlineText).toHaveClass("text-muted-foreground");
     });
   });
 

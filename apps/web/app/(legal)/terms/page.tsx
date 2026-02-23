@@ -13,6 +13,9 @@ import {
 } from "@repo/ui";
 import type { Metadata } from "next";
 import {
+  LegalCallout,
+  LegalContactFooter,
+  LegalNav,
   LegalPageHeader,
   LegalSectionCard,
   LegalTableOfContents,
@@ -54,16 +57,18 @@ export default function TermsPage() {
         documentType="Terms of Service"
         effectiveDate="February 16, 2026"
         version="1.0"
+        readingTimeMinutes={6}
       />
+
+      <LegalNav currentPath="/terms" />
 
       <LegalTableOfContents items={tocItems} />
 
-      <div className="space-y-6">
+      <div className="space-y-8">
         <LegalSectionCard
           id="acceptance"
           icon={FileText}
           title="Acceptance of Terms"
-          accentColor="primary"
         >
           <p>
             By accessing or using{" "}
@@ -83,7 +88,6 @@ export default function TermsPage() {
           id="service-description"
           icon={Info}
           title="Description of Service"
-          accentColor="accent"
         >
           <p>
             Scrum Poker Game is a{" "}
@@ -119,7 +123,6 @@ export default function TermsPage() {
           id="anonymous-accounts"
           icon={UserX}
           title="Anonymous Accounts"
-          accentColor="warm"
         >
           <p>
             The Service uses{" "}
@@ -157,7 +160,6 @@ export default function TermsPage() {
           id="acceptable-use"
           icon={Check}
           title="Acceptable Use"
-          accentColor="primary"
         >
           <p>
             You agree to use the Service only for its intended purpose. You must
@@ -196,7 +198,6 @@ export default function TermsPage() {
           id="rate-limits"
           icon={Clock}
           title="Rate Limits & Fair Use"
-          accentColor="accent"
         >
           <p>
             To ensure fair access for all users, the Service enforces the
@@ -224,7 +225,6 @@ export default function TermsPage() {
           id="intellectual-property"
           icon={Lock}
           title="Intellectual Property"
-          accentColor="warm"
         >
           <p>
             The Scrum Poker Game name, logo, visual design, and application
@@ -246,7 +246,6 @@ export default function TermsPage() {
           id="user-content"
           icon={MessageSquare}
           title="User-Generated Content"
-          accentColor="primary"
         >
           <p>
             When using the Service, you may provide content including display
@@ -276,18 +275,14 @@ export default function TermsPage() {
           id="disclaimers"
           icon={AlertTriangle}
           title="Disclaimers"
-          accentColor="accent"
         >
-          <p>
-            THE SERVICE IS PROVIDED ON AN{" "}
-            <strong className="text-foreground">&ldquo;AS IS&rdquo;</strong> AND{" "}
-            <strong className="text-foreground">
-              &ldquo;AS AVAILABLE&rdquo;
-            </strong>{" "}
-            BASIS WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-            INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF MERCHANTABILITY,
-            FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
-          </p>
+          <LegalCallout variant="warning">
+            THE SERVICE IS PROVIDED ON AN <strong>&ldquo;AS IS&rdquo;</strong>{" "}
+            AND <strong>&ldquo;AS AVAILABLE&rdquo;</strong> BASIS WITHOUT
+            WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT
+            LIMITED TO IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+            PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
+          </LegalCallout>
           <p>We do not warrant that:</p>
           <ul className="ml-1 list-inside list-disc space-y-1.5">
             <li>
@@ -307,7 +302,6 @@ export default function TermsPage() {
           id="liability"
           icon={Shield}
           title="Limitation of Liability"
-          accentColor="warm"
         >
           <p>
             TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, SCRUM POKER GAME
@@ -332,12 +326,7 @@ export default function TermsPage() {
           </p>
         </LegalSectionCard>
 
-        <LegalSectionCard
-          id="termination"
-          icon={Trash2}
-          title="Termination"
-          accentColor="primary"
-        >
+        <LegalSectionCard id="termination" icon={Trash2} title="Termination">
           <p>
             We reserve the right to restrict or terminate access to the Service
             for any user who violates these Terms or engages in abusive
@@ -356,12 +345,7 @@ export default function TermsPage() {
           </p>
         </LegalSectionCard>
 
-        <LegalSectionCard
-          id="governing-law"
-          icon={Scale}
-          title="Governing Law"
-          accentColor="accent"
-        >
+        <LegalSectionCard id="governing-law" icon={Scale} title="Governing Law">
           <p>
             These Terms shall be governed by and construed in accordance with
             applicable laws, without regard to conflict of law principles. Any
@@ -372,12 +356,7 @@ export default function TermsPage() {
           </p>
         </LegalSectionCard>
 
-        <LegalSectionCard
-          id="changes"
-          icon={FileText}
-          title="Changes to Terms"
-          accentColor="warm"
-        >
+        <LegalSectionCard id="changes" icon={FileText} title="Changes to Terms">
           <p>
             We may revise these Terms of Service from time to time. Any changes
             will be reflected by an updated &ldquo;Effective&rdquo; date at the
@@ -392,12 +371,7 @@ export default function TermsPage() {
         </LegalSectionCard>
       </div>
 
-      <div className="rounded-lg border border-border/50 bg-muted/30 p-6 text-center text-sm text-muted-foreground">
-        <p>
-          For questions about these terms, please contact us at{" "}
-          <strong className="text-foreground">info@scrumpokergame.com</strong>
-        </p>
-      </div>
+      <LegalContactFooter subject="questions about these terms" />
     </>
   );
 }

@@ -67,7 +67,7 @@ export function PlayerList({
         >
           {onlineCount}/{players.length} online · {votedCount} voted
           {foldCount > 0 && (
-            <span aria-hidden="true" className="text-amber-700 ml-1">
+            <span aria-hidden="true" className="text-warm-700 ml-1">
               ({foldCount} folded)
             </span>
           )}

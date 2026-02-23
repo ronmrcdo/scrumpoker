@@ -20,7 +20,7 @@ export function InviteBanner({ roomId }: InviteBannerProps) {
   };
 
   return (
-    <div className="w-full max-w-sm px-2 animate-fade-in">
+    <div className="w-full max-w-sm md:max-w-md px-2 animate-fade-in">
       <div className="flex flex-col items-center gap-2 rounded-lg border border-border bg-card p-4 text-center">
         <Users aria-hidden="true" className="h-5 w-5 text-muted-foreground" />
         <p className="text-sm text-muted-foreground">
@@ -32,7 +32,6 @@ export function InviteBanner({ roomId }: InviteBannerProps) {
           size="sm"
           className="gap-1.5"
           onClick={shareRoom}
-          aria-label="Copy invite link"
         >
           {copied ? (
             <>
@@ -46,6 +45,9 @@ export function InviteBanner({ roomId }: InviteBannerProps) {
             </>
           )}
         </Button>
+        <span className="sr-only" aria-live="polite" aria-atomic="true">
+          {copied ? "Link copied to clipboard" : ""}
+        </span>
       </div>
     </div>
   );

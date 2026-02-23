@@ -1,15 +1,18 @@
 import {
   AlertTriangle,
   ChevronRight,
+  ExternalLink,
   Eye,
   Globe,
   Info,
-  MessageSquare,
   Scale,
   Shield,
 } from "@repo/ui";
 import type { Metadata } from "next";
 import {
+  LegalCallout,
+  LegalContactFooter,
+  LegalNav,
   LegalPageHeader,
   LegalSectionCard,
   LegalTableOfContents,
@@ -34,7 +37,6 @@ const tocItems = [
   { id: "liability", title: "Limitation of Liability", icon: Scale },
   { id: "links", title: "External Links", icon: ChevronRight },
   { id: "accuracy", title: "Accuracy of Information", icon: Eye },
-  { id: "contact", title: "Contact Information", icon: MessageSquare },
 ];
 
 export default function DisclaimerPage() {
@@ -47,16 +49,18 @@ export default function DisclaimerPage() {
         documentType="Disclaimer"
         effectiveDate="February 16, 2026"
         version="1.0"
+        readingTimeMinutes={4}
       />
+
+      <LegalNav currentPath="/disclaimer" />
 
       <LegalTableOfContents items={tocItems} />
 
-      <div className="space-y-6">
+      <div className="space-y-8">
         <LegalSectionCard
           id="general"
           icon={AlertTriangle}
           title="General Disclaimer"
-          accentColor="primary"
         >
           <p>
             The information provided on{" "}
@@ -77,7 +81,6 @@ export default function DisclaimerPage() {
           id="no-advice"
           icon={Info}
           title="No Professional Advice"
-          accentColor="accent"
         >
           <p>
             Scrum Poker Game is a{" "}
@@ -108,12 +111,7 @@ export default function DisclaimerPage() {
           </ul>
         </LegalSectionCard>
 
-        <LegalSectionCard
-          id="as-is"
-          icon={Shield}
-          title={'"As-Is" Service'}
-          accentColor="warm"
-        >
+        <LegalSectionCard id="as-is" icon={Shield} title={'"As-Is" Service'}>
           <p>
             Scrum Poker Game is provided{" "}
             <strong className="text-foreground">
@@ -155,7 +153,6 @@ export default function DisclaimerPage() {
           id="third-party"
           icon={Globe}
           title="Third-Party Services"
-          accentColor="primary"
         >
           <p>
             Scrum Poker Game relies on third-party infrastructure to operate. We
@@ -173,9 +170,10 @@ export default function DisclaimerPage() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Supabase Privacy Policy (opens in new tab)"
-                className="text-primary underline hover:text-primary-700 dark:hover:text-primary-300"
+                className="inline-flex items-center gap-1 text-primary underline underline-offset-2 hover:text-primary-700 dark:hover:text-primary-300"
               >
                 Supabase Privacy Policy
+                <ExternalLink aria-hidden="true" className="size-3 shrink-0" />
               </a>
             </li>
             <li>
@@ -187,9 +185,10 @@ export default function DisclaimerPage() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Plausible Analytics Privacy Policy (opens in new tab)"
-                className="text-primary underline hover:text-primary-700 dark:hover:text-primary-300"
+                className="inline-flex items-center gap-1 text-primary underline underline-offset-2 hover:text-primary-700 dark:hover:text-primary-300"
               >
                 Plausible Privacy Policy
+                <ExternalLink aria-hidden="true" className="size-3 shrink-0" />
               </a>
             </li>
           </ul>
@@ -204,7 +203,6 @@ export default function DisclaimerPage() {
           id="liability"
           icon={Scale}
           title="Limitation of Liability"
-          accentColor="accent"
         >
           <p>
             Under no circumstances shall the operators of Scrum Poker Game be
@@ -221,19 +219,14 @@ export default function DisclaimerPage() {
             <li>Unauthorized access to rooms by unintended participants</li>
             <li>Service interruptions, errors, or security breaches</li>
           </ul>
-          <p>
-            This is a <strong className="text-foreground">free service</strong>{" "}
-            with no paid tier. All data is ephemeral and expires within 24
-            hours. Users acknowledge these limitations when using the service.
-          </p>
+          <LegalCallout variant="info">
+            This is a <strong>free service</strong> with no paid tier. All data
+            is ephemeral and expires within 24 hours. Users acknowledge these
+            limitations when using the service.
+          </LegalCallout>
         </LegalSectionCard>
 
-        <LegalSectionCard
-          id="links"
-          icon={ChevronRight}
-          title="External Links"
-          accentColor="warm"
-        >
+        <LegalSectionCard id="links" icon={ChevronRight} title="External Links">
           <p>
             Our service may contain links to third-party websites or resources,
             such as privacy policies of our service providers. These links are
@@ -251,7 +244,6 @@ export default function DisclaimerPage() {
           id="accuracy"
           icon={Eye}
           title="Accuracy of Information"
-          accentColor="primary"
         >
           <p>
             The voting analytics provided by Scrum Poker Game — including
@@ -280,27 +272,9 @@ export default function DisclaimerPage() {
             </li>
           </ul>
         </LegalSectionCard>
-
-        <LegalSectionCard
-          id="contact"
-          icon={MessageSquare}
-          title="Contact Information"
-          accentColor="accent"
-        >
-          <p>
-            If you have any questions, concerns, or feedback regarding this
-            Disclaimer or any aspect of the Scrum Poker Game service, please
-            contact us at:
-          </p>
-          <p>
-            <strong className="text-foreground">info@scrumpokergame.com</strong>
-          </p>
-          <p>
-            We welcome feedback and will make reasonable efforts to respond to
-            inquiries in a timely manner.
-          </p>
-        </LegalSectionCard>
       </div>
+
+      <LegalContactFooter subject="questions about this disclaimer" />
     </>
   );
 }

@@ -172,17 +172,17 @@ export function PokerRoomClient({ initialRoom }: PokerRoomClientProps) {
   }, [activeRoom.id, activeRoom.players.length, stats?.consensus, resetVotes]);
 
   return (
-    <div className="flex flex-col items-center gap-4 sm:gap-6 md:gap-8 p-3 sm:p-4 md:p-6 pb-safe max-w-4xl mx-auto">
+    <div className="flex flex-col items-center gap-4 sm:gap-6 md:gap-8 p-3 sm:p-4 md:p-6 pb-safe-fallback max-w-4xl mx-auto">
       {!isPlayerInRoom && currentUserId && (
         <JoinRoomDialog roomId={activeRoom.id} />
       )}
       {/* Session Info */}
-      <div className="text-center px-2">
+      <div className="text-center px-2 py-3 sm:py-4">
         <h1 className="text-lg sm:text-xl md:text-2xl font-semibold text-foreground break-words">
           {activeRoom.name}
         </h1>
         <p
-          className="text-xs sm:text-sm text-muted-foreground mt-1"
+          className="text-sm sm:text-base font-medium text-muted-foreground mt-1.5"
           aria-live="polite"
           aria-atomic="true"
         >
@@ -191,7 +191,7 @@ export function PokerRoomClient({ initialRoom }: PokerRoomClientProps) {
             : `${activeRoom.players.filter((p) => p.vote !== null).length}/${activeRoom.players.length} voted`}
         </p>
         {!activeRoom.isRevealed && foldedCount > 0 && (
-          <p className="text-xs text-amber-600 font-medium mt-0.5">
+          <p className="text-xs sm:text-sm text-warm-600 font-medium mt-1">
             {foldedCount} {foldedCount === 1 ? "player" : "players"} folded —
             needs clarification
           </p>
@@ -213,7 +213,7 @@ export function PokerRoomClient({ initialRoom }: PokerRoomClientProps) {
 
       {/* Vote Selection (hidden when revealed) */}
       {!activeRoom.isRevealed && (
-        <div className="w-full max-w-sm px-2">
+        <div className="w-full max-w-sm md:max-w-md px-2">
           <VoteSelection
             currentVote={currentVote}
             isRevealed={activeRoom.isRevealed}
@@ -224,7 +224,7 @@ export function PokerRoomClient({ initialRoom }: PokerRoomClientProps) {
 
       {/* Metrics (shown when revealed, above toolbar) */}
       {activeRoom.isRevealed && (
-        <div className="w-full max-w-sm px-2 space-y-2 sm:space-y-3">
+        <div className="w-full max-w-sm md:max-w-lg px-2 space-y-3 sm:space-y-4">
           <Consensus stats={stats} />
           <Overview stats={stats} />
           <VoteDistribution stats={stats} />
@@ -233,7 +233,7 @@ export function PokerRoomClient({ initialRoom }: PokerRoomClientProps) {
       )}
 
       {/* Toolbar */}
-      <div className="w-full max-w-sm px-2">
+      <div className="w-full max-w-sm md:max-w-md px-2">
         <Toolbar
           isFacilitator={isFacilitator}
           isRevealed={activeRoom.isRevealed}

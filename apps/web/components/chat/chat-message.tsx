@@ -33,14 +33,14 @@ export const ChatMessage = memo(function ChatMessage({
       )}
     >
       {!isOwnMessage && (
-        <span className="text-[10px] text-muted-foreground font-medium ml-3">
+        <span className="text-xs text-muted-foreground font-medium ml-3">
           {message.senderName}
         </span>
       )}
       <div
         className={cn(
           "max-w-[85%] px-3 py-2 rounded-2xl text-sm transition-shadow duration-200",
-          "hover:shadow-md break-words",
+          "hover:shadow-soft-md break-words",
           isOwnMessage
             ? "bg-primary-100 text-primary-800 rounded-br-md"
             : "bg-muted text-foreground rounded-bl-md",
@@ -49,7 +49,7 @@ export const ChatMessage = memo(function ChatMessage({
       >
         {message.text}
       </div>
-      <span className="text-[10px] text-muted-foreground mx-3">
+      <span className="text-xs text-muted-foreground mx-3">
         {message.timestamp}
       </span>
     </li>

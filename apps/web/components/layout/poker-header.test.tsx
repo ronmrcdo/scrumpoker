@@ -7,6 +7,7 @@ import { PokerHeader } from "./poker-header";
 describe("PokerHeader", () => {
   const defaultProps = {
     roomId: "room-123",
+    roomName: "Sprint Planning",
     isChatOpen: false,
     isPlayerListOpen: false,
     onToggleChat: vi.fn(),
@@ -31,9 +32,9 @@ describe("PokerHeader", () => {
   });
 
   describe("rendering", () => {
-    it("should display app name", () => {
+    it("should display room name", () => {
       render(<PokerHeader {...defaultProps} />);
-      expect(screen.getByText("Scrum Poker Game")).toBeInTheDocument();
+      expect(screen.getByText("Sprint Planning")).toBeInTheDocument();
     });
 
     it("should render player list toggle button", () => {
@@ -134,8 +135,8 @@ describe("PokerHeader", () => {
   });
 
   describe("app name display", () => {
-    it("should always display Scrum Poker Game", () => {
-      render(<PokerHeader {...defaultProps} />);
+    it("should fall back to generic name when roomName is empty", () => {
+      render(<PokerHeader {...defaultProps} roomName="" />);
       expect(screen.getByText("Scrum Poker Game")).toBeInTheDocument();
     });
   });

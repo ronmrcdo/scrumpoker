@@ -10,7 +10,7 @@ export default function LegalLayout({
     <>
       <LandingHeader />
       <main id="main-content" className="min-h-screen pt-24 pb-16">
-        <div className="container mx-auto max-w-3xl space-y-8 px-4">
+        <div className="container mx-auto max-w-3xl space-y-10 px-4">
           {children}
         </div>
       </main>

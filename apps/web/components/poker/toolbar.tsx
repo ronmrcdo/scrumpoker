@@ -20,13 +20,13 @@ export function Toolbar({
   if (!isFacilitator) return null;
 
   return (
-    <div className="flex items-center gap-2 flex-wrap w-full">
+    <div className="flex items-center justify-center gap-3 w-full">
       <Button
         onClick={onToggleReveal}
         disabled={isCounting}
         variant="default"
-        size="sm"
-        className="flex-1 sm:flex-none min-w-[100px] transition-transform duration-200 hover:scale-105 active:scale-95"
+        size="md"
+        className="flex-1 sm:flex-none min-w-[140px] transition-transform duration-200 hover:scale-105 active:scale-95"
       >
         {isRevealed ? (
           <>
@@ -45,7 +45,7 @@ export function Toolbar({
         variant="outline"
         disabled={isCounting}
         size="sm"
-        className="flex-1 sm:flex-none min-w-[100px] transition-transform duration-200 hover:scale-105 active:scale-95"
+        className="flex-1 sm:flex-none min-w-[100px] transition-transform duration-200 hover:scale-[1.03] active:scale-95"
       >
         <RotateCcw className="h-4 w-4 mr-1 transition-transform duration-300 hover:rotate-180" />
         Reset

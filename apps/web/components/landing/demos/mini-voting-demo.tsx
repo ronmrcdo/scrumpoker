@@ -87,6 +87,7 @@ export function MiniVotingDemo() {
   return (
     <div
       ref={containerRef}
+      aria-hidden="true"
       className="relative rounded-xl overflow-hidden h-[340px] bg-background border border-border shadow-soft-lg"
     >
       {/* Header */}
@@ -154,6 +155,7 @@ export function MiniVotingDemo() {
               <button
                 key={value}
                 type="button"
+                tabIndex={-1}
                 aria-label={`Vote ${value} story points`}
                 aria-pressed={selectedCard === value}
                 className={cn(

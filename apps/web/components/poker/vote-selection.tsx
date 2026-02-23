@@ -23,11 +23,11 @@ export const VoteSelection = memo(function VoteSelection({
   );
 
   return (
-    <div>
-      <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-2 sm:mb-3">
+    <fieldset className="border-0 p-0 m-0">
+      <legend className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-2 sm:mb-3">
         Choose Your Card
-      </h3>
-      <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 sm:gap-2.5">
+      </legend>
+      <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 sm:gap-2.5 md:gap-3">
         {CARD_VALUES.map((val, index) => (
           <button
             key={val}
@@ -38,7 +38,7 @@ export const VoteSelection = memo(function VoteSelection({
             aria-label={`Vote ${val} story points`}
             style={{ animationDelay: `${index * 50}ms` }}
             className={cn(
-              "h-14 sm:h-16 rounded-lg border-2 text-lg sm:text-xl font-bold",
+              "h-14 sm:h-16 md:h-[4.5rem] rounded-lg border-2 text-lg sm:text-xl font-bold",
               "transition-[transform,box-shadow,background-color,border-color] duration-300 ease-out",
               "hover:shadow-soft-md hover:-translate-y-1 hover:scale-105",
               "active:scale-95 active:duration-75",
@@ -60,7 +60,7 @@ export const VoteSelection = memo(function VoteSelection({
         onClick={() => handleVote(FOLD_VALUE)}
         aria-pressed={currentVote === FOLD_VALUE}
         className={cn(
-          "w-full mt-2 sm:mt-3 h-10 sm:h-11 rounded-lg border-2 text-sm font-semibold",
+          "w-full mt-3 sm:mt-4 h-10 sm:h-11 rounded-lg border-2 text-sm font-semibold",
           "transition-[transform,box-shadow,background-color,border-color] duration-300 ease-out",
           "hover:shadow-soft-md",
           "active:scale-[0.98] active:duration-75",
@@ -68,12 +68,12 @@ export const VoteSelection = memo(function VoteSelection({
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2",
           "animate-scale-in",
           currentVote === FOLD_VALUE
-            ? "bg-amber-500 text-white border-amber-500 shadow-soft-md"
-            : "bg-card text-amber-600 border-amber-300 hover:border-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/20",
+            ? "bg-warm-500 text-white border-warm-500 shadow-soft-md"
+            : "bg-card text-warm-600 border-warm-300 hover:border-warm-400 hover:bg-warm-50 dark:hover:bg-warm-950/20",
         )}
       >
         Fold — Need More Info
       </button>
-    </div>
+    </fieldset>
   );
 });

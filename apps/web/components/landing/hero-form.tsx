@@ -20,7 +20,7 @@ export function HeroForm() {
       {formError && (
         <div
           role="alert"
-          className="p-3 text-sm bg-red-50 dark:bg-red-950/20 text-red-600 dark:text-red-400 rounded-lg border border-red-200 dark:border-red-900"
+          className="p-3 text-sm bg-destructive/10 dark:bg-destructive/20 text-destructive rounded-lg border border-destructive/30"
         >
           {formError}
         </div>
@@ -34,7 +34,7 @@ export function HeroForm() {
           <Input
             id="hero-user-name"
             placeholder="Enter your name"
-            className="h-11 bg-card/50 backdrop-blur-sm border-border/50"
+            className="h-10 bg-card/50 backdrop-blur-sm border-border/50"
             disabled={isSubmitting}
             aria-invalid={!!form.formState.errors.userName}
             aria-describedby={
@@ -48,7 +48,7 @@ export function HeroForm() {
             <p
               id="hero-user-name-error"
               role="alert"
-              className="text-xs text-red-500"
+              className="text-xs text-destructive"
             >
               {form.formState.errors.userName.message}
             </p>
@@ -62,7 +62,7 @@ export function HeroForm() {
           <Input
             id="hero-room-name"
             placeholder="e.g., Sprint 42"
-            className="h-11 bg-card/50 backdrop-blur-sm border-border/50"
+            className="h-10 bg-card/50 backdrop-blur-sm border-border/50"
             disabled={isSubmitting}
             aria-invalid={!!form.formState.errors.roomName}
             aria-describedby={
@@ -76,7 +76,7 @@ export function HeroForm() {
             <p
               id="hero-room-name-error"
               role="alert"
-              className="text-xs text-red-500"
+              className="text-xs text-destructive"
             >
               {form.formState.errors.roomName.message}
             </p>

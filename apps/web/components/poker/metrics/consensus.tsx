@@ -21,14 +21,14 @@ export function Consensus({ stats }: ConsensusProps) {
   }
 
   return (
-    <Card className="animate-scale-in">
-      <CardContent className="p-3 sm:p-4">
+    <Card className="animate-scale-in shadow-soft-md">
+      <CardContent className="p-4 sm:p-5">
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0">
-            <p className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wider">
+            <p className="text-xs sm:text-sm font-medium text-muted-foreground uppercase tracking-wider">
               Most Common
             </p>
-            <p className="text-2xl sm:text-3xl font-bold text-foreground mt-1 animate-bounce-once">
+            <p className="text-3xl sm:text-4xl font-bold text-foreground mt-1 animate-bounce-once">
               {stats.mode}
             </p>
           </div>

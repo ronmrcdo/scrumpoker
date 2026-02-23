@@ -81,11 +81,11 @@ export const PlayerItem = memo(function PlayerItem({
             className={cn(
               "absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-card",
               !isOnline
-                ? "bg-gray-400"
+                ? "bg-muted-foreground"
                 : hasFolded
-                  ? "bg-amber-500"
+                  ? "bg-warm-400"
                   : hasVoted
-                    ? "bg-green-600"
+                    ? "bg-accent-500"
                     : "bg-muted-foreground",
             )}
           />
@@ -102,7 +102,7 @@ export const PlayerItem = memo(function PlayerItem({
               {player.name}
             </span>
             {player.role === "FACILITATOR" && (
-              <Badge variant="default" className="text-[10px] px-1.5 py-0">
+              <Badge variant="default" className="text-xs px-1.5 py-0">
                 The Dealer
               </Badge>
             )}
@@ -113,9 +113,9 @@ export const PlayerItem = memo(function PlayerItem({
             className={cn(
               "text-xs",
               !isOnline
-                ? "text-neutral-500 font-medium"
+                ? "text-muted-foreground font-medium"
                 : hasFolded
-                  ? "text-amber-700 font-medium"
+                  ? "text-warm-700 font-medium"
                   : "text-muted-foreground",
             )}
           >

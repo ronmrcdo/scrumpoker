@@ -121,6 +121,11 @@
     padding-bottom: env(safe-area-inset-bottom);
   }
 
+  /* Safe area padding with a minimum fallback for non-notched devices */
+  .pb-safe-fallback {
+    padding-bottom: max(1.5rem, env(safe-area-inset-bottom, 1.5rem));
+  }
+
   /* Flip animation for card reveal */
   @keyframes flip {
     0% {

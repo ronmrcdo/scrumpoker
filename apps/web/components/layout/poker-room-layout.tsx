@@ -86,6 +86,7 @@ export function PokerRoomLayout({ children }: PokerRoomLayoutProps) {
     <div className="h-dvh flex flex-col bg-background">
       <PokerHeader
         roomId={room.id}
+        roomName={room.name}
         isChatOpen={isChatOpen}
         isPlayerListOpen={isPlayerListOpen}
         onToggleChat={toggleChat}

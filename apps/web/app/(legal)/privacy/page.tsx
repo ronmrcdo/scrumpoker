@@ -2,6 +2,7 @@ import {
   BarChart3,
   Cookie,
   Database,
+  ExternalLink,
   Eye,
   FileText,
   Globe,
@@ -13,6 +14,9 @@ import {
 } from "@repo/ui";
 import type { Metadata } from "next";
 import {
+  LegalCallout,
+  LegalContactFooter,
+  LegalNav,
   LegalPageHeader,
   LegalSectionCard,
   LegalTableOfContents,
@@ -57,17 +61,15 @@ export default function PrivacyPolicyPage() {
         documentType="Privacy Policy"
         effectiveDate="February 16, 2026"
         version="1.0"
+        readingTimeMinutes={5}
       />
+
+      <LegalNav currentPath="/privacy" />
 
       <LegalTableOfContents items={tocItems} />
 
-      <div className="space-y-6">
-        <LegalSectionCard
-          id="introduction"
-          icon={Info}
-          title="Introduction"
-          accentColor="primary"
-        >
+      <div className="space-y-8">
+        <LegalSectionCard id="introduction" icon={Info} title="Introduction">
           <p>
             Welcome to{" "}
             <strong className="text-foreground">Scrum Poker Game</strong>{" "}
@@ -89,7 +91,6 @@ export default function PrivacyPolicyPage() {
           id="information-collected"
           icon={Database}
           title="Information We Collect"
-          accentColor="accent"
         >
           <p>
             We collect the{" "}
@@ -127,18 +128,17 @@ export default function PrivacyPolicyPage() {
               in our database.
             </li>
           </ul>
-          <p className="rounded-lg border border-accent-200 bg-accent-50 p-3 text-accent-700 dark:border-accent-500/30 dark:bg-accent-500/10 dark:text-accent-400">
-            <strong>We do NOT collect:</strong> email addresses, phone numbers,
-            passwords, real names, physical addresses, payment information, or
-            any other personally identifiable information.
-          </p>
+          <LegalCallout variant="success" title="We do NOT collect:">
+            email addresses, phone numbers, passwords, real names, physical
+            addresses, payment information, or any other personally identifiable
+            information.
+          </LegalCallout>
         </LegalSectionCard>
 
         <LegalSectionCard
           id="how-we-use"
           icon={Eye}
           title="How We Use Your Information"
-          accentColor="warm"
         >
           <p>
             The information we collect is used solely for the following
@@ -180,19 +180,21 @@ export default function PrivacyPolicyPage() {
           id="cookies"
           icon={Cookie}
           title="Cookies & Local Storage"
-          accentColor="primary"
         >
           <p>
             We use a minimal set of cookies and local storage for essential
             functionality:
           </p>
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto rounded-lg border border-border/50 bg-muted/20">
             <table className="w-full text-sm">
+              <caption className="sr-only">
+                Cookies and local storage used by the service
+              </caption>
               <thead>
-                <tr className="border-b border-border">
+                <tr className="border-b border-border bg-muted/40">
                   <th
                     scope="col"
-                    className="py-2 pr-4 text-left font-medium text-foreground"
+                    className="py-2 pr-4 pl-3 text-left font-medium text-foreground"
                   >
                     Name
                   </th>
@@ -210,42 +212,42 @@ export default function PrivacyPolicyPage() {
                   </th>
                   <th
                     scope="col"
-                    className="py-2 text-left font-medium text-foreground"
+                    className="py-2 pr-3 text-left font-medium text-foreground"
                   >
                     Duration
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border/50">
+              <tbody className="divide-y divide-border/30">
                 <tr>
-                  <td className="py-2 pr-4 font-mono text-xs">
+                  <td className="py-2 pr-4 pl-3 font-mono text-xs">
                     sb-*-auth-token
                   </td>
                   <td className="py-2 pr-4">Cookie (Necessary)</td>
                   <td className="py-2 pr-4">
                     Anonymous session authentication
                   </td>
-                  <td className="py-2">1 hour</td>
+                  <td className="py-2 pr-3">1 hour</td>
                 </tr>
                 <tr>
-                  <td className="py-2 pr-4 font-mono text-xs">
+                  <td className="py-2 pr-4 pl-3 font-mono text-xs">
                     cookie-consent
                   </td>
                   <td className="py-2 pr-4">Local Storage</td>
                   <td className="py-2 pr-4">
                     Stores your cookie consent preference
                   </td>
-                  <td className="py-2">Persistent</td>
+                  <td className="py-2 pr-3">Persistent</td>
                 </tr>
                 <tr>
-                  <td className="py-2 pr-4 font-mono text-xs">
+                  <td className="py-2 pr-4 pl-3 font-mono text-xs">
                     scrumpoker-theme
                   </td>
                   <td className="py-2 pr-4">Local Storage</td>
                   <td className="py-2 pr-4">
                     Stores your light/dark theme preference
                   </td>
-                  <td className="py-2">Persistent</td>
+                  <td className="py-2 pr-3">Persistent</td>
                 </tr>
               </tbody>
             </table>
@@ -257,12 +259,7 @@ export default function PrivacyPolicyPage() {
           </p>
         </LegalSectionCard>
 
-        <LegalSectionCard
-          id="analytics"
-          icon={BarChart3}
-          title="Analytics"
-          accentColor="accent"
-        >
+        <LegalSectionCard id="analytics" icon={BarChart3} title="Analytics">
           <p>
             We use{" "}
             <strong className="text-foreground">Plausible Analytics</strong> for
@@ -297,7 +294,6 @@ export default function PrivacyPolicyPage() {
           id="data-retention"
           icon={Trash2}
           title="Data Retention"
-          accentColor="warm"
         >
           <p>
             Our service is designed to be{" "}
@@ -335,7 +331,6 @@ export default function PrivacyPolicyPage() {
           id="third-party"
           icon={Globe}
           title="Third-Party Services"
-          accentColor="primary"
         >
           <p>
             We rely on the following third-party services to operate our
@@ -352,9 +347,10 @@ export default function PrivacyPolicyPage() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Supabase Privacy Policy (opens in new tab)"
-                className="text-primary underline hover:text-primary-700 dark:hover:text-primary-300"
+                className="inline-flex items-center gap-1 text-primary underline underline-offset-2 hover:text-primary-700 dark:hover:text-primary-300"
               >
                 Supabase Privacy Policy
+                <ExternalLink aria-hidden="true" className="size-3 shrink-0" />
               </a>
             </li>
             <li>
@@ -366,9 +362,10 @@ export default function PrivacyPolicyPage() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Plausible Analytics Privacy Policy (opens in new tab)"
-                className="text-primary underline hover:text-primary-700 dark:hover:text-primary-300"
+                className="inline-flex items-center gap-1 text-primary underline underline-offset-2 hover:text-primary-700 dark:hover:text-primary-300"
               >
                 Plausible Privacy Policy
+                <ExternalLink aria-hidden="true" className="size-3 shrink-0" />
               </a>
             </li>
           </ul>
@@ -378,12 +375,7 @@ export default function PrivacyPolicyPage() {
           </p>
         </LegalSectionCard>
 
-        <LegalSectionCard
-          id="your-rights"
-          icon={Shield}
-          title="Your Rights"
-          accentColor="accent"
-        >
+        <LegalSectionCard id="your-rights" icon={Shield} title="Your Rights">
           <p>
             Depending on your jurisdiction, you may have the following rights
             regarding your data:
@@ -417,12 +409,7 @@ export default function PrivacyPolicyPage() {
           </p>
         </LegalSectionCard>
 
-        <LegalSectionCard
-          id="security"
-          icon={Lock}
-          title="Security"
-          accentColor="warm"
-        >
+        <LegalSectionCard id="security" icon={Lock} title="Security">
           <p>
             We implement multiple layers of security to protect the service and
             your data:
@@ -457,12 +444,7 @@ export default function PrivacyPolicyPage() {
           </ul>
         </LegalSectionCard>
 
-        <LegalSectionCard
-          id="children"
-          icon={UserX}
-          title="Children's Privacy"
-          accentColor="primary"
-        >
+        <LegalSectionCard id="children" icon={UserX} title="Children's Privacy">
           <p>
             Our service is not directed at children under the age of 13. We do
             not knowingly collect personal information from children. Because
@@ -480,7 +462,6 @@ export default function PrivacyPolicyPage() {
           id="changes"
           icon={FileText}
           title="Changes to This Policy"
-          accentColor="accent"
         >
           <p>
             We may update this Privacy Policy from time to time to reflect
@@ -495,12 +476,7 @@ export default function PrivacyPolicyPage() {
         </LegalSectionCard>
       </div>
 
-      <div className="rounded-lg border border-border/50 bg-muted/30 p-6 text-center text-sm text-muted-foreground">
-        <p>
-          For privacy inquiries, please contact us at{" "}
-          <strong className="text-foreground">info@scrumpokergame.com</strong>
-        </p>
-      </div>
+      <LegalContactFooter subject="privacy inquiries" />
     </>
   );
 }

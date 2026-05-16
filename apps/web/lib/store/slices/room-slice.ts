@@ -3,6 +3,7 @@ import type { StateCreator } from "zustand";
 import { MAX_PLAYERS } from "@/lib/constants/cards";
 import { createClient } from "@/lib/supabase/client";
 import type { Player, Room } from "../../types";
+import type { ConnectionSlice } from "./connection-slice";
 import type { SessionSlice } from "./session-slice";
 
 const supabase = createClient();
@@ -30,15 +31,17 @@ function mapPlayers(players: DbPlayer[]): Player[] {
 export async function fetchRoomWithPlayers(
   roomId: string,
 ): Promise<Room | null> {
-  // Run both queries in parallel to halve latency
   const [roomResult, playersResult] = await Promise.all([
     supabase
       .from("rooms")
-      .select("*")
+      .select("id, name, is_revealed, facilitator_id")
       .eq("id", roomId)
       .gt("expires_at", new Date().toISOString())
-      .single(),
-    supabase.from("players_masked").select("*").eq("room_id", roomId),
+      .maybeSingle(),
+    supabase
+      .from("players_masked")
+      .select("user_id, name, role, vote")
+      .eq("room_id", roomId),
   ]);
 
   if (!roomResult.data) return null;
@@ -49,7 +52,7 @@ export async function fetchRoomWithPlayers(
     name: room.name,
     isRevealed: room.is_revealed,
     facilitatorId: room.facilitator_id,
-    players: mapPlayers(playersResult.data ?? []),
+    players: mapPlayers((playersResult.data ?? []) as DbPlayer[]),
   };
 }
 
@@ -68,7 +71,7 @@ export interface RoomSlice {
 }
 
 export const createRoomSlice: StateCreator<
-  SessionSlice & RoomSlice,
+  SessionSlice & RoomSlice & ConnectionSlice,
   [],
   [],
   RoomSlice
@@ -106,10 +109,9 @@ export const createRoomSlice: StateCreator<
   },
 
   castVote: async (value) => {
-    const { room, currentUserId } = get();
+    const { room, currentUserId, setLastError } = get();
     if (!room || !currentUserId) return;
 
-    // Optimistic update
     const previousRoom = room;
     set({
       room: {
@@ -121,41 +123,53 @@ export const createRoomSlice: StateCreator<
     });
 
     try {
-      const { error } = await supabase
-        .from("players")
-        .update({ vote: value })
-        .eq("room_id", room.id)
-        .eq("user_id", currentUserId);
+      // p_vote accepts NULL at the SQL level (clears the vote). The generated
+      // type widens to `string`, so cast at the call site.
+      const { error } = await supabase.rpc("cast_vote", {
+        p_room_id: room.id,
+        p_vote: value as string,
+      });
 
-      if (error) set({ room: previousRoom });
-    } catch {
+      if (error) {
+        set({ room: previousRoom });
+        setLastError(error.message || "Failed to cast vote");
+      }
+    } catch (err) {
       set({ room: previousRoom });
+      setLastError(err instanceof Error ? err.message : "Failed to cast vote");
     }
   },
 
   toggleReveal: async () => {
-    const { room } = get();
+    const { room, setLastError } = get();
     if (!room) return;
 
     const previousRoom = room;
+    const nextRevealed = !previousRoom.isRevealed;
     set({
-      room: { ...room, isRevealed: !room.isRevealed },
+      room: { ...room, isRevealed: nextRevealed },
     });
 
     try {
-      const { error } = await supabase
-        .from("rooms")
-        .update({ is_revealed: !previousRoom.isRevealed })
-        .eq("id", room.id);
+      const { error } = await supabase.rpc("set_room_revealed", {
+        p_room_id: room.id,
+        p_revealed: nextRevealed,
+      });
 
-      if (error) set({ room: previousRoom });
-    } catch {
+      if (error) {
+        set({ room: previousRoom });
+        setLastError(error.message || "Failed to update reveal state");
+      }
+    } catch (err) {
       set({ room: previousRoom });
+      setLastError(
+        err instanceof Error ? err.message : "Failed to update reveal state",
+      );
     }
   },
 
   resetVotes: async () => {
-    const { room } = get();
+    const { room, setLastError } = get();
     if (!room) return;
 
     const previousRoom = room;
@@ -172,9 +186,15 @@ export const createRoomSlice: StateCreator<
         p_room_id: room.id,
       });
 
-      if (error) set({ room: previousRoom });
-    } catch {
+      if (error) {
+        set({ room: previousRoom });
+        setLastError(error.message || "Failed to reset votes");
+      }
+    } catch (err) {
       set({ room: previousRoom });
+      setLastError(
+        err instanceof Error ? err.message : "Failed to reset votes",
+      );
     }
   },
 
@@ -187,10 +207,9 @@ export const createRoomSlice: StateCreator<
   },
 
   kickPlayer: async (playerId) => {
-    const { room } = get();
+    const { room, setLastError } = get();
     if (!room) return;
 
-    // Optimistic update
     const previousRoom = room;
     set({
       room: {
@@ -200,15 +219,20 @@ export const createRoomSlice: StateCreator<
     });
 
     try {
-      const { error } = await supabase
-        .from("players")
-        .delete()
-        .eq("room_id", room.id)
-        .eq("user_id", playerId);
+      const { error } = await supabase.rpc("kick_player", {
+        p_room_id: room.id,
+        p_target_user_id: playerId,
+      });
 
-      if (error) set({ room: previousRoom });
-    } catch {
+      if (error) {
+        set({ room: previousRoom });
+        setLastError(error.message || "Failed to kick player");
+      }
+    } catch (err) {
       set({ room: previousRoom });
+      setLastError(
+        err instanceof Error ? err.message : "Failed to kick player",
+      );
     }
   },
 });

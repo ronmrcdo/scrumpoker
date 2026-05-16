@@ -29,4 +29,15 @@ describe("ConnectionSlice", () => {
     store.getState().setIsOnline(true);
     expect(store.getState().isOnline).toBe(true);
   });
+
+  it("initializes lastError as null", () => {
+    expect(store.getState().lastError).toBeNull();
+  });
+
+  it("setLastError stores and clears the message", () => {
+    store.getState().setLastError("Something broke");
+    expect(store.getState().lastError).toBe("Something broke");
+    store.getState().setLastError(null);
+    expect(store.getState().lastError).toBeNull();
+  });
 });

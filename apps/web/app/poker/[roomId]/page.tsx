@@ -15,11 +15,14 @@ export async function generateMetadata({
   if (!isValidUUID(roomId)) return base;
   try {
     const supabase = await createServerSupabaseClient();
+    // .maybeSingle() returns data: null (no error) when the caller isn't a
+    // member of this room (RLS hides it). .single() would surface PGRST116
+    // as an error and force a noisier branch here.
     const { data } = await supabase
       .from("rooms")
       .select("name")
       .eq("id", roomId)
-      .single();
+      .maybeSingle();
     if (data?.name) return { ...base, title: data.name };
     const { data: previewRows } = await supabase.rpc("get_room_preview", {
       p_room_id: roomId,
@@ -43,16 +46,28 @@ export default async function PokerRoomPage({
 
   const supabase = await createServerSupabaseClient();
 
-  // Try full fetch first — RLS restricts SELECT to room members only
+  // Try full fetch first — RLS restricts SELECT to room members only.
+  // .maybeSingle() gives us data: null cleanly when the caller isn't a
+  // member; PGRST116 from .single() would otherwise be swallowed alongside
+  // real errors here.
   const [roomResult, playersResult] = await Promise.all([
     supabase
       .from("rooms")
-      .select("*")
+      .select("id, name, is_revealed, facilitator_id")
       .eq("id", roomId)
       .gt("expires_at", new Date().toISOString())
-      .single(),
-    supabase.from("players_masked").select("*").eq("room_id", roomId),
+      .maybeSingle(),
+    supabase
+      .from("players_masked")
+      .select("user_id, name, role, vote")
+      .eq("room_id", roomId),
   ]);
+
+  // Surface unexpected DB errors instead of silently falling through to
+  // the preview branch (#9).
+  if (roomResult.error) {
+    throw new Error(`Failed to load room: ${roomResult.error.message}`);
+  }
 
   if (roomResult.data) {
     const room = roomResult.data;
@@ -65,19 +80,12 @@ export default async function PokerRoomPage({
           name: room.name,
           isRevealed: room.is_revealed,
           facilitatorId: room.facilitator_id,
-          players: (players ?? []).map(
-            (p: {
-              user_id: string;
-              name: string;
-              role: string;
-              vote: string | null;
-            }) => ({
-              id: p.user_id,
-              name: p.name,
-              role: p.role as "FACILITATOR" | "MEMBER",
-              vote: p.vote,
-            }),
-          ),
+          players: (players ?? []).map((p) => ({
+            id: p.user_id ?? "",
+            name: p.name ?? "",
+            role: p.role === "FACILITATOR" ? "FACILITATOR" : "MEMBER",
+            vote: p.vote,
+          })),
         }}
       />
     );

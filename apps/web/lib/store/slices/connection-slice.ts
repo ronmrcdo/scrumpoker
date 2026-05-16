@@ -9,8 +9,10 @@ export type ConnectionStatus =
 export interface ConnectionSlice {
   connectionStatus: ConnectionStatus;
   isOnline: boolean;
+  lastError: string | null;
   setConnectionStatus: (status: ConnectionStatus) => void;
   setIsOnline: (online: boolean) => void;
+  setLastError: (message: string | null) => void;
 }
 
 export const createConnectionSlice: StateCreator<
@@ -21,7 +23,9 @@ export const createConnectionSlice: StateCreator<
 > = (set) => ({
   connectionStatus: "connecting",
   isOnline: typeof navigator !== "undefined" ? navigator.onLine : true,
+  lastError: null,
 
   setConnectionStatus: (status) => set({ connectionStatus: status }),
   setIsOnline: (online) => set({ isOnline: online }),
+  setLastError: (message) => set({ lastError: message }),
 });

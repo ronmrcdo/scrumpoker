@@ -35,6 +35,15 @@ jobs:
       - name: Format & lint
         run: pnpm format-and-lint
 
+      - name: DB types are fresh
+        # Starts a local Supabase stack, regenerates types from current
+        # migrations, and diffs against the committed file. Fails if
+        # apps/web/lib/database.types.ts is stale relative to migrations.
+        run: |
+          pnpm exec supabase start --exclude=imgproxy,pooler,vector,studio,inbucket,storage-api,edge-runtime,logflare,realtime-dev
+          pnpm db:types:check
+          pnpm exec supabase stop --no-backup
+
       - name: Type-check
         run: pnpm check-types
 

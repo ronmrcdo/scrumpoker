@@ -67,6 +67,11 @@ globalThis.IntersectionObserver =
 // Mock scrollIntoView
 Element.prototype.scrollIntoView = vi.fn();
 
+// Mock window.scrollTo — jsdom prints "Not implemented" warnings otherwise,
+// which leak from any motion/react animate() frames that resolve after a
+// test's local scrollTo mock has been restored.
+window.scrollTo = vi.fn() as unknown as typeof window.scrollTo;
+
 // Mock Supabase client
 vi.mock("@/lib/supabase/client", () => ({
   createClient: () => ({

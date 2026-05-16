@@ -14,6 +14,12 @@ export default defineConfig({
       reporter: ["text", "json", "html"],
       include: ["lib/**/*.ts", "components/**/*.tsx"],
       exclude: ["**/node_modules/**", "**/test/**"],
+      thresholds: {
+        statements: 70,
+        branches: 65,
+        functions: 70,
+        lines: 70,
+      },
     },
   },
   resolve: {

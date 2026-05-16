@@ -8,16 +8,24 @@
       "outputs": ["dist/**", ".next/**", "!.next/cache/**", "!.next/dev/**"]
     },
     "lint": {
-      "dependsOn": ["^lint"]
+      "dependsOn": ["^lint"],
+      "inputs": ["$TURBO_DEFAULT$", "biome.json"]
     },
     "check-types": {
-      "dependsOn": ["^check-types"]
+      "dependsOn": ["^check-types"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "tsconfig.json",
+        "../../packages/typescript-config/*.json"
+      ]
     },
     "dev": {
       "cache": false,
       "persistent": true
     },
-    "//#format-and-lint": {},
+    "//#format-and-lint": {
+      "cache": false
+    },
     "//#format-and-lint:fix": {
       "cache": false
     },

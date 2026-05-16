@@ -1,12 +1,13 @@
 import type { CookieOptions } from "@supabase/ssr";
 import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
+import { env } from "@/lib/env";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
+const supabaseUrl = env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseWs = supabaseUrl.replace(/^http/, "ws");
 
-const plausibleHost = process.env.NEXT_PUBLIC_PLAUSIBLE_SCRIPT_URL
-  ? safeOrigin(process.env.NEXT_PUBLIC_PLAUSIBLE_SCRIPT_URL)
+const plausibleHost = env.NEXT_PUBLIC_PLAUSIBLE_SCRIPT_URL
+  ? safeOrigin(env.NEXT_PUBLIC_PLAUSIBLE_SCRIPT_URL)
   : "";
 
 function safeOrigin(value: string): string {
@@ -81,8 +82,8 @@ export async function middleware(request: NextRequest) {
   response.headers.set("content-security-policy", csp);
 
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL ?? "",
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "",
+    env.NEXT_PUBLIC_SUPABASE_URL,
+    env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     {
       cookies: {
         getAll() {

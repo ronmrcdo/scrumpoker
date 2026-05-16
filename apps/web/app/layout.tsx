@@ -1,26 +1,29 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { JetBrains_Mono, Space_Grotesk } from "next/font/google";
+import { headers } from "next/headers";
 import Script from "next/script";
 import { CookieConsent } from "@/components/cookie-consent";
 import { ThemeProvider } from "@/components/providers/theme-provider";
+import { SITE_URL } from "@/lib/config";
 import { Providers } from "./providers";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-space-grotesk",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-jetbrains-mono",
   subsets: ["latin"],
+  weight: ["400", "500"],
+  display: "swap",
 });
-
-const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://scrumpokergame.com";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "Scrum Poker Game - Real-Time Agile Estimation",
     template: "%s | Scrum Poker Game",
@@ -53,7 +56,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: siteUrl,
+    url: SITE_URL,
     siteName: "Scrum Poker Game",
     title: "Scrum Poker Game - Real-Time Agile Estimation",
     description:
@@ -86,8 +89,6 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
   viewportFit: "cover",
 };
 
@@ -121,36 +122,24 @@ const themeScript = `
 })();
 `;
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const headerList = await headers();
+  const nonce = headerList.get("x-nonce") ?? undefined;
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
-        {process.env.NEXT_PUBLIC_PLAUSIBLE_SCRIPT_URL && (
-          <>
-            <Script
-              async
-              defer
-              data-domain={new URL(siteUrl).hostname}
-              src={process.env.NEXT_PUBLIC_PLAUSIBLE_SCRIPT_URL}
-              strategy="afterInteractive"
-            />
-            <Script
-              id="plausible-init"
-              strategy="afterInteractive"
-              dangerouslySetInnerHTML={{
-                __html: `window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};plausible.init()`,
-              }}
-            />
-          </>
-        )}
+        <script
+          nonce={nonce}
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{ __html: themeScript }}
+        />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased`}
+        className={`${spaceGrotesk.variable} ${jetbrainsMono.variable} font-sans antialiased`}
       >
         <a
           href="#main-content"
@@ -164,6 +153,26 @@ export default function RootLayout({
             <CookieConsent />
           </ThemeProvider>
         </Providers>
+        {process.env.NEXT_PUBLIC_PLAUSIBLE_SCRIPT_URL && (
+          <>
+            <Script
+              async
+              defer
+              nonce={nonce}
+              data-domain={new URL(SITE_URL).hostname}
+              src={process.env.NEXT_PUBLIC_PLAUSIBLE_SCRIPT_URL}
+              strategy="afterInteractive"
+            />
+            <Script
+              id="plausible-init"
+              nonce={nonce}
+              strategy="afterInteractive"
+              dangerouslySetInnerHTML={{
+                __html: `window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};plausible.init()`,
+              }}
+            />
+          </>
+        )}
       </body>
     </html>
   );

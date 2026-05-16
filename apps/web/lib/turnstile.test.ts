@@ -57,7 +57,7 @@ describe("verifyTurnstileToken", () => {
 
     await verifyTurnstileToken("token", "1.2.3.4");
 
-    const callBody = (globalThis.fetch as Mock).mock.calls[0][1].body;
+    const callBody = (globalThis.fetch as Mock).mock.calls[0]?.[1]?.body;
     expect(callBody).toContain("remoteip=1.2.3.4");
   });
 
@@ -69,7 +69,7 @@ describe("verifyTurnstileToken", () => {
 
     await verifyTurnstileToken("my-token");
 
-    const callBody = (globalThis.fetch as Mock).mock.calls[0][1].body;
+    const callBody = (globalThis.fetch as Mock).mock.calls[0]?.[1]?.body;
     expect(callBody).toContain("secret=my-secret");
     expect(callBody).toContain("response=my-token");
   });
@@ -85,13 +85,14 @@ describe("verifyTurnstileToken", () => {
   it("fails in production when secret key is missing", async () => {
     delete process.env.TURNSTILE_SECRET_KEY;
     const originalNodeEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = "production";
+    (process.env as Record<string, string>).NODE_ENV = "production";
 
     const result = await verifyTurnstileToken("any-token");
     expect(result.success).toBe(false);
     expect(result.errorCodes).toContain("missing-secret-key");
     expect(globalThis.fetch).not.toHaveBeenCalled();
 
-    process.env.NODE_ENV = originalNodeEnv;
+    (process.env as Record<string, string | undefined>).NODE_ENV =
+      originalNodeEnv;
   });
 });

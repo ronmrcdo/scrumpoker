@@ -1,30 +1,28 @@
 import type { MetadataRoute } from "next";
-
-const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://scrumpokergame.com";
+import { SITE_URL } from "@/lib/config";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
     {
-      url: siteUrl,
+      url: SITE_URL,
       lastModified: new Date(),
       changeFrequency: "monthly",
       priority: 1.0,
     },
     {
-      url: `${siteUrl}/privacy`,
+      url: `${SITE_URL}/privacy`,
       lastModified: new Date("2026-02-16"),
       changeFrequency: "yearly",
       priority: 0.3,
     },
     {
-      url: `${siteUrl}/terms`,
+      url: `${SITE_URL}/terms`,
       lastModified: new Date("2026-02-16"),
       changeFrequency: "yearly",
       priority: 0.3,
     },
     {
-      url: `${siteUrl}/disclaimer`,
+      url: `${SITE_URL}/disclaimer`,
       lastModified: new Date("2026-02-16"),
       changeFrequency: "yearly",
       priority: 0.3,

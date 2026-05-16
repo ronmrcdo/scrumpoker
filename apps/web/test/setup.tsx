@@ -2,6 +2,12 @@ import "@testing-library/jest-dom/vitest";
 import { cleanup } from "@testing-library/react";
 import { afterEach, vi } from "vitest";
 
+// Provide safe defaults for env validation during tests
+process.env.NEXT_PUBLIC_SUPABASE_URL =
+  process.env.NEXT_PUBLIC_SUPABASE_URL ?? "http://localhost:54321";
+process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY =
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "test-anon-key";
+
 // Cleanup after each test
 afterEach(() => {
   cleanup();
@@ -96,7 +102,7 @@ vi.mock("next/navigation", () => ({
   useSearchParams: () => ({
     get: vi.fn(() => null),
   }),
-  usePathname: () => "/",
+  usePathname: vi.fn(() => "/"),
 }));
 
 // Mock Next.js Link

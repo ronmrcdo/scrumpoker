@@ -1,0 +1,11 @@
+-- Local-dev seed (#13)
+-- ----------------------------------------------------------------
+-- supabase/config.toml already points db.seed.sql_paths at this file,
+-- so `supabase db reset` will run it after migrations.
+--
+-- We intentionally do NOT seed rooms/players: the app's only user model
+-- is anonymous Supabase auth, so seeded rows would have no auth.uid()
+-- behind them and couldn't be exercised via the normal flows. Use this
+-- file for stable lookup data, future feature flags, etc.
+
+-- (intentionally empty for now)

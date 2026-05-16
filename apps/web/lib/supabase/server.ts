@@ -1,11 +1,17 @@
 import { type CookieOptions, createServerClient } from "@supabase/ssr";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
+import type { Database } from "@/lib/database.types";
 import { env } from "@/lib/env";
 
-export async function createServerSupabaseClient() {
+// See note in client.ts: the generics @supabase/ssr 0.6 passes through to
+// SupabaseClient 2.94+ collapse to `never`, so we widen by casting.
+type TypedClient = SupabaseClient<Database>;
+
+export async function createServerSupabaseClient(): Promise<TypedClient> {
   const cookieStore = await cookies();
 
-  return createServerClient(
+  const client = createServerClient<Database>(
     env.NEXT_PUBLIC_SUPABASE_URL,
     env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     {
@@ -38,4 +44,6 @@ export async function createServerSupabaseClient() {
       },
     },
   );
+
+  return client as unknown as TypedClient;
 }

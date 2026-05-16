@@ -1,12 +1,15 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // vi.hoisted runs before vi.mock hoisting — safe for shared references
-const { notFoundMock, mockSingle, mockPlayersEq, mockRpc, mockFrom } =
+const { notFoundMock, mockMaybeSingle, mockPlayersEq, mockRpc, mockFrom } =
   vi.hoisted(() => {
     const notFoundMock = vi.fn();
-    const mockSingle = vi.fn();
-    const mockGt = vi.fn(() => ({ single: mockSingle }));
-    const mockEqChained = vi.fn(() => ({ gt: mockGt }));
+    const mockMaybeSingle = vi.fn();
+    const mockGt = vi.fn(() => ({ maybeSingle: mockMaybeSingle }));
+    const mockEqChained = vi.fn(() => ({
+      gt: mockGt,
+      maybeSingle: mockMaybeSingle,
+    }));
     const mockSelect = vi.fn(() => ({ eq: mockEqChained }));
 
     const mockPlayersEq = vi.fn();
@@ -26,7 +29,7 @@ const { notFoundMock, mockSingle, mockPlayersEq, mockRpc, mockFrom } =
 
     return {
       notFoundMock,
-      mockSingle,
+      mockMaybeSingle,
       mockPlayersEq,
       mockRpc,
       mockFrom,
@@ -85,7 +88,7 @@ describe("PokerRoomPage", () => {
       { user_id: "user-2", name: "Bob", role: "MEMBER", vote: "5" },
     ];
 
-    mockSingle.mockResolvedValue({ data: roomData, error: null });
+    mockMaybeSingle.mockResolvedValue({ data: roomData, error: null });
     mockPlayersEq.mockResolvedValue({ data: playersData, error: null });
 
     const result = await PokerRoomPage({
@@ -105,7 +108,7 @@ describe("PokerRoomPage", () => {
   });
 
   it("should fall back to preview RPC for non-members", async () => {
-    mockSingle.mockResolvedValue({ data: null, error: { code: "PGRST116" } });
+    mockMaybeSingle.mockResolvedValue({ data: null, error: null });
     mockPlayersEq.mockResolvedValue({ data: [], error: null });
 
     mockRpc.mockResolvedValue({
@@ -129,7 +132,7 @@ describe("PokerRoomPage", () => {
   });
 
   it("should call notFound when room does not exist", async () => {
-    mockSingle.mockResolvedValue({ data: null, error: { code: "PGRST116" } });
+    mockMaybeSingle.mockResolvedValue({ data: null, error: null });
     mockPlayersEq.mockResolvedValue({ data: [], error: null });
     mockRpc.mockResolvedValue({ data: [], error: null });
 
@@ -143,7 +146,7 @@ describe("PokerRoomPage", () => {
   });
 
   it("should call notFound when room is expired", async () => {
-    mockSingle.mockResolvedValue({ data: null, error: { code: "PGRST116" } });
+    mockMaybeSingle.mockResolvedValue({ data: null, error: null });
     mockPlayersEq.mockResolvedValue({ data: [], error: null });
     mockRpc.mockResolvedValue({
       data: [{ name: "Old Room", is_expired: true }],

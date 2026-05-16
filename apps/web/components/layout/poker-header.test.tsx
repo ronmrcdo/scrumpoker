@@ -8,15 +8,12 @@ describe("PokerHeader", () => {
   const defaultProps = {
     roomId: "room-123",
     roomName: "Sprint Planning",
-    isChatOpen: false,
     isPlayerListOpen: false,
-    onToggleChat: vi.fn(),
     onTogglePlayerList: vi.fn(),
   };
 
   beforeEach(() => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
-    // Mock clipboard API properly
     Object.defineProperty(navigator, "clipboard", {
       value: {
         writeText: vi.fn().mockResolvedValue(undefined),
@@ -49,12 +46,6 @@ describe("PokerHeader", () => {
       expect(
         screen.getByRole("button", { name: /copy share link/i }),
       ).toBeInTheDocument();
-    });
-
-    it("should render chat toggle button", () => {
-      render(<PokerHeader {...defaultProps} />);
-      const buttons = screen.getAllByRole("button");
-      expect(buttons.length).toBeGreaterThanOrEqual(3);
     });
   });
 
@@ -91,21 +82,6 @@ describe("PokerHeader", () => {
     });
   });
 
-  describe("chat toggle", () => {
-    it("should call onToggleChat when chat button is clicked", async () => {
-      const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
-      const onToggleChat = vi.fn();
-
-      render(<PokerHeader {...defaultProps} onToggleChat={onToggleChat} />);
-
-      const buttons = screen.getAllByRole("button");
-      const chatButton = buttons[buttons.length - 1];
-
-      await user.click(chatButton!);
-      expect(onToggleChat).toHaveBeenCalledTimes(1);
-    });
-  });
-
   describe("share functionality", () => {
     it("should trigger share and show copied state", async () => {
       const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
@@ -116,7 +92,6 @@ describe("PokerHeader", () => {
         screen.getByRole("button", { name: /copy share link/i }),
       );
 
-      // Verify share action triggered by checking UI state change
       expect(screen.getByText("Copied!")).toBeInTheDocument();
     });
 
@@ -129,7 +104,6 @@ describe("PokerHeader", () => {
         screen.getByRole("button", { name: /copy share link/i }),
       );
 
-      // After clicking, the text should change to "Copied!"
       expect(screen.getByText("Copied!")).toBeInTheDocument();
     });
   });
@@ -147,11 +121,6 @@ describe("PokerHeader", () => {
       expect(container.querySelector(".sticky")).toBeInTheDocument();
     });
 
-    it("should have backdrop blur", () => {
-      const { container } = render(<PokerHeader {...defaultProps} />);
-      expect(container.querySelector(".backdrop-blur-sm")).toBeInTheDocument();
-    });
-
     it("should have border bottom", () => {
       const { container } = render(<PokerHeader {...defaultProps} />);
       expect(container.querySelector(".border-b")).toBeInTheDocument();
@@ -161,7 +130,6 @@ describe("PokerHeader", () => {
   describe("responsive behavior", () => {
     it("should have responsive Share text", () => {
       const { container } = render(<PokerHeader {...defaultProps} />);
-      // Share text uses responsive classes
       const shareSpan = container.querySelector("span.hidden");
       expect(shareSpan).toBeInTheDocument();
     });

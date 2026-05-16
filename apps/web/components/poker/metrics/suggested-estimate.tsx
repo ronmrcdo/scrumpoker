@@ -76,13 +76,13 @@ export function SuggestedEstimate({ stats }: SuggestedEstimateProps) {
 
   return (
     <Card
-      className="animate-scale-in shadow-soft-md border-primary-200"
+      className="animate-scale-in shadow-soft-md border-foreground"
       style={{ animationDelay: "250ms" }}
     >
       <CardContent className="p-4 sm:p-5">
         <div className="flex items-center gap-2 mb-2">
-          <Lightbulb aria-hidden="true" className="w-4 h-4 text-amber-500" />
-          <p className="text-xs sm:text-sm font-medium text-muted-foreground uppercase tracking-wider">
+          <Lightbulb aria-hidden="true" className="w-4 h-4 text-foreground" />
+          <p className="font-mono text-[11px] font-medium text-muted-foreground uppercase tracking-widest">
             Suggested Estimate
           </p>
         </div>

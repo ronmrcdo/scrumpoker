@@ -118,15 +118,6 @@ export default function PrivacyPolicyPage() {
               <strong className="text-foreground">Votes</strong> — Story point
               estimates you submit during planning poker sessions.
             </li>
-            <li>
-              <strong className="text-foreground">Chat Messages</strong> —
-              Messages sent within a poker room. These are transmitted in
-              real-time via broadcast channels and are{" "}
-              <strong className="text-foreground">
-                not permanently stored
-              </strong>{" "}
-              in our database.
-            </li>
           </ul>
           <LegalCallout variant="success" title="We do NOT collect:">
             email addresses, phone numbers, passwords, real names, physical
@@ -309,11 +300,6 @@ export default function PrivacyPolicyPage() {
             <li>
               <strong className="text-foreground">Player data</strong> (display
               names, votes) is cascade-deleted when the room expires.
-            </li>
-            <li>
-              <strong className="text-foreground">Chat messages</strong> are
-              transmitted via real-time broadcast channels and are never stored
-              in our database.
             </li>
             <li>
               <strong className="text-foreground">IP addresses</strong> used for

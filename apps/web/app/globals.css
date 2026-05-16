@@ -7,88 +7,133 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-bone: var(--bone);
+  --color-bone-2: var(--bone-2);
+  --color-bone-3: var(--bone-3);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-rule: var(--rule);
 }
 
 @layer base {
   :root {
-    --background: #fafafa;
-    --foreground: #404040;
+    /* Minimal theme — light (default) */
+    --bone: #fafafa;
+    --bone-2: #f4f4f4;
+    --bone-3: #c0c0c0;
+    --ink: #0a0a0a;
+    --ink-2: #2a2a2a;
+    --ink-3: #6a6a6a;
+
+    --background: var(--bone);
+    --foreground: var(--ink);
     --card: #ffffff;
-    --card-foreground: #404040;
+    --card-foreground: var(--ink);
     --popover: #ffffff;
-    --popover-foreground: #404040;
-    --primary: #6b7de6;
-    --primary-foreground: #ffffff;
-    --secondary: #f5f5f5;
-    --secondary-foreground: #404040;
-    --muted: #f5f5f5;
-    --muted-foreground: #737373;
-    --accent: #22c55e;
-    --accent-foreground: #ffffff;
-    --destructive: #f87171;
+    --popover-foreground: var(--ink);
+    --primary: var(--ink);
+    --primary-foreground: var(--bone);
+    --secondary: var(--bone-2);
+    --secondary-foreground: var(--ink);
+    --muted: var(--bone-2);
+    --muted-foreground: var(--ink-3);
+    --accent: var(--bone-2);
+    --accent-foreground: var(--ink);
+    --success: #16a34a;
+    --success-foreground: #ffffff;
+    --destructive: #c14a36;
     --destructive-foreground: #ffffff;
-    --border: #e5e5e5;
-    --input: #e5e5e5;
-    --ring: #6b7de6;
+    --border: var(--bone-3);
+    --input: var(--bone-3);
+    --ring: var(--ink);
+    --rule: var(--bone-3);
     --radius: 0.5rem;
   }
 
   html[data-theme="dark"] {
-    --background: #171717;
-    --foreground: #f5f5f5;
-    --card: rgba(38, 38, 38, 0.75);
-    --card-foreground: #f5f5f5;
-    --popover: #262626;
-    --popover-foreground: #f5f5f5;
-    --primary: #6b7de6;
-    --primary-foreground: #ffffff;
-    --secondary: #404040;
-    --secondary-foreground: #f5f5f5;
-    --muted: #404040;
-    --muted-foreground: #a3a3a3;
-    --accent: #22c55e;
-    --accent-foreground: #ffffff;
-    --destructive: #dc2626;
+    /* Minimal theme — dark */
+    --bone: #0a0a0a;
+    --bone-2: #141414;
+    --bone-3: #404040;
+    --ink: #fafafa;
+    --ink-2: #d4d4d4;
+    --ink-3: #8a8a8a;
+
+    --background: var(--bone);
+    --foreground: var(--ink);
+    --card: #141414;
+    --card-foreground: var(--ink);
+    --popover: #141414;
+    --popover-foreground: var(--ink);
+    --primary: var(--ink);
+    --primary-foreground: var(--bone);
+    --secondary: var(--bone-2);
+    --secondary-foreground: var(--ink);
+    --muted: var(--bone-2);
+    --muted-foreground: var(--ink-3);
+    --accent: var(--bone-2);
+    --accent-foreground: var(--ink);
+    --success: #4ade80;
+    --success-foreground: #0a0a0a;
+    --destructive: #e26952;
     --destructive-foreground: #ffffff;
-    --border: rgba(64, 64, 64, 0.6);
-    --input: #404040;
-    --ring: #6b7de6;
+    --border: var(--bone-3);
+    --input: var(--bone-3);
+    --ring: var(--ink);
+    --rule: var(--bone-3);
   }
 
   @media (prefers-color-scheme: dark) {
     html:not([data-theme="light"]):not([data-theme="dark"]) {
-      --background: #171717;
-      --foreground: #f5f5f5;
-      --card: rgba(38, 38, 38, 0.75);
-      --card-foreground: #f5f5f5;
-      --popover: #262626;
-      --popover-foreground: #f5f5f5;
-      --primary: #6b7de6;
-      --primary-foreground: #ffffff;
-      --secondary: #404040;
-      --secondary-foreground: #f5f5f5;
-      --muted: #404040;
-      --muted-foreground: #a3a3a3;
-      --accent: #22c55e;
-      --accent-foreground: #ffffff;
-      --destructive: #dc2626;
+      --bone: #0a0a0a;
+      --bone-2: #141414;
+      --bone-3: #404040;
+      --ink: #fafafa;
+      --ink-2: #d4d4d4;
+      --ink-3: #8a8a8a;
+
+      --background: var(--bone);
+      --foreground: var(--ink);
+      --card: #141414;
+      --card-foreground: var(--ink);
+      --popover: #141414;
+      --popover-foreground: var(--ink);
+      --primary: var(--ink);
+      --primary-foreground: var(--bone);
+      --secondary: var(--bone-2);
+      --secondary-foreground: var(--ink);
+      --muted: var(--bone-2);
+      --muted-foreground: var(--ink-3);
+      --accent: var(--bone-2);
+      --accent-foreground: var(--ink);
+      --success: #4ade80;
+      --success-foreground: #0a0a0a;
+      --destructive: #e26952;
       --destructive-foreground: #ffffff;
-      --border: rgba(64, 64, 64, 0.6);
-      --input: #404040;
-      --ring: #6b7de6;
+      --border: var(--bone-3);
+      --input: var(--bone-3);
+      --ring: var(--ink);
+      --rule: var(--bone-3);
     }
   }
 
@@ -104,6 +149,8 @@
     background-color: var(--background);
     color: var(--foreground);
     font-feature-settings: "rlig" 1, "calt" 1;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
     overscroll-behavior: none;
   }
 
@@ -121,9 +168,17 @@
     padding-bottom: env(safe-area-inset-bottom);
   }
 
-  /* Safe area padding with a minimum fallback for non-notched devices */
   .pb-safe-fallback {
     padding-bottom: max(1.5rem, env(safe-area-inset-bottom, 1.5rem));
+  }
+
+  /* Editorial-style eyebrow label (mono, uppercase) */
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-3);
   }
 
   /* Flip animation for card reveal */
@@ -144,7 +199,6 @@
     transform-style: preserve-3d;
   }
 
-  /* Fade in animation */
   @keyframes fade-in {
     from {
       opacity: 0;
@@ -158,7 +212,6 @@
     animation: fade-in 0.4s ease-out;
   }
 
-  /* Scale in animation with stagger support */
   @keyframes scale-in {
     from {
       opacity: 0;
@@ -174,7 +227,6 @@
     animation: scale-in 0.3s ease-out backwards;
   }
 
-  /* Single bounce animation */
   @keyframes bounce-once {
     0%, 100% {
       transform: translate3d(0, -0.25rem, 0) scale3d(1.05, 1.05, 1);
@@ -188,7 +240,6 @@
     animation: bounce-once 0.4s ease-out;
   }
 
-  /* Slide in from left */
   @keyframes slide-in-left {
     from {
       transform: translate3d(-100%, 0, 0);
@@ -204,7 +255,6 @@
     animation: slide-in-left 0.3s ease-out;
   }
 
-  /* Slide in from right */
   @keyframes slide-in-right {
     from {
       transform: translate3d(100%, 0, 0);
@@ -220,7 +270,6 @@
     animation: slide-in-right 0.3s ease-out;
   }
 
-  /* Pulse animation for notifications — infinite, keep will-change */
   @keyframes pulse-soft {
     0%, 100% {
       opacity: 1;
@@ -237,7 +286,6 @@
     will-change: transform, opacity;
   }
 
-  /* Fade up animation for scroll reveal */
   @keyframes fade-up {
     from {
       opacity: 0;
@@ -253,7 +301,6 @@
     animation: fade-up 0.6s ease-out forwards;
   }
 
-  /* Gentle float animation for ambient movement — infinite, keep will-change */
   @keyframes float {
     0%, 100% {
       transform: translate3d(0, 0, 0);
@@ -268,7 +315,7 @@
     will-change: transform;
   }
 
-  /* Hero card 3D flip styles */
+  /* 3D flip helpers */
   .perspective-1000 {
     perspective: 1000px;
   }
@@ -285,7 +332,6 @@
     transform: rotateY(180deg);
   }
 
-  /* Card hover group animation */
   .card-flip-container:hover .card-front {
     transform: rotateY(180deg);
   }
@@ -298,7 +344,6 @@
     transform: translateY(-16px) scale(1.05);
   }
 
-  /* Staggered fade in for children */
   @keyframes stagger-fade-in {
     from {
       opacity: 0;
@@ -314,7 +359,6 @@
     animation: stagger-fade-in 0.5s ease-out forwards;
   }
 
-  /* Countdown pulse for reveal timer */
   @keyframes countdown-pulse {
     0% {
       opacity: 0;

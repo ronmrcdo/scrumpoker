@@ -60,17 +60,17 @@ describe("PlayerItem", () => {
   });
 
   describe("voting status", () => {
-    it("should show 'Thinking...' when player has not voted", () => {
+    it("should show '?' when player has not voted", () => {
       render(
         <PlayerItem
           {...defaultProps}
           player={createMockPlayer({ vote: null })}
         />,
       );
-      expect(screen.getByText("Thinking...")).toBeInTheDocument();
+      expect(screen.getByText("?")).toBeInTheDocument();
     });
 
-    it("should show 'Voted' when player has voted but not revealed", () => {
+    it("should show 'In' when player has voted but not revealed", () => {
       render(
         <PlayerItem
           {...defaultProps}
@@ -78,7 +78,7 @@ describe("PlayerItem", () => {
           isRevealed={false}
         />,
       );
-      expect(screen.getByText("Voted")).toBeInTheDocument();
+      expect(screen.getByText("In")).toBeInTheDocument();
     });
 
     it("should show vote value when revealed", () => {
@@ -89,7 +89,7 @@ describe("PlayerItem", () => {
           isRevealed={true}
         />,
       );
-      expect(screen.getByText("Voted: 8")).toBeInTheDocument();
+      expect(screen.getByText("In · 8")).toBeInTheDocument();
     });
 
     it("should show coffee emoji vote when revealed", () => {
@@ -100,7 +100,7 @@ describe("PlayerItem", () => {
           isRevealed={true}
         />,
       );
-      expect(screen.getByText("Voted: ☕")).toBeInTheDocument();
+      expect(screen.getByText("In · ☕")).toBeInTheDocument();
     });
   });
 
@@ -117,41 +117,41 @@ describe("PlayerItem", () => {
       ).toBeInTheDocument();
     });
 
-    it("should show active dot when voted", () => {
+    it("should show success dot when voted", () => {
       const { container } = render(
         <PlayerItem
           {...defaultProps}
           player={createMockPlayer({ vote: "5" })}
         />,
       );
-      expect(container.querySelector(".bg-accent-500")).toBeInTheDocument();
+      expect(container.querySelector(".bg-success")).toBeInTheDocument();
     });
   });
 
   describe("facilitator badge", () => {
-    it("should show The Dealer badge for facilitators", () => {
+    it("should show Facilitator badge for facilitators", () => {
       render(
         <PlayerItem
           {...defaultProps}
           player={createMockPlayer({ role: "FACILITATOR" })}
         />,
       );
-      expect(screen.getByText("The Dealer")).toBeInTheDocument();
+      expect(screen.getByText("Facilitator")).toBeInTheDocument();
     });
 
-    it("should not show The Dealer badge for regular members", () => {
+    it("should not show Facilitator badge for regular members", () => {
       render(
         <PlayerItem
           {...defaultProps}
           player={createMockPlayer({ role: "MEMBER" })}
         />,
       );
-      expect(screen.queryByText("The Dealer")).not.toBeInTheDocument();
+      expect(screen.queryByText("Facilitator")).not.toBeInTheDocument();
     });
   });
 
   describe("fold status", () => {
-    it("should show Folded text when player has folded", () => {
+    it("should show Fold text when player has folded", () => {
       render(
         <PlayerItem
           {...defaultProps}
@@ -159,31 +159,31 @@ describe("PlayerItem", () => {
           isRevealed={false}
         />,
       );
-      expect(screen.getByText("Folded")).toBeInTheDocument();
+      expect(screen.getByText("Fold")).toBeInTheDocument();
     });
 
-    it("should show Folded with amber styling", () => {
+    it("should show Fold with destructive styling", () => {
       render(
         <PlayerItem
           {...defaultProps}
           player={createMockPlayer({ vote: "FOLD" })}
         />,
       );
-      const foldedText = screen.getByText("Folded");
-      expect(foldedText).toHaveClass("text-warm-700");
+      const foldedText = screen.getByText("Fold");
+      expect(foldedText).toHaveClass("text-destructive");
     });
 
-    it("should show amber indicator dot when folded", () => {
+    it("should show destructive indicator dot when folded", () => {
       const { container } = render(
         <PlayerItem
           {...defaultProps}
           player={createMockPlayer({ vote: "FOLD" })}
         />,
       );
-      expect(container.querySelector(".bg-warm-400")).toBeInTheDocument();
+      expect(container.querySelector(".bg-destructive")).toBeInTheDocument();
     });
 
-    it("should show Folded even when revealed", () => {
+    it("should show Fold even when revealed", () => {
       render(
         <PlayerItem
           {...defaultProps}
@@ -191,7 +191,7 @@ describe("PlayerItem", () => {
           isRevealed={true}
         />,
       );
-      expect(screen.getByText("Folded")).toBeInTheDocument();
+      expect(screen.getByText("Fold")).toBeInTheDocument();
     });
   });
 
@@ -200,21 +200,21 @@ describe("PlayerItem", () => {
       const { container } = render(
         <PlayerItem {...defaultProps} isCurrentUser={true} />,
       );
-      expect(container.querySelector(".bg-primary-50")).toBeInTheDocument();
+      expect(container.querySelector(".bg-bone-2")).toBeInTheDocument();
     });
 
     it("should not highlight non-current users", () => {
       const { container } = render(
         <PlayerItem {...defaultProps} isCurrentUser={false} />,
       );
-      expect(container.querySelector(".bg-primary-50")).not.toBeInTheDocument();
+      // Only avatar uses bg-bone-2 in non-current state; the row itself shouldn't
+      const row = container.querySelector(".items-center.gap-3.px-4");
+      expect(row?.className).not.toMatch(/\bbg-bone-2\b/);
     });
 
-    it("should style avatar differently for current user", () => {
-      const { container } = render(
-        <PlayerItem {...defaultProps} isCurrentUser={true} />,
-      );
-      expect(container.querySelector(".bg-primary-100")).toBeInTheDocument();
+    it("should still render avatar fallback for current user", () => {
+      render(<PlayerItem {...defaultProps} isCurrentUser={true} />);
+      expect(screen.getByText("A")).toBeInTheDocument();
     });
   });
 
@@ -224,7 +224,7 @@ describe("PlayerItem", () => {
         <PlayerItem {...defaultProps} isFacilitator={false} onKick={vi.fn()} />,
       );
       expect(
-        screen.queryByRole("button", { name: /kick/i }),
+        screen.queryByRole("button", { name: /remove .* from room/i }),
       ).not.toBeInTheDocument();
     });
 
@@ -238,7 +238,7 @@ describe("PlayerItem", () => {
         />,
       );
       expect(
-        screen.queryByRole("button", { name: /kick/i }),
+        screen.queryByRole("button", { name: /remove .* from room/i }),
       ).not.toBeInTheDocument();
     });
 
@@ -251,7 +251,7 @@ describe("PlayerItem", () => {
         />,
       );
       expect(
-        screen.queryByRole("button", { name: /kick/i }),
+        screen.queryByRole("button", { name: /remove .* from room/i }),
       ).not.toBeInTheDocument();
     });
 
@@ -264,7 +264,9 @@ describe("PlayerItem", () => {
           onKick={vi.fn()}
         />,
       );
-      expect(screen.getByRole("button", { name: /kick/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: /remove .* from room/i }),
+      ).toBeInTheDocument();
     });
 
     it("should open confirmation dialog when kick button is clicked", async () => {
@@ -273,7 +275,9 @@ describe("PlayerItem", () => {
         <PlayerItem {...defaultProps} isFacilitator={true} onKick={vi.fn()} />,
       );
 
-      await user.click(screen.getByRole("button", { name: /kick/i }));
+      await user.click(
+        screen.getByRole("button", { name: /remove .* from room/i }),
+      );
       expect(screen.getByText(/Remove Alice\?/)).toBeInTheDocument();
     });
 
@@ -288,7 +292,9 @@ describe("PlayerItem", () => {
         />,
       );
 
-      await user.click(screen.getByRole("button", { name: /kick/i }));
+      await user.click(
+        screen.getByRole("button", { name: /remove .* from room/i }),
+      );
       expect(screen.getByText("Remove Bob?")).toBeInTheDocument();
       expect(
         screen.getByText(/removed from the room.*rejoin with the room link/),
@@ -309,7 +315,9 @@ describe("PlayerItem", () => {
         />,
       );
 
-      await user.click(screen.getByRole("button", { name: /kick/i }));
+      await user.click(
+        screen.getByRole("button", { name: /remove .* from room/i }),
+      );
       await user.click(screen.getByRole("button", { name: "Remove" }));
 
       expect(onKick).toHaveBeenCalledWith("player-123");
@@ -321,7 +329,9 @@ describe("PlayerItem", () => {
         <PlayerItem {...defaultProps} isFacilitator={true} onKick={vi.fn()} />,
       );
 
-      await user.click(screen.getByRole("button", { name: /kick/i }));
+      await user.click(
+        screen.getByRole("button", { name: /remove .* from room/i }),
+      );
       expect(screen.getByText(/Remove Alice\?/)).toBeInTheDocument();
 
       await user.click(screen.getByRole("button", { name: "Cancel" }));
@@ -336,7 +346,9 @@ describe("PlayerItem", () => {
         <PlayerItem {...defaultProps} isFacilitator={true} onKick={onKick} />,
       );
 
-      await user.click(screen.getByRole("button", { name: /kick/i }));
+      await user.click(
+        screen.getByRole("button", { name: /remove .* from room/i }),
+      );
       await user.click(screen.getByRole("button", { name: "Cancel" }));
 
       expect(onKick).not.toHaveBeenCalled();
@@ -352,7 +364,9 @@ describe("PlayerItem", () => {
           isOnline={false}
         />,
       );
-      expect(container.querySelector(".bg-muted-foreground")).toBeInTheDocument();
+      expect(
+        container.querySelector(".bg-muted-foreground"),
+      ).toBeInTheDocument();
     });
 
     it("should show 'Offline' text when player is offline", () => {
@@ -364,7 +378,7 @@ describe("PlayerItem", () => {
         />,
       );
       expect(screen.getByText("Offline")).toBeInTheDocument();
-      expect(screen.queryByText("Thinking...")).not.toBeInTheDocument();
+      expect(screen.queryByText("?")).not.toBeInTheDocument();
     });
 
     it("should show 'Offline' text even when player has voted", () => {
@@ -376,7 +390,7 @@ describe("PlayerItem", () => {
         />,
       );
       expect(screen.getByText("Offline")).toBeInTheDocument();
-      expect(screen.queryByText("Voted")).not.toBeInTheDocument();
+      expect(screen.queryByText("In")).not.toBeInTheDocument();
     });
 
     it("should show gray dot when offline even if player voted", () => {
@@ -387,11 +401,13 @@ describe("PlayerItem", () => {
           isOnline={false}
         />,
       );
-      expect(container.querySelector(".bg-muted-foreground")).toBeInTheDocument();
-      expect(container.querySelector(".bg-accent-500")).not.toBeInTheDocument();
+      expect(
+        container.querySelector(".bg-muted-foreground"),
+      ).toBeInTheDocument();
+      expect(container.querySelector(".bg-success")).not.toBeInTheDocument();
     });
 
-    it("should show normal vote dot when online", () => {
+    it("should show success vote dot when online", () => {
       const { container } = render(
         <PlayerItem
           {...defaultProps}
@@ -399,8 +415,10 @@ describe("PlayerItem", () => {
           isOnline={true}
         />,
       );
-      expect(container.querySelector(".bg-accent-500")).toBeInTheDocument();
-      expect(container.querySelector(".bg-muted-foreground")).not.toBeInTheDocument();
+      expect(container.querySelector(".bg-success")).toBeInTheDocument();
+      expect(
+        container.querySelector(".bg-muted-foreground"),
+      ).not.toBeInTheDocument();
     });
 
     it("should default to online when isOnline is not provided", () => {
@@ -410,11 +428,11 @@ describe("PlayerItem", () => {
           player={createMockPlayer({ vote: null })}
         />,
       );
-      expect(screen.getByText("Thinking...")).toBeInTheDocument();
+      expect(screen.getByText("?")).toBeInTheDocument();
       expect(screen.queryByText("Offline")).not.toBeInTheDocument();
     });
 
-    it("should apply gray text styling when offline", () => {
+    it("should apply muted text styling when offline", () => {
       render(
         <PlayerItem
           {...defaultProps}
@@ -451,7 +469,7 @@ describe("PlayerItem", () => {
         />,
       );
       // Should still render without crashing
-      expect(screen.getByText("Thinking...")).toBeInTheDocument();
+      expect(screen.getByText("?")).toBeInTheDocument();
     });
   });
 });

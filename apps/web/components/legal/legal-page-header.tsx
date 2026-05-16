@@ -44,10 +44,10 @@ export function LegalPageHeader({
         <span className="font-medium text-foreground">{title}</span>
       </nav>
 
-      <div className="rounded-2xl bg-gradient-to-br from-primary/[0.03] to-transparent p-6 sm:p-8">
+      <div className="rounded-2xl border border-border bg-card p-6 sm:p-8">
         <div className="flex items-start gap-4">
-          <div className="shrink-0 rounded-2xl bg-primary-50 p-4 shadow-soft-sm dark:bg-primary-500/10">
-            <Icon aria-hidden="true" className="size-8 text-primary" />
+          <div className="shrink-0 rounded-2xl bg-bone-2 p-4 shadow-soft-sm">
+            <Icon aria-hidden="true" className="size-8 text-foreground" />
           </div>
           <div className="space-y-2">
             <h1 className="text-3xl font-bold text-foreground sm:text-4xl">

@@ -22,11 +22,12 @@ export function ConnectionBanner() {
   const Icon = isDisconnected ? WifiOff : Wifi;
 
   const colorClasses = isDisconnected
-    ? "bg-destructive/10 dark:bg-destructive/20 text-destructive border-destructive/30"
-    : "bg-warm-50 dark:bg-warm-950/20 text-warm-700 dark:text-warm-400 border-warm-200 dark:border-warm-900";
+    ? "bg-destructive/10 text-destructive border-destructive/30"
+    : "bg-bone-2 text-ink-3 border-border";
 
   return (
     <output
+      aria-live="polite"
       aria-atomic="true"
       className={`flex items-center justify-center gap-2 px-3 py-1.5 text-xs sm:text-sm border-b ${colorClasses} animate-fade-in`}
     >

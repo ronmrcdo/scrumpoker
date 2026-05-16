@@ -15,30 +15,23 @@ interface PresencePayload {
 }
 
 export function usePresenceSync(roomId: string | null) {
-  const {
-    currentUserId,
-    room,
-    setOnlinePlayerIds,
-    clearPresence,
-    addSystemMessage,
-    kickPlayer,
-  } = usePokerStore(
-    useShallow((s) => ({
-      currentUserId: s.currentUserId,
-      room: s.room,
-      setOnlinePlayerIds: s.setOnlinePlayerIds,
-      clearPresence: s.clearPresence,
-      addSystemMessage: s.addSystemMessage,
-      kickPlayer: s.kickPlayer,
-    })),
-  );
+  const { currentUserId, room, setOnlinePlayerIds, clearPresence, kickPlayer } =
+    usePokerStore(
+      useShallow((s) => ({
+        currentUserId: s.currentUserId,
+        room: s.room,
+        setOnlinePlayerIds: s.setOnlinePlayerIds,
+        clearPresence: s.clearPresence,
+        kickPlayer: s.kickPlayer,
+      })),
+    );
 
   const channelRef = useRef<RealtimeChannel | null>(null);
   const supabaseRef = useRef(createClient());
   const graceTimersRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(
     new Map(),
   );
-  // Track names for system messages when grace period expires
+  // Track names so we can identify them after disconnect
   const playerNamesRef = useRef<Map<string, string>>(new Map());
 
   const clearAllTimers = useCallback(() => {
@@ -62,13 +55,11 @@ export function usePresenceSync(roomId: string | null) {
       },
     });
 
-    // Sync event: full state reconciliation
     channel.on("presence", { event: "sync" }, () => {
       const state = channel.presenceState<PresencePayload>();
       const onlineIds = new Set<string>();
       for (const key of Object.keys(state)) {
         onlineIds.add(key);
-        // Update name cache from presence state
         const presences = state[key];
         const first = presences?.[0];
         if (first) {
@@ -78,7 +69,6 @@ export function usePresenceSync(roomId: string | null) {
       setOnlinePlayerIds(onlineIds);
     });
 
-    // Join event: cancel grace timer if player reconnected
     channel.on(
       "presence",
       { event: "join" },
@@ -91,45 +81,31 @@ export function usePresenceSync(roomId: string | null) {
       }) => {
         if (key === currentUserId) return;
 
-        // Cancel grace period timer if one was pending
         const existingTimer = graceTimersRef.current.get(key);
         if (existingTimer) {
           clearTimeout(existingTimer);
           graceTimersRef.current.delete(key);
-          const name =
-            newPresences[0]?.name ??
-            playerNamesRef.current.get(key) ??
-            "A player";
-          addSystemMessage(`${name} reconnected`);
         }
 
-        // Cache the name
         if (newPresences[0]?.name) {
           playerNamesRef.current.set(key, newPresences[0].name);
         }
       },
     );
 
-    // Leave event: start grace period for auto-removal
     channel.on(
       "presence",
       { event: "leave" },
       ({ key }: { key: string; leftPresences: PresencePayload[] }) => {
         if (key === currentUserId) return;
 
-        const playerName = playerNamesRef.current.get(key) ?? "A player";
-        addSystemMessage(`${playerName} disconnected`);
-
-        // Clear any existing timer for this player before starting a new one
         const existingLeaveTimer = graceTimersRef.current.get(key);
         if (existingLeaveTimer) {
           clearTimeout(existingLeaveTimer);
         }
 
-        // Start grace period timer — only facilitator executes removal
         const timer = setTimeout(() => {
           graceTimersRef.current.delete(key);
-          // Re-read facilitator status at timer execution time
           const currentRoom = usePokerStore.getState().room;
           const isFacilitator = currentRoom?.facilitatorId === currentUserId;
           if (isFacilitator) {
@@ -144,7 +120,6 @@ export function usePresenceSync(roomId: string | null) {
     channel.subscribe(async (status) => {
       if (status === "SUBSCRIBED") {
         channelRef.current = channel;
-        // Find current user's name from the room state
         const currentRoom = usePokerStore.getState().room;
         const currentPlayer = currentRoom?.players.find(
           (p) => p.id === currentUserId,
@@ -168,12 +143,10 @@ export function usePresenceSync(roomId: string | null) {
     currentUserId,
     setOnlinePlayerIds,
     clearPresence,
-    addSystemMessage,
     kickPlayer,
     clearAllTimers,
   ]);
 
-  // Clean up timers for players that no longer exist in the room
   useEffect(() => {
     if (!room) return;
     const playerIds = new Set(room.players.map((p) => p.id));

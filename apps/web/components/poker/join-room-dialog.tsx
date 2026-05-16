@@ -101,6 +101,7 @@ export function JoinRoomDialog({ roomId }: JoinRoomDialogProps) {
               id="join-name"
               placeholder="Enter your name"
               maxLength={50}
+              autoComplete="name"
               className="h-10 text-sm"
               disabled={isSubmitting}
               aria-invalid={!!form.formState.errors.userName}

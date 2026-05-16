@@ -130,7 +130,7 @@ export default function DisclaimerPage() {
                 No data persistence guarantee
               </strong>{" "}
               — All poker rooms and associated data expire automatically after
-              24 hours. Chat messages are ephemeral and not stored.
+              24 hours.
             </li>
             <li>
               <strong className="text-foreground">

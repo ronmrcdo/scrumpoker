@@ -34,6 +34,7 @@ export function HeroForm() {
           <Input
             id="hero-user-name"
             placeholder="Enter your name"
+            autoComplete="name"
             className="h-10 bg-card/50 backdrop-blur-sm border-border/50"
             disabled={isSubmitting}
             aria-invalid={!!form.formState.errors.userName}
@@ -62,6 +63,7 @@ export function HeroForm() {
           <Input
             id="hero-room-name"
             placeholder="e.g., Sprint 42"
+            autoComplete="off"
             className="h-10 bg-card/50 backdrop-blur-sm border-border/50"
             disabled={isSubmitting}
             aria-invalid={!!form.formState.errors.roomName}

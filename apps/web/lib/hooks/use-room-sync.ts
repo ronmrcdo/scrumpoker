@@ -18,7 +18,6 @@ export function useRoomSync(roomId: string, initialRoom: Room) {
     setRoom,
     setWasKicked,
     fetchRoom,
-    addSystemMessage,
     currentUserId,
     setConnectionStatus,
     setIsOnline,
@@ -27,7 +26,6 @@ export function useRoomSync(roomId: string, initialRoom: Room) {
       setRoom: s.setRoom,
       setWasKicked: s.setWasKicked,
       fetchRoom: s.fetchRoom,
-      addSystemMessage: s.addSystemMessage,
       currentUserId: s.currentUserId,
       setConnectionStatus: s.setConnectionStatus,
       setIsOnline: s.setIsOnline,
@@ -41,31 +39,12 @@ export function useRoomSync(roomId: string, initialRoom: Room) {
   const visibilityTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const channelIdRef = useRef(0);
 
-  // Track player changes for detecting joins and leaves
+  // Track player changes (kept for potential future use; currently a no-op)
   const updatePlayerTracking = useCallback(
-    (players: Room["players"], eventType: "INSERT" | "DELETE" | "UPDATE") => {
-      const currentPlayers = new Map(players.map((p) => [p.id, p.name]));
-      const prevPlayers = previousPlayersRef.current;
-
-      if (eventType === "INSERT") {
-        // Find new players (not including self)
-        for (const player of players) {
-          if (!prevPlayers.has(player.id) && player.id !== currentUserId) {
-            addSystemMessage(`${player.name} joined the room`);
-          }
-        }
-      } else if (eventType === "DELETE") {
-        // Find players who left (not including self)
-        for (const [playerId, playerName] of prevPlayers) {
-          if (!currentPlayers.has(playerId) && playerId !== currentUserId) {
-            addSystemMessage(`${playerName} left the room`);
-          }
-        }
-      }
-
-      previousPlayersRef.current = currentPlayers;
+    (players: Room["players"], _eventType: "INSERT" | "DELETE" | "UPDATE") => {
+      previousPlayersRef.current = new Map(players.map((p) => [p.id, p.name]));
     },
-    [currentUserId, addSystemMessage],
+    [],
   );
 
   // Hydrate store with server-fetched data on mount
@@ -109,7 +88,7 @@ export function useRoomSync(roomId: string, initialRoom: Room) {
           fetchRoom(roomId);
         },
       )
-      .on(
+      .on<{ user_id: string }>(
         "postgres_changes",
         {
           event: "*",
@@ -121,7 +100,7 @@ export function useRoomSync(roomId: string, initialRoom: Room) {
           // Check if current user was kicked
           if (
             payload.eventType === "DELETE" &&
-            (payload.old as Record<string, unknown>)?.user_id === currentUserId
+            payload.old?.user_id === currentUserId
           ) {
             setWasKicked(true);
             setRoom(null);

@@ -3,6 +3,7 @@
 import {
   AlertTriangle,
   Button,
+  Check,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -12,10 +13,11 @@ import {
   DialogTrigger,
   LogOut,
   Separator,
-  Users,
+  Share2,
 } from "@repo/ui";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
+import { trackEvent } from "@/lib/analytics";
 import { FOLD_VALUE } from "@/lib/constants/cards";
 import type { Player } from "@/lib/types";
 import { PlayerItem } from "./player-item";
@@ -25,6 +27,7 @@ interface PlayerListProps {
   currentUserId: string;
   isRevealed: boolean;
   isFacilitator: boolean;
+  roomId?: string;
   onlinePlayerIds?: Set<string>;
   onLeave: () => void;
   onKick: (playerId: string) => void;
@@ -35,18 +38,26 @@ export function PlayerList({
   currentUserId,
   isRevealed,
   isFacilitator,
+  roomId,
   onlinePlayerIds,
   onLeave,
   onKick,
 }: PlayerListProps) {
   const [isLeaveDialogOpen, setIsLeaveDialogOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [inviteUrl, setInviteUrl] = useState("");
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && roomId) {
+      setInviteUrl(`${window.location.origin}/poker/${roomId}`);
+    }
+  }, [roomId]);
+
   let votedCount = 0;
   let foldCount = 0;
-  let onlineCount = 0;
   for (const p of players) {
     if (p.vote !== null) votedCount++;
     if (p.vote === FOLD_VALUE) foldCount++;
-    if (!onlinePlayerIds || onlinePlayerIds.has(p.id)) onlineCount++;
   }
 
   const handleConfirmLeave = () => {
@@ -54,21 +65,34 @@ export function PlayerList({
     onLeave();
   };
 
+  const handleCopyInvite = () => {
+    if (!inviteUrl) return;
+    navigator.clipboard.writeText(inviteUrl);
+    trackEvent("invite_link_copied", {
+      room_id: roomId ?? "",
+      source: "sidebar",
+    });
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-center gap-2 px-3 sm:px-4 py-2.5 sm:py-3">
-        <Users className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
-        <h2 id="players-heading" className="text-sm font-semibold">
-          Players
+      <div className="flex items-baseline justify-between px-4 py-4">
+        <h2
+          id="players-heading"
+          className="text-lg font-semibold tracking-tight text-foreground"
+        >
+          At the table
         </h2>
         <output
-          aria-label={`${onlineCount} of ${players.length} online, ${votedCount} voted${foldCount > 0 ? `, ${foldCount} folded` : ""}`}
-          className="ml-auto text-xs text-muted-foreground"
+          aria-label={`${votedCount} of ${players.length} in${foldCount > 0 ? `, ${foldCount} folded` : ""}`}
+          className="text-xs font-medium text-muted-foreground tracking-wide"
         >
-          {onlineCount}/{players.length} online · {votedCount} voted
+          {votedCount}/{players.length} In
           {foldCount > 0 && (
-            <span aria-hidden="true" className="text-warm-700 ml-1">
-              ({foldCount} folded)
+            <span aria-hidden="true" className="text-destructive ml-1">
+              · {foldCount} Fold
             </span>
           )}
         </output>
@@ -76,7 +100,7 @@ export function PlayerList({
       <Separator />
       <ul
         aria-labelledby="players-heading"
-        className="flex-1 overflow-y-auto p-2 sm:p-2 space-y-1 list-none"
+        className="flex-1 overflow-y-auto list-none"
       >
         {players.map((player) => (
           <PlayerItem
@@ -90,6 +114,40 @@ export function PlayerList({
           />
         ))}
       </ul>
+
+      {roomId && (
+        <div className="px-4 py-4 border-t border-rule">
+          <div className="text-xs font-medium text-muted-foreground tracking-wide mb-2">
+            Invite
+          </div>
+          <div
+            aria-hidden="true"
+            className="font-mono text-[11px] px-3 py-2 border border-dashed border-ink-3/40 bg-bone-2 text-ink-2 rounded-md break-all mb-2"
+          >
+            {inviteUrl || "…"}
+          </div>
+          <Button
+            variant="default"
+            size="sm"
+            className="w-full gap-1.5"
+            onClick={handleCopyInvite}
+            aria-label={copied ? "Link copied" : "Copy invite link"}
+          >
+            {copied ? (
+              <>
+                <Check className="h-4 w-4" />
+                Copied!
+              </>
+            ) : (
+              <>
+                <Share2 className="h-4 w-4" />
+                Copy invite
+              </>
+            )}
+          </Button>
+        </div>
+      )}
+
       <Separator />
       <div className="p-2 sm:p-3">
         <Dialog open={isLeaveDialogOpen} onOpenChange={setIsLeaveDialogOpen}>

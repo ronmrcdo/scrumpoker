@@ -1,5 +1,4 @@
 import { create } from "zustand";
-import { type ChatSlice, createChatSlice } from "./slices/chat-slice";
 import {
   type ConnectionSlice,
   createConnectionSlice,
@@ -18,7 +17,6 @@ import { createUISlice, type UISlice } from "./slices/ui-slice";
 
 export type PokerStore = SessionSlice &
   RoomSlice &
-  ChatSlice &
   CountdownSlice &
   UISlice &
   ConnectionSlice &
@@ -27,7 +25,6 @@ export type PokerStore = SessionSlice &
 export const usePokerStore = create<PokerStore>()((...a) => ({
   ...createSessionSlice(...a),
   ...createRoomSlice(...a),
-  ...createChatSlice(...a),
   ...createCountdownSlice(...a),
   ...createUISlice(...a),
   ...createConnectionSlice(...a),

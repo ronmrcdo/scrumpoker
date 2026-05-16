@@ -109,7 +109,6 @@ export default function TermsPage() {
               Voting analytics including averages, consensus detection, and
               distribution
             </li>
-            <li>In-room team chat for discussion during estimation sessions</li>
           </ul>
           <p>
             Rooms are{" "}
@@ -176,7 +175,7 @@ export default function TermsPage() {
             </li>
             <li>
               Submit offensive, abusive, or inappropriate content through room
-              names, display names, or chat messages
+              names or display names
             </li>
             <li>Impersonate other individuals or team members</li>
             <li>
@@ -249,14 +248,12 @@ export default function TermsPage() {
         >
           <p>
             When using the Service, you may provide content including display
-            names, room names, votes, and chat messages. Regarding this content:
+            names, room names, and votes. Regarding this content:
           </p>
           <ul className="ml-1 list-inside list-disc space-y-1.5">
             <li>
               <strong className="text-foreground">Ephemeral nature</strong> —
-              All user content is temporary. Room data expires after 24 hours,
-              and chat messages are broadcast in real-time without persistent
-              storage.
+              All user content is temporary. Room data expires after 24 hours.
             </li>
             <li>
               <strong className="text-foreground">No ownership claim</strong> —

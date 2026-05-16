@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { create } from "zustand";
+import { create, type StoreApi } from "zustand";
 import { createSessionSlice, type SessionSlice } from "./session-slice";
 
 describe("SessionSlice", () => {
-  let store: ReturnType<typeof create<SessionSlice>>;
+  let store: StoreApi<SessionSlice>;
 
   beforeEach(() => {
     store = create<SessionSlice>()((...a) => createSessionSlice(...a));

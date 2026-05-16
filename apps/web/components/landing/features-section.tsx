@@ -1,107 +1,165 @@
 "use client";
 
-import { BarChart3, EyeOff, MessageSquare, Users } from "@repo/ui";
-import {
-  MiniAnalyticsDemo,
-  MiniAnonymousDemo,
-  MiniChatDemo,
-  MiniVotingDemo,
-} from "./demos";
-import { FeatureCard } from "./feature-card";
-import { ScrollReveal } from "./scroll-reveal";
+import { Reveal, RevealItem, RevealStagger } from "./_motion";
 
-const features = [
+const HOW_STEPS = [
   {
-    title: "Real-time Voting",
-    description:
-      "See everyone's votes update instantly as they select their cards. No more waiting for emails or messages — your entire team estimates together in real-time.",
-    icon: Users,
-    demo: <MiniVotingDemo />,
+    n: "01",
+    t: "Deal a room",
+    d: "Pick a name for yourself and the sprint or story you're sizing. We mint a private link in under a second.",
   },
   {
-    title: "Team Chat",
-    description:
-      "Discuss estimates with your team without leaving the room. Built-in chat keeps the conversation flowing and helps resolve differing opinions quickly.",
-    icon: MessageSquare,
-    demo: <MiniChatDemo />,
+    n: "02",
+    t: "Pass the cards",
+    d: "Share the link. Teammates join with no accounts, no email, no setup. Up to 24 around the table.",
   },
   {
-    title: "Anonymous Voting",
-    description:
-      "Votes stay hidden until the facilitator reveals them. This prevents anchoring bias and ensures everyone provides their honest estimate.",
-    icon: EyeOff,
-    demo: <MiniAnonymousDemo />,
-  },
-  {
-    title: "Instant Analytics",
-    description:
-      "Get consensus detection and statistical analysis automatically. See the average, spread, and whether your team agrees — all calculated in real-time.",
-    icon: BarChart3,
-    demo: <MiniAnalyticsDemo />,
+    n: "03",
+    t: "Show your hand",
+    d: "Everyone picks a card face-down. When the facilitator reveals, the hand flips together — no anchoring, no peeking.",
   },
 ];
 
+const HOUSE_RULES = [
+  {
+    n: "01",
+    title: "Real-time hands",
+    body: "Every flip, fold, and reveal syncs across the table in under 80ms. Watch your team's cards land as they're dealt.",
+    icon: "♠",
+  },
+  {
+    n: "02",
+    title: "No anchoring",
+    body: "Cards stay face-down until the facilitator reveals. The loudest engineer can't set the price before the rest of you finish thinking.",
+    icon: "♥",
+  },
+  {
+    n: "03",
+    title: "Consensus, scored",
+    body: "Median, spread, agreement index. We'll tell you when the table is split — and when it's actually time to stop arguing.",
+    icon: "♣",
+  },
+  {
+    n: "04",
+    title: "Fold without shame",
+    body: "The 'need more info' card is a first-class citizen. Folding a story is the cheapest re-deal in the deck.",
+    icon: "♦",
+  },
+];
+
+function SectionHead({
+  num,
+  title,
+  eyebrow,
+  headingId,
+}: {
+  num: string;
+  title: string;
+  eyebrow: string;
+  headingId: string;
+}) {
+  return (
+    <Reveal className="grid grid-cols-1 sm:grid-cols-[1fr_auto] items-end gap-4 mb-12 sm:mb-16">
+      <div className="space-y-2">
+        <div className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
+          {num} · {eyebrow}
+        </div>
+        <h2
+          id={headingId}
+          className="text-3xl sm:text-4xl lg:text-5xl font-medium tracking-tight text-foreground leading-tight"
+        >
+          {title}
+        </h2>
+      </div>
+    </Reveal>
+  );
+}
+
 export function FeaturesSection() {
   return (
-    <section
-      id="features"
-      aria-labelledby="features-heading"
-      className="py-24 sm:py-32 bg-muted/20 scroll-mt-14"
-    >
-      <div className="container mx-auto px-4 sm:px-6">
-        {/* Section Header */}
-        <ScrollReveal>
-          <div className="text-center mb-20 sm:mb-24">
-            <p className="text-sm font-semibold text-primary tracking-wide uppercase mb-3">
-              Features
-            </p>
-            <h2
-              id="features-heading"
-              className="text-3xl sm:text-4xl lg:text-[2.75rem] font-bold text-foreground tracking-tight"
-            >
-              Everything you need for
-              <br className="hidden sm:block" />
-              efficient estimation
-            </h2>
-            <p className="text-base sm:text-lg text-muted-foreground max-w-xl mx-auto mt-4 leading-relaxed">
-              Collaborative tools designed for agile teams to estimate faster
-              and more accurately.
-            </p>
-          </div>
-        </ScrollReveal>
-
-        {/* Feature Cards */}
-        <div className="space-y-24 sm:space-y-32">
-          {features.map((feature, index) => (
-            <FeatureCard
-              key={feature.title}
-              {...feature}
-              reverse={index % 2 === 1}
-              delay={index * 100}
-            />
-          ))}
-        </div>
-
-        {/* Bottom CTA */}
-        <ScrollReveal delay={400}>
-          <div className="mt-24 sm:mt-32 text-center">
-            <div className="max-w-md mx-auto space-y-4 p-8 rounded-2xl bg-card border border-border/40 shadow-soft-lg">
-              <h3 className="text-xl sm:text-2xl font-bold text-foreground">
-                Ready to start planning?
-              </h3>
-              <p className="text-muted-foreground text-sm sm:text-base">
-                Create a room in seconds and invite your team.
-              </p>
-              <a
-                href="#hero"
-                className="inline-flex items-center justify-center h-11 px-8 rounded-lg bg-primary text-primary-foreground font-semibold text-sm hover:bg-primary/90 active:bg-primary/80 transition-colors cursor-pointer"
+    <>
+      <section
+        id="how"
+        aria-labelledby="how-heading"
+        className="border-b border-border bg-background"
+      >
+        <div className="mx-auto max-w-[1320px] px-5 sm:px-10 py-20 sm:py-28">
+          <SectionHead
+            num="02"
+            title="How it plays"
+            eyebrow="Three rounds, no chips"
+            headingId="how-heading"
+          />
+          <RevealStagger className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {HOW_STEPS.map((s) => (
+              <RevealItem
+                key={s.n}
+                as="article"
+                className="rounded-2xl border border-border bg-card p-8 sm:p-9 flex flex-col gap-4"
               >
-                Get Started Free
-              </a>
-            </div>
-          </div>
-        </ScrollReveal>
-      </div>
-    </section>
+                <div className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
+                  № {s.n}
+                </div>
+                <h3 className="text-2xl sm:text-3xl font-medium tracking-tight text-foreground leading-tight">
+                  {s.t}
+                </h3>
+                <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+                  {s.d}
+                </p>
+              </RevealItem>
+            ))}
+          </RevealStagger>
+        </div>
+      </section>
+
+      <section
+        id="features"
+        aria-labelledby="features-heading"
+        className="border-b border-border bg-background"
+      >
+        <div className="mx-auto max-w-[1320px] px-5 sm:px-10 py-20 sm:py-28">
+          <SectionHead
+            num="03"
+            title="The house rules"
+            eyebrow="Features, but better named"
+            headingId="features-heading"
+          />
+          <RevealStagger className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {HOUSE_RULES.map((f) => {
+              const isRed = f.icon === "♥" || f.icon === "♦";
+              return (
+                <RevealItem
+                  key={f.n}
+                  as="article"
+                  className="rounded-2xl border border-border bg-card p-8 sm:p-9 flex flex-col gap-4 min-h-[220px]"
+                >
+                  <div className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
+                    № {f.n}
+                  </div>
+                  <div className="flex items-start justify-between gap-4">
+                    <h3 className="text-2xl sm:text-3xl font-medium tracking-tight text-foreground leading-tight">
+                      {f.title}
+                    </h3>
+                    <span
+                      aria-hidden
+                      className={
+                        isRed
+                          ? "text-4xl sm:text-5xl text-destructive leading-none"
+                          : "text-4xl sm:text-5xl text-foreground leading-none"
+                      }
+                    >
+                      {f.icon}
+                    </span>
+                  </div>
+                  <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+                    {f.body}
+                  </p>
+                </RevealItem>
+              );
+            })}
+          </RevealStagger>
+        </div>
+      </section>
+    </>
   );
 }

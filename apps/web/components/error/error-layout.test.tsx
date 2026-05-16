@@ -182,9 +182,10 @@ describe("ErrorLayout", () => {
         />,
       );
 
-      // Secondary should have outline variant (border-2 class)
+      // Secondary should have outline variant (border + border-border)
       const secondaryButton = screen.getByRole("button", { name: "Secondary" });
-      expect(secondaryButton).toHaveClass("border-2");
+      expect(secondaryButton).toHaveClass("border");
+      expect(secondaryButton).toHaveClass("border-border");
     });
   });
 

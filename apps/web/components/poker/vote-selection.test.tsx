@@ -18,9 +18,9 @@ describe("VoteSelection", () => {
   };
 
   describe("rendering", () => {
-    it("should render the header text", () => {
+    it("should render the hidden legend for screen readers", () => {
       render(<VoteSelection {...defaultProps} />);
-      expect(screen.getByText("Choose Your Card")).toBeInTheDocument();
+      expect(screen.getByText(/pick a card/i)).toBeInTheDocument();
     });
 
     it("should render all card values", () => {
@@ -91,14 +91,14 @@ describe("VoteSelection", () => {
   });
 
   describe("current vote styling", () => {
-    it("should highlight the currently selected vote", () => {
+    it("should highlight the currently selected vote with foreground border + outline", () => {
       render(
         <VoteSelection currentVote="5" isRevealed={false} onVote={vi.fn()} />,
       );
 
       const selectedButton = getVoteButton("5");
-      expect(selectedButton).toHaveClass("bg-primary-500");
-      expect(selectedButton).toHaveClass("text-white");
+      expect(selectedButton).toHaveClass("border-foreground");
+      expect(selectedButton.getAttribute("aria-pressed")).toBe("true");
     });
 
     it("should not highlight unselected votes", () => {
@@ -107,7 +107,7 @@ describe("VoteSelection", () => {
       );
 
       const unselectedButton = getVoteButton("3");
-      expect(unselectedButton).not.toHaveClass("bg-primary-500");
+      expect(unselectedButton).not.toHaveClass("border-foreground");
       expect(unselectedButton).toHaveClass("bg-card");
     });
 
@@ -117,7 +117,7 @@ describe("VoteSelection", () => {
       );
 
       const coffeeButton = getVoteButton("☕");
-      expect(coffeeButton).toHaveClass("bg-primary-500");
+      expect(coffeeButton).toHaveClass("border-foreground");
     });
 
     it("should have no highlighted card when no vote", () => {
@@ -131,7 +131,7 @@ describe("VoteSelection", () => {
 
       const buttons = screen.getAllByRole("button");
       buttons.forEach((button) => {
-        expect(button).not.toHaveClass("bg-primary-500");
+        expect(button).not.toHaveClass("border-foreground");
       });
     });
   });
@@ -182,21 +182,29 @@ describe("VoteSelection", () => {
   });
 
   describe("styling and layout", () => {
-    it("should use grid layout", () => {
+    it("should use flex layout for the hand row", () => {
       const { container } = render(<VoteSelection {...defaultProps} />);
-      expect(container.querySelector(".grid")).toBeInTheDocument();
+      expect(container.querySelector(".flex")).toBeInTheDocument();
     });
 
-    it("should apply animation delay to card buttons", () => {
+    it("should render a dedicated Fold button below the hand", () => {
       render(<VoteSelection {...defaultProps} />);
+      expect(
+        screen.getByRole("button", { name: /fold — need more info/i }),
+      ).toBeInTheDocument();
+    });
 
-      const cardValues = ["1", "2", "3", "5", "8", "13", "21", "☕"];
-      cardValues.forEach((value, index) => {
-        const button = getVoteButton(value);
-        expect(button).toHaveStyle({
-          animationDelay: `${index * 50}ms`,
-        });
+    it("should be full-width on mobile and auto-width centered on desktop", () => {
+      render(<VoteSelection {...defaultProps} />);
+      const foldButton = screen.getByRole("button", {
+        name: /fold — need more info/i,
       });
+
+      expect(foldButton).toHaveClass("w-full");
+      expect(foldButton).toHaveClass("sm:w-auto");
+      expect(foldButton).toHaveClass("sm:px-8");
+      expect(foldButton).toHaveClass("sm:mx-auto");
+      expect(foldButton).toHaveClass("sm:block");
     });
   });
 
@@ -255,7 +263,7 @@ describe("VoteSelection", () => {
       );
 
       const selectedButton = getVoteButton("5");
-      expect(selectedButton).toHaveClass("bg-primary-500");
+      expect(selectedButton).toHaveClass("border-foreground");
     });
   });
 });

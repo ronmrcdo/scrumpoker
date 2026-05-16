@@ -5,12 +5,32 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { isValidUUID } from "@/lib/validation";
 import { PokerRoomClient } from "./poker-room-client";
 
-export const metadata: Metadata = {
-  robots: {
-    index: false,
-    follow: false,
-  },
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ roomId: string }>;
+}): Promise<Metadata> {
+  const { roomId } = await params;
+  const base: Metadata = { robots: { index: false, follow: false } };
+  if (!isValidUUID(roomId)) return base;
+  try {
+    const supabase = await createServerSupabaseClient();
+    const { data } = await supabase
+      .from("rooms")
+      .select("name")
+      .eq("id", roomId)
+      .single();
+    if (data?.name) return { ...base, title: data.name };
+    const { data: previewRows } = await supabase.rpc("get_room_preview", {
+      p_room_id: roomId,
+    });
+    const preview = previewRows?.[0];
+    if (preview?.name) return { ...base, title: preview.name };
+  } catch {
+    // fall through to base metadata
+  }
+  return base;
+}
 
 export default async function PokerRoomPage({
   params,

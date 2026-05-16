@@ -2,23 +2,23 @@ import { type NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
 import { validateAntiBot } from "@/lib/anti-bot";
+import { getClientIp } from "@/lib/client-ip";
 import { roomCreationLimiter } from "@/lib/rate-limit";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { verifyTurnstileToken } from "@/lib/turnstile";
 import { roomNameSchema, userNameSchema } from "@/lib/validation";
+
+const turnstileConfigured = Boolean(process.env.TURNSTILE_SECRET_KEY);
 
 const createRoomApiSchema = z.object({
   roomName: roomNameSchema,
   userName: userNameSchema,
   hp: z.string().max(500).default(""),
   formLoadedAt: z.number().int().positive(),
-  turnstileToken: z.string().default(""),
+  turnstileToken: turnstileConfigured
+    ? z.string().min(1, "Missing security token")
+    : z.string().default(""),
 });
-
-function getClientIp(request: NextRequest): string {
-  const forwarded = request.headers.get("x-forwarded-for");
-  return forwarded?.split(",")[0]?.trim() ?? "unknown";
-}
 
 export async function POST(request: NextRequest) {
   // 1. Rate limit by IP
@@ -68,8 +68,8 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // 3b. Verify Turnstile token (only when configured)
-  if (parsed.data.turnstileToken) {
+  // 3b. Verify Turnstile token when the secret is configured
+  if (turnstileConfigured) {
     const turnstileResult = await verifyTurnstileToken(
       parsed.data.turnstileToken,
       ip,
@@ -81,12 +81,6 @@ export async function POST(request: NextRequest) {
         { status: 422 },
       );
     }
-  } else if (process.env.TURNSTILE_SECRET_KEY) {
-    // Token is required when Turnstile is configured on the server
-    return NextResponse.json(
-      { error: "Missing security token" },
-      { status: 400 },
-    );
   }
 
   // 4. Authenticate via Supabase session cookie

@@ -1,5 +1,4 @@
-const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://scrumpokergame.com";
+import { SITE_URL as siteUrl } from "@/lib/config";
 
 export function getWebApplicationJsonLd() {
   return {
@@ -19,7 +18,6 @@ export function getWebApplicationJsonLd() {
     featureList: [
       "Real-time voting",
       "Anonymous estimation",
-      "Team chat",
       "Instant analytics",
       "No sign-up required",
       "Fibonacci estimation scales",

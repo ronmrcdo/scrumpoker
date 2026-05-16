@@ -1,28 +1,9 @@
+import nextBundleAnalyzer from "@next/bundle-analyzer";
 import type { NextConfig } from "next";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
-const supabaseWs = supabaseUrl.replace(/^http/, "ws");
-
-const plausibleHost = process.env.NEXT_PUBLIC_PLAUSIBLE_SCRIPT_URL
-  ? new URL(process.env.NEXT_PUBLIC_PLAUSIBLE_SCRIPT_URL).origin
-  : "";
-
-const turnstileOrigin = "https://challenges.cloudflare.com";
-const cloudflareInsights = "https://static.cloudflareinsights.com";
-
-const cspDirectives = [
-  "default-src 'self'",
-  `script-src 'self' 'unsafe-inline' ${plausibleHost} ${turnstileOrigin} ${cloudflareInsights}${process.env.NODE_ENV === "development" ? " 'unsafe-eval'" : ""}`,
-  "style-src 'self' 'unsafe-inline'",
-  `connect-src 'self' ${supabaseUrl} ${supabaseWs} ${plausibleHost} ${turnstileOrigin} ${cloudflareInsights}`,
-  "font-src 'self' data:",
-  "img-src 'self' data: blob: https://cdn.jsdelivr.net",
-  `frame-src ${turnstileOrigin}`,
-  "frame-ancestors 'none'",
-  "base-uri 'self'",
-  "form-action 'self'",
-  "object-src 'none'",
-];
+const withBundleAnalyzer = nextBundleAnalyzer({
+  enabled: process.env.ANALYZE === "true",
+});
 
 const nextConfig: NextConfig = {
   output: "standalone",
@@ -31,18 +12,11 @@ const nextConfig: NextConfig = {
   images: {
     formats: ["image/avif", "image/webp"],
   },
-  experimental: {
-    turbopackFileSystemCacheForDev: false,
-  },
   async headers() {
     return [
       {
         source: "/(.*)",
         headers: [
-          {
-            key: "Content-Security-Policy",
-            value: cspDirectives.join("; "),
-          },
           {
             key: "Strict-Transport-Security",
             value: "max-age=63072000; includeSubDomains; preload",
@@ -69,4 +43,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withBundleAnalyzer(nextConfig);

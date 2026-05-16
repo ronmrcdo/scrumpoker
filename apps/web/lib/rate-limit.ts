@@ -103,3 +103,9 @@ export const roomCreationLimiter = new SlidingWindowRateLimiter({
   windowMs: DEFAULT_WINDOW_MS,
   maxRequests: DEFAULT_MAX_REQUESTS,
 });
+
+/** Higher-cap limiter for the leave-room beacon endpoint */
+export const leaveRoomLimiter = new SlidingWindowRateLimiter({
+  windowMs: 10_000,
+  maxRequests: 20,
+});

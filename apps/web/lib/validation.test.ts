@@ -83,7 +83,7 @@ describe("userNameSchema", () => {
     const result = userNameSchema.safeParse("");
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error.issues[0].message).toBe("Your name is required");
+      expect(result.error.issues[0]?.message).toBe("Your name is required");
     }
   });
 
@@ -91,7 +91,7 @@ describe("userNameSchema", () => {
     const result = userNameSchema.safeParse("a".repeat(51));
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error.issues[0].message).toBe(
+      expect(result.error.issues[0]?.message).toBe(
         "Name must be 50 characters or fewer",
       );
     }
@@ -146,7 +146,7 @@ describe("roomNameSchema", () => {
     const result = roomNameSchema.safeParse("");
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error.issues[0].message).toBe("Room name is required");
+      expect(result.error.issues[0]?.message).toBe("Room name is required");
     }
   });
 
@@ -154,7 +154,7 @@ describe("roomNameSchema", () => {
     const result = roomNameSchema.safeParse("a".repeat(101));
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error.issues[0].message).toBe(
+      expect(result.error.issues[0]?.message).toBe(
         "Room name must be 100 characters or fewer",
       );
     }

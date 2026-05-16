@@ -1,12 +1,20 @@
 import { createBrowserClient } from "@supabase/ssr";
+import { env } from "@/lib/env";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "";
+type BrowserClient = ReturnType<typeof createBrowserClient>;
 
-export function createClient() {
-  return createBrowserClient(supabaseUrl, supabaseAnonKey, {
-    auth: {
-      autoRefreshToken: false,
+let browserClient: BrowserClient | null = null;
+
+export function createClient(): BrowserClient {
+  if (browserClient) return browserClient;
+  browserClient = createBrowserClient(
+    env.NEXT_PUBLIC_SUPABASE_URL,
+    env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    {
+      auth: {
+        autoRefreshToken: false,
+      },
     },
-  });
+  );
+  return browserClient;
 }

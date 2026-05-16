@@ -1,10 +1,84 @@
+import type { CookieOptions } from "@supabase/ssr";
 import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
 
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
+const supabaseWs = supabaseUrl.replace(/^http/, "ws");
+
+const plausibleHost = process.env.NEXT_PUBLIC_PLAUSIBLE_SCRIPT_URL
+  ? safeOrigin(process.env.NEXT_PUBLIC_PLAUSIBLE_SCRIPT_URL)
+  : "";
+
+function safeOrigin(value: string): string {
+  try {
+    const url = new URL(value);
+    if (url.protocol !== "https:" && url.protocol !== "http:") return "";
+    return url.origin;
+  } catch {
+    return "";
+  }
+}
+
+const TURNSTILE_ORIGIN = "https://challenges.cloudflare.com";
+const CLOUDFLARE_INSIGHTS = "https://static.cloudflareinsights.com";
+
+function buildCsp(nonce: string): string {
+  const scriptSrc = [
+    "'self'",
+    `'nonce-${nonce}'`,
+    "'strict-dynamic'",
+    plausibleHost,
+    TURNSTILE_ORIGIN,
+    CLOUDFLARE_INSIGHTS,
+    process.env.NODE_ENV === "development" ? "'unsafe-eval'" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  const connectSrc = [
+    "'self'",
+    supabaseUrl,
+    supabaseWs,
+    plausibleHost,
+    TURNSTILE_ORIGIN,
+    CLOUDFLARE_INSIGHTS,
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  return [
+    "default-src 'self'",
+    `script-src ${scriptSrc}`,
+    "style-src 'self' 'unsafe-inline'",
+    `connect-src ${connectSrc}`,
+    "font-src 'self' data:",
+    "img-src 'self' data: blob: https://cdn.jsdelivr.net",
+    `frame-src ${TURNSTILE_ORIGIN}`,
+    "frame-ancestors 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+    "object-src 'none'",
+  ].join("; ");
+}
+
+function generateNonce(): string {
+  const bytes = new Uint8Array(16);
+  crypto.getRandomValues(bytes);
+  let binary = "";
+  for (const b of bytes) binary += String.fromCharCode(b);
+  return btoa(binary);
+}
+
 export async function middleware(request: NextRequest) {
-  let response = NextResponse.next({
-    request: { headers: request.headers },
-  });
+  const nonce = generateNonce();
+  const csp = buildCsp(nonce);
+
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-nonce", nonce);
+  requestHeaders.set("content-security-policy", csp);
+
+  let response = NextResponse.next({ request: { headers: requestHeaders } });
+  response.headers.set("content-security-policy", csp);
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL ?? "",
@@ -18,15 +92,16 @@ export async function middleware(request: NextRequest) {
           cookiesToSet: {
             name: string;
             value: string;
-            options?: Record<string, unknown>;
+            options?: CookieOptions;
           }[],
         ) {
           for (const { name, value } of cookiesToSet) {
             request.cookies.set(name, value);
           }
           response = NextResponse.next({
-            request: { headers: request.headers },
+            request: { headers: requestHeaders },
           });
+          response.headers.set("content-security-policy", csp);
           for (const { name, value, options } of cookiesToSet) {
             response.cookies.set(name, value, options);
           }
@@ -35,17 +110,14 @@ export async function middleware(request: NextRequest) {
     },
   );
 
-  // Refresh the session token. getSession() reads from cookies without a
-  // network round-trip and refreshes the token when expired. Using getUser()
-  // here would call the Supabase auth server on every request, adding latency
-  // and causing navigation failures for freshly-authenticated anonymous users.
+  // Verify the JWT with the auth server. This is the authoritative auth
+  // check; `getSession()` only reads the cookie and would let a forged
+  // cookie pass the redirect gate.
   const {
-    data: { session },
-  } = await supabase.auth.getSession();
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  // Redirect unauthenticated users away from poker rooms so the client-side
-  // Providers component can initialize anonymous auth first.
-  if (request.nextUrl.pathname.startsWith("/poker/") && !session) {
+  if (request.nextUrl.pathname.startsWith("/poker/") && !user) {
     const redirectUrl = request.nextUrl.clone();
     redirectUrl.pathname = "/";
     redirectUrl.searchParams.set("redirect", request.nextUrl.pathname);

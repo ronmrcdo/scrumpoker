@@ -96,7 +96,7 @@ describe("VoteDistribution", () => {
       const { container } = render(<VoteDistribution stats={stats} />);
 
       // The bar for "5" (3 votes) should have 100% width
-      const bars = container.querySelectorAll(".bg-primary-500");
+      const bars = container.querySelectorAll(".bg-foreground");
       const barStyles = Array.from(bars).map(
         (bar) => (bar as HTMLElement).style.width,
       );
@@ -111,7 +111,7 @@ describe("VoteDistribution", () => {
       });
       const { container } = render(<VoteDistribution stats={stats} />);
 
-      const bars = container.querySelectorAll(".bg-primary-500");
+      const bars = container.querySelectorAll(".bg-foreground");
       const barStyles = Array.from(bars).map(
         (bar) => (bar as HTMLElement).style.width,
       );

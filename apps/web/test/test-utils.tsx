@@ -1,13 +1,13 @@
-import type { RenderOptions } from "@testing-library/react";
+import type { RenderOptions, RenderResult } from "@testing-library/react";
 import { render } from "@testing-library/react";
 import type { ReactElement } from "react";
-import type { ChatMessage, Player, Room, VoteStats } from "@/lib/types";
+import type { Player, Room, VoteStats } from "@/lib/types";
 
 // Custom render function that can be extended with providers
 function customRender(
   ui: ReactElement,
   options?: Omit<RenderOptions, "wrapper">,
-) {
+): RenderResult {
   return render(ui, { ...options });
 }
 
@@ -45,21 +45,6 @@ export function createMockRoom(overrides: Partial<Room> = {}): Room {
       createMockPlayer(),
       createMockPlayer(),
     ],
-    ...overrides,
-  };
-}
-
-export function createMockChatMessage(
-  overrides: Partial<ChatMessage> = {},
-): ChatMessage {
-  idCounter++;
-  return {
-    id: `msg-${idCounter}`,
-    senderId: `user-${idCounter}`,
-    senderName: `User ${idCounter}`,
-    text: `Test message ${idCounter}`,
-    timestamp: "10:00 AM",
-    type: "User",
     ...overrides,
   };
 }

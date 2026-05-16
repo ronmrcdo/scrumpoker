@@ -38,7 +38,7 @@ describe("PokerCard", () => {
       expect(screen.getByText("?")).toBeInTheDocument();
     });
 
-    it("should show checkmark when voted but not revealed", () => {
+    it("should show no glyph when voted but not revealed", () => {
       render(
         <PokerCard
           memberName="Alice"
@@ -47,7 +47,11 @@ describe("PokerCard", () => {
           isCurrentUser={false}
         />,
       );
-      expect(screen.getByText("✓")).toBeInTheDocument();
+      // Voted-hidden state is conveyed via dark card background, not text
+      expect(screen.queryByText("?")).not.toBeInTheDocument();
+      expect(screen.queryByText("—")).not.toBeInTheDocument();
+      // Screen-reader text confirms the state
+      expect(screen.getByText("Voted")).toBeInTheDocument();
     });
 
     it("should show vote value when revealed", () => {
@@ -59,19 +63,20 @@ describe("PokerCard", () => {
           isCurrentUser={false}
         />,
       );
-      expect(screen.getByText("8")).toBeInTheDocument();
+      // Vote is shown twice (TL + BR corners)
+      expect(screen.getAllByText("8").length).toBeGreaterThan(0);
     });
 
-    it("should show coffee emoji when revealed", () => {
+    it("should show fold emoji when voted FOLD (not revealed)", () => {
       render(
         <PokerCard
           memberName="Alice"
-          vote="☕"
-          isRevealed={true}
+          vote="FOLD"
+          isRevealed={false}
           isCurrentUser={false}
         />,
       );
-      expect(screen.getByText("☕")).toBeInTheDocument();
+      expect(screen.getByText("✋")).toBeInTheDocument();
     });
   });
 
@@ -112,8 +117,8 @@ describe("PokerCard", () => {
           compact={true}
         />,
       );
-      // Compact mode uses smaller dimensions
-      expect(container.querySelector(".w-10")).toBeInTheDocument();
+      // Compact mode uses w-11
+      expect(container.querySelector(".w-11")).toBeInTheDocument();
     });
 
     it("should render in normal mode by default", () => {
@@ -125,14 +130,14 @@ describe("PokerCard", () => {
           isCurrentUser={false}
         />,
       );
-      // Normal mode uses larger dimensions
-      expect(container.querySelector(".w-12")).toBeInTheDocument();
+      // Normal mode uses w-14
+      expect(container.querySelector(".w-14")).toBeInTheDocument();
     });
   });
 
   describe("current user indicator", () => {
-    it("should highlight current user name", () => {
-      const { container } = render(
+    it("should style current user name as foreground", () => {
+      render(
         <PokerCard
           memberName="Alice"
           vote="5"
@@ -140,7 +145,8 @@ describe("PokerCard", () => {
           isCurrentUser={true}
         />,
       );
-      expect(container.querySelector(".text-primary-600")).toBeInTheDocument();
+      const name = screen.getByText("Alice");
+      expect(name).toHaveClass("text-foreground");
     });
 
     it("should not highlight non-current user name", () => {
@@ -229,7 +235,6 @@ describe("PokerCard", () => {
 
       expect(container.querySelector(".animate-flip")).toBeInTheDocument();
 
-      // Fast forward past the animation timeout (600ms) and flush React updates
       await act(async () => {
         vi.advanceTimersByTime(700);
       });
@@ -263,11 +268,11 @@ describe("PokerCard", () => {
           isCurrentUser={false}
         />,
       );
-      expect(screen.getByText("5")).toBeInTheDocument();
+      expect(screen.getAllByText("5").length).toBeGreaterThan(0);
     });
 
-    it("should handle all card values", () => {
-      const cardValues = ["1", "2", "3", "5", "8", "13", "21", "☕"];
+    it("should render all numeric card values when revealed", () => {
+      const cardValues = ["1", "2", "3", "5", "8", "13", "21"];
 
       for (const value of cardValues) {
         const { unmount } = render(
@@ -278,7 +283,7 @@ describe("PokerCard", () => {
             isCurrentUser={false}
           />,
         );
-        expect(screen.getByText(value)).toBeInTheDocument();
+        expect(screen.getAllByText(value).length).toBeGreaterThan(0);
         unmount();
       }
     });

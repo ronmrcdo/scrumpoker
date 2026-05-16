@@ -1,5 +1,3 @@
-"use client";
-
 import { PokerRoomLayout } from "@/components/layout/poker-room-layout";
 
 export default function PokerLayout({

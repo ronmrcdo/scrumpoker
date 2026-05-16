@@ -1,65 +1,52 @@
-import Image from "next/image";
 import Link from "next/link";
 
 export function LandingFooter() {
-  const currentYear = new Date().getFullYear();
-
   return (
-    <footer className="border-t border-border/60 pb-safe">
-      <div className="container mx-auto px-4 sm:px-6 py-10 sm:py-12">
-        <div className="flex flex-col sm:flex-row justify-between gap-8">
-          {/* Left: Branding */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <Image
-                src="/scrum-poker.png"
-                alt=""
-                width={20}
-                height={20}
-                className="rounded-sm"
-              />
-              <span className="text-sm font-bold tracking-tight text-foreground">
-                Scrum<span className="text-primary"> Poker</span>
-              </span>
+    <footer className="border-t border-border bg-background pb-safe">
+      <div className="mx-auto max-w-[1320px] px-5 sm:px-10 py-12 sm:py-16">
+        <div className="grid grid-cols-1 sm:grid-cols-12 gap-8 items-end">
+          <div className="sm:col-span-9 space-y-2">
+            <div className="text-3xl sm:text-5xl font-medium tracking-tight text-foreground">
+              Scrum Poker
             </div>
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              &copy; {currentYear} Scrum Poker Game.
-              <br />
-              Real-time planning poker for agile teams.
+            <p className="text-base sm:text-lg text-muted-foreground">
+              A planning instrument for agile teams.
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Made with{" "}
+              <span role="img" aria-label="love">
+                ❤
+              </span>{" "}
+              by{" "}
+              <a
+                href="https://ronmrcdo.dev"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline underline-offset-2 hover:text-foreground transition-colors"
+              >
+                ronmrcdo.dev
+              </a>
             </p>
           </div>
-
-          {/* Right: Legal */}
-          <div className="space-y-3">
-            <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-              Legal
-            </h4>
-            <ul className="space-y-2">
-              <li>
-                <Link
-                  href="/privacy"
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  Privacy Policy
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/terms"
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  Terms of Use
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/disclaimer"
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  Disclaimer
-                </Link>
-              </li>
-            </ul>
+          <div className="sm:col-span-3 space-y-2 font-mono text-xs uppercase tracking-widest text-muted-foreground">
+            <Link
+              href="/privacy"
+              className="block hover:text-foreground transition-colors"
+            >
+              Privacy
+            </Link>
+            <Link
+              href="/terms"
+              className="block hover:text-foreground transition-colors"
+            >
+              Terms
+            </Link>
+            <Link
+              href="/disclaimer"
+              className="block hover:text-foreground transition-colors"
+            >
+              Disclaimer
+            </Link>
           </div>
         </div>
       </div>

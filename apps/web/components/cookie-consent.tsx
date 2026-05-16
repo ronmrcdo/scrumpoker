@@ -2,7 +2,7 @@
 
 import { Button, Cookie } from "@repo/ui";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 
 const CONSENT_KEY = "cookie-consent";
 
@@ -15,9 +15,23 @@ function getStoredConsent(): ConsentValue | null {
   return null;
 }
 
+const FOCUSABLE_SELECTOR =
+  'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
 export function CookieConsent() {
   const [visible, setVisible] = useState(false);
   const dialogRef = useRef<HTMLDivElement>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
+  const titleId = useId();
+
+  const handleConsent = useCallback((value: ConsentValue) => {
+    try {
+      localStorage.setItem(CONSENT_KEY, value);
+    } catch {
+      // localStorage unavailable (private browsing, quota exceeded)
+    }
+    setVisible(false);
+  }, []);
 
   useEffect(() => {
     const consent = getStoredConsent();
@@ -27,19 +41,46 @@ export function CookieConsent() {
   }, []);
 
   useEffect(() => {
-    if (visible) {
-      dialogRef.current?.querySelector<HTMLElement>("button")?.focus();
-    }
+    if (!visible) return;
+    previousFocusRef.current = document.activeElement as HTMLElement | null;
+    const first =
+      dialogRef.current?.querySelector<HTMLElement>(FOCUSABLE_SELECTOR);
+    first?.focus();
+    return () => {
+      previousFocusRef.current?.focus?.();
+    };
   }, [visible]);
 
-  const handleConsent = (value: ConsentValue) => {
-    try {
-      localStorage.setItem(CONSENT_KEY, value);
-    } catch {
-      // localStorage unavailable (private browsing, quota exceeded)
-    }
-    setVisible(false);
-  };
+  useEffect(() => {
+    if (!visible) return;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        handleConsent("necessary");
+        return;
+      }
+      if (event.key !== "Tab") return;
+      const root = dialogRef.current;
+      if (!root) return;
+      const focusables = Array.from(
+        root.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR),
+      ).filter((el) => !el.hasAttribute("disabled"));
+      if (focusables.length === 0) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      if (!first || !last) return;
+      const active = document.activeElement as HTMLElement | null;
+      if (event.shiftKey && (active === first || !root.contains(active))) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && active === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [visible, handleConsent]);
 
   if (!visible) return null;
 
@@ -48,7 +89,7 @@ export function CookieConsent() {
       ref={dialogRef}
       role="dialog"
       aria-modal="true"
-      aria-labelledby="cookie-consent-title"
+      aria-labelledby={titleId}
       className="fixed bottom-[calc(1rem+env(safe-area-inset-bottom))] left-4 right-4 sm:right-auto z-50 sm:w-sm rounded-lg border border-border bg-background/95 shadow-lg backdrop-blur-md animate-fade-up"
     >
       <div className="p-4">
@@ -57,10 +98,7 @@ export function CookieConsent() {
             <Cookie className="size-5 text-primary" />
           </div>
           <div className="space-y-2">
-            <p
-              id="cookie-consent-title"
-              className="text-sm font-semibold text-foreground"
-            >
+            <p id={titleId} className="text-sm font-semibold text-foreground">
               Security &amp; Analytics
             </p>
             <p className="text-xs text-muted-foreground">

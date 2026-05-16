@@ -44,7 +44,7 @@ describe("LegalCallout", () => {
       <LegalCallout variant="info">Content</LegalCallout>,
     );
     const callout = container.querySelector("aside");
-    expect(callout?.className).toContain("bg-primary-50");
+    expect(callout?.className).toContain("bg-bone-2");
   });
 
   it("should apply success variant classes", () => {
@@ -52,7 +52,7 @@ describe("LegalCallout", () => {
       <LegalCallout variant="success">Content</LegalCallout>,
     );
     const callout = container.querySelector("aside");
-    expect(callout?.className).toContain("bg-accent-50");
+    expect(callout?.className).toContain("bg-success/10");
   });
 
   it("should apply warning variant classes", () => {
@@ -60,7 +60,7 @@ describe("LegalCallout", () => {
       <LegalCallout variant="warning">Content</LegalCallout>,
     );
     const callout = container.querySelector("aside");
-    expect(callout?.className).toContain("bg-warm-50");
+    expect(callout?.className).toContain("bg-destructive/10");
   });
 
   it("should render as aside element for accessibility", () => {

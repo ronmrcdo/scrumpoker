@@ -3,7 +3,6 @@
 import { useEffect, useRef } from "react";
 import { useShallow } from "zustand/react/shallow";
 import { usePokerStore } from "@/lib/store/poker-store";
-import { ChatSidebar } from "./chat-sidebar";
 import { ConnectionBanner } from "./connection-banner";
 import { PlayerSidebar } from "./player-sidebar";
 import { PokerHeader } from "./poker-header";
@@ -17,23 +16,17 @@ const RESIZE_DEBOUNCE_MS = 150;
 export function PokerRoomLayout({ children }: PokerRoomLayoutProps) {
   const {
     room,
-    isChatOpen,
     isPlayerListOpen,
     isHydrated,
-    toggleChat,
     togglePlayerList,
-    setChatOpen,
     setPlayerListOpen,
     initializeUI,
   } = usePokerStore(
     useShallow((s) => ({
       room: s.room,
-      isChatOpen: s.isChatOpen,
       isPlayerListOpen: s.isPlayerListOpen,
       isHydrated: s.isHydrated,
-      toggleChat: s.toggleChat,
       togglePlayerList: s.togglePlayerList,
-      setChatOpen: s.setChatOpen,
       setPlayerListOpen: s.setPlayerListOpen,
       initializeUI: s.initializeUI,
     })),
@@ -57,10 +50,8 @@ export function PokerRoomLayout({ children }: PokerRoomLayoutProps) {
       resizeTimerRef.current = setTimeout(() => {
         const isDesktop = window.innerWidth >= 768;
         if (wasDesktop.current && !isDesktop) {
-          setChatOpen(false);
           setPlayerListOpen(false);
         } else if (!wasDesktop.current && isDesktop) {
-          setChatOpen(true);
           setPlayerListOpen(true);
         }
         wasDesktop.current = isDesktop;
@@ -72,12 +63,14 @@ export function PokerRoomLayout({ children }: PokerRoomLayoutProps) {
       if (resizeTimerRef.current) clearTimeout(resizeTimerRef.current);
       window.removeEventListener("resize", handleResize);
     };
-  }, [setChatOpen, setPlayerListOpen]);
+  }, [setPlayerListOpen]);
 
   if (!room) {
     return (
       <div className="h-dvh flex flex-col bg-background">
-        <main className="flex-1 overflow-y-auto">{children}</main>
+        <main id="main-content" className="flex-1 overflow-y-auto">
+          {children}
+        </main>
       </div>
     );
   }
@@ -87,9 +80,7 @@ export function PokerRoomLayout({ children }: PokerRoomLayoutProps) {
       <PokerHeader
         roomId={room.id}
         roomName={room.name}
-        isChatOpen={isChatOpen}
         isPlayerListOpen={isPlayerListOpen}
-        onToggleChat={toggleChat}
         onTogglePlayerList={togglePlayerList}
       />
 
@@ -98,15 +89,12 @@ export function PokerRoomLayout({ children }: PokerRoomLayoutProps) {
       <div className="flex-1 flex overflow-hidden relative">
         <PlayerSidebar />
 
-        {/* Main content area */}
         <main
           id="main-content"
           className="flex-1 overflow-y-auto transition-all duration-300"
         >
           {children}
         </main>
-
-        <ChatSidebar />
       </div>
     </div>
   );

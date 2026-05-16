@@ -1,9 +1,9 @@
 "use client";
 
-import { memo, useEffect, useMemo, useRef, useState } from "react";
+import { memo, useMemo } from "react";
 
 import type { Player } from "@/lib/types";
-import { getRadialPosition } from "@/lib/utils";
+import { FxFeltTable, FxSeat } from "./motion-fx";
 import { PokerCard } from "./poker-card";
 
 interface PokerCardsProps {
@@ -13,72 +13,54 @@ interface PokerCardsProps {
   countdown?: number | null;
 }
 
-function getRadiusForWidth(width: number, scaleFactor: number) {
-  if (width < 640) {
-    return {
-      radiusX: Math.round(120 * scaleFactor),
-      radiusY: Math.round(80 * scaleFactor),
-    };
+// Position other-players around the top arc (-150° to -30° from center)
+function seatPosition(index: number, total: number) {
+  if (total <= 0) {
+    return { left: "50%", top: "50%" } as const;
   }
-  if (width < 768) {
-    return {
-      radiusX: Math.round(150 * scaleFactor),
-      radiusY: Math.round(100 * scaleFactor),
-    };
-  }
-  return {
-    radiusX: Math.round(180 * scaleFactor),
-    radiusY: Math.round(120 * scaleFactor),
-  };
+  const startAngle = -150;
+  const endAngle = -30;
+  const step = total > 1 ? (endAngle - startAngle) / (total - 1) : 0;
+  const angle = total === 1 ? -90 : startAngle + step * index;
+  const rad = (angle * Math.PI) / 180;
+  const rx = 38; // % of table width radius
+  const ry = 36; // % of table height radius
+  const x = 50 + rx * Math.cos(rad);
+  const y = 50 + ry * Math.sin(rad);
+  return { left: `${x}%`, top: `${y}%` } as const;
 }
 
-const SSR_RADIUS = { radiusX: 140, radiusY: 90 };
-
-// Memoized player card to prevent unnecessary re-renders and recalculations
-interface PlayerCardProps {
+interface SeatProps {
   player: Player;
   index: number;
-  totalPlayers: number;
-  radiusX: number;
-  radiusY: number;
+  total: number;
   isRevealed: boolean;
   isCurrentUser: boolean;
-  compact: boolean;
 }
 
-const PlayerCard = memo(function PlayerCard({
+const Seat = memo(function Seat({
   player,
   index,
-  totalPlayers,
-  radiusX,
-  radiusY,
+  total,
   isRevealed,
   isCurrentUser,
-  compact,
-}: PlayerCardProps) {
-  // Memoize position calculation
-  const position = useMemo(
-    () => getRadialPosition(index, totalPlayers, radiusX, radiusY),
-    [index, totalPlayers, radiusX, radiusY],
-  );
-
-  // Memoize style object to prevent recreation
-  const style = useMemo(
-    () => ({
-      transform: `translate(${position.x}px, ${position.y}px)`,
-    }),
-    [position.x, position.y],
-  );
-
+}: SeatProps) {
+  const pos = useMemo(() => seatPosition(index, total), [index, total]);
+  // Positioning is on a plain wrapper so its translate(-50%, -50%) doesn't
+  // collide with FxSeat's motion.div scale/opacity transform.
   return (
-    <div className="absolute transition-transform duration-500" style={style}>
-      <PokerCard
-        memberName={player.name}
-        vote={player.vote}
-        isRevealed={isRevealed}
-        isCurrentUser={isCurrentUser}
-        compact={compact}
-      />
+    <div
+      className="absolute -translate-x-1/2 -translate-y-1/2"
+      style={{ left: pos.left, top: pos.top }}
+    >
+      <FxSeat index={index}>
+        <PokerCard
+          memberName={player.name}
+          vote={player.vote}
+          isRevealed={isRevealed}
+          isCurrentUser={isCurrentUser}
+        />
+      </FxSeat>
     </div>
   );
 });
@@ -89,88 +71,67 @@ export function PokerCards({
   isRevealed,
   countdown,
 }: PokerCardsProps) {
-  const count = players.length;
-  const compact = count > 8;
-
-  // Scale factor grows with member count, capped at 1.8x
-  const scaleFactor = useMemo(
-    () => Math.min(1.8, Math.max(1, count / 6)),
-    [count],
+  const yourSeat = useMemo(
+    () => players.find((p) => p.id === currentUserId),
+    [players, currentUserId],
   );
-
-  const [radius, setRadius] = useState(SSR_RADIUS);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  useEffect(() => {
-    const update = () => {
-      // Debounce resize updates to prevent excessive re-renders
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-      timeoutRef.current = setTimeout(() => {
-        setRadius(getRadiusForWidth(window.innerWidth, scaleFactor));
-      }, 150);
-    };
-
-    // Initial update without debounce
-    setRadius(getRadiusForWidth(window.innerWidth, scaleFactor));
-
-    window.addEventListener("resize", update);
-    return () => {
-      window.removeEventListener("resize", update);
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-    };
-  }, [scaleFactor]);
-
-  const { radiusX, radiusY } = radius;
-
-  // Memoize style object to prevent new reference on every render
-  const tableStyle = useMemo(
-    () => ({ maxWidth: `${Math.round(36 * scaleFactor)}rem` }),
-    [scaleFactor],
+  const others = useMemo(
+    () => players.filter((p) => p.id !== currentUserId),
+    [players, currentUserId],
   );
 
   return (
-    <div
-      className="relative w-full aspect-[5/3] flex items-center justify-center px-2 sm:px-0"
-      style={tableStyle}
-    >
-      {/* Table surface */}
-      <div className="absolute inset-0 rounded-[60px] sm:rounded-[80px] md:rounded-[100px] border-2 border-border bg-card shadow-soft-lg" />
-      <div className="absolute inset-2 sm:inset-3 rounded-[50px] sm:rounded-[70px] md:rounded-[90px] border border-border/50 bg-muted/30" />
+    <FxFeltTable className="w-full">
+      <div
+        className="relative w-full max-w-[820px] mx-auto rounded-3xl border border-rule bg-bone-2"
+        style={{ aspectRatio: "820 / 360", minHeight: 280 }}
+      >
+        {countdown != null && countdown > 0 && (
+          <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
+            <span
+              key={countdown}
+              aria-hidden="true"
+              className="text-6xl sm:text-7xl md:text-8xl font-semibold text-foreground/80 animate-countdown-pulse"
+            >
+              {countdown}
+            </span>
+            <span className="sr-only" aria-live="assertive" aria-atomic="true">
+              {`Revealing cards in ${countdown}`}
+            </span>
+          </div>
+        )}
 
-      {/* Countdown overlay */}
-      {countdown != null && countdown > 0 && (
-        <div className="absolute inset-0 z-10 flex items-center justify-center">
-          <span
-            key={countdown}
-            aria-hidden="true"
-            className="text-6xl sm:text-7xl md:text-8xl font-bold text-foreground/80 animate-countdown-pulse"
+        {/* Other players' seats around the top arc */}
+        {others.map((player, i) => (
+          <Seat
+            key={player.id}
+            player={player}
+            index={i}
+            total={others.length}
+            isRevealed={isRevealed}
+            isCurrentUser={false}
+          />
+        ))}
+
+        {/* "Your" seat at the bottom-center, slightly pulled below the felt to mirror the top arc */}
+        {yourSeat && (
+          <div
+            className="absolute left-1/2 -translate-x-1/2"
+            style={{ bottom: -16 }}
           >
-            {countdown}
-          </span>
-          <span className="sr-only" aria-live="assertive" aria-atomic="true">
-            {`Revealing cards in ${countdown}`}
-          </span>
-        </div>
-      )}
-
-      {/* Cards arranged radially */}
-      {players.map((player, index) => (
-        <PlayerCard
-          key={player.id}
-          player={player}
-          index={index}
-          totalPlayers={players.length}
-          radiusX={radiusX}
-          radiusY={radiusY}
-          isRevealed={isRevealed}
-          isCurrentUser={player.id === currentUserId}
-          compact={compact}
-        />
-      ))}
-    </div>
+            <FxSeat index={others.length}>
+              <PokerCard
+                memberName={yourSeat.name}
+                vote={yourSeat.vote}
+                isRevealed={isRevealed}
+                isCurrentUser={true}
+              />
+            </FxSeat>
+          </div>
+        )}
+      </div>
+      {/* Spacer for the bottom-overlap of your seat */}
+      <div aria-hidden="true" className="h-8 sm:h-10" />
+    </FxFeltTable>
   );
 }

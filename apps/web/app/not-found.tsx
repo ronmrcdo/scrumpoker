@@ -1,5 +1,3 @@
-"use client";
-
 import { Button, Home } from "@repo/ui";
 import Link from "next/link";
 

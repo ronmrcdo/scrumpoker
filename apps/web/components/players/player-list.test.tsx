@@ -25,47 +25,27 @@ describe("PlayerList", () => {
   };
 
   describe("header", () => {
-    it("should display Players header", () => {
+    it("should display 'At the table' header", () => {
       render(<PlayerList {...defaultProps} />);
-      expect(screen.getByText("Players")).toBeInTheDocument();
+      expect(screen.getByText("At the table")).toBeInTheDocument();
     });
 
-    it("should display online and vote count", () => {
+    it("should display vote count in IN format", () => {
       const players = createPlayers(5, 2); // 2 voted out of 5
       render(<PlayerList {...defaultProps} players={players} />);
-      expect(screen.getByText(/5\/5 online/)).toBeInTheDocument();
-      expect(screen.getByText(/2 voted/)).toBeInTheDocument();
+      expect(screen.getByText(/2\/5 In/i)).toBeInTheDocument();
     });
 
-    it("should display 0 voted when no one voted", () => {
+    it("should display 0/N In when no one voted", () => {
       const players = createPlayers(3, 0);
       render(<PlayerList {...defaultProps} players={players} />);
-      expect(screen.getByText(/0 voted/)).toBeInTheDocument();
+      expect(screen.getByText(/0\/3 In/i)).toBeInTheDocument();
     });
 
-    it("should display all voted", () => {
+    it("should display all voted (4/4 In)", () => {
       const players = createPlayers(4, 4);
       render(<PlayerList {...defaultProps} players={players} />);
-      expect(screen.getByText(/4 voted/)).toBeInTheDocument();
-    });
-
-    it("should show correct online count when onlinePlayerIds is provided", () => {
-      const players = createPlayers(3);
-      const onlinePlayerIds = new Set(["player-0", "player-1"]);
-      render(
-        <PlayerList
-          {...defaultProps}
-          players={players}
-          onlinePlayerIds={onlinePlayerIds}
-        />,
-      );
-      expect(screen.getByText(/2\/3 online/)).toBeInTheDocument();
-    });
-
-    it("should assume all online when onlinePlayerIds is not provided", () => {
-      const players = createPlayers(3);
-      render(<PlayerList {...defaultProps} players={players} />);
-      expect(screen.getByText(/3\/3 online/)).toBeInTheDocument();
+      expect(screen.getByText(/4\/4 In/i)).toBeInTheDocument();
     });
   });
 
@@ -88,10 +68,10 @@ describe("PlayerList", () => {
           currentUserId="player-1"
         />,
       );
-      // The current user item should have highlighting
-      expect(
-        container.querySelectorAll(".bg-primary-50").length,
-      ).toBeGreaterThan(0);
+      // The current user row gets bg-bone-2 background highlighting
+      expect(container.querySelectorAll(".bg-bone-2").length).toBeGreaterThan(
+        0,
+      );
     });
 
     it("should pass isRevealed to player items", () => {
@@ -100,8 +80,8 @@ describe("PlayerList", () => {
         <PlayerList {...defaultProps} players={players} isRevealed={true} />,
       );
 
-      // When revealed, should show the actual votes
-      expect(screen.getAllByText(/Voted: 5/).length).toBe(2);
+      // When revealed, status renders as "In · 5" for each voter
+      expect(screen.getAllByText(/In · 5/).length).toBe(2);
     });
   });
 
@@ -168,8 +148,7 @@ describe("PlayerList", () => {
   });
 
   describe("kick functionality", () => {
-    it("should pass onKick to player items for facilitator", async () => {
-      const user = userEvent.setup();
+    it("should pass onKick to player items for facilitator", () => {
       const onKick = vi.fn();
       const players = createPlayers(2);
 
@@ -184,7 +163,9 @@ describe("PlayerList", () => {
       );
 
       // Find kick button for Player 2 (not current user)
-      const kickButtons = screen.getAllByRole("button", { name: /kick/i });
+      const kickButtons = screen.getAllByRole("button", {
+        name: /remove .* from room/i,
+      });
       expect(kickButtons.length).toBe(1); // Only one kick button (can't kick yourself)
     });
 
@@ -200,7 +181,7 @@ describe("PlayerList", () => {
       );
 
       expect(
-        screen.queryByRole("button", { name: /kick/i }),
+        screen.queryByRole("button", { name: /remove .* from room/i }),
       ).not.toBeInTheDocument();
     });
   });
@@ -215,7 +196,7 @@ describe("PlayerList", () => {
       ];
 
       render(<PlayerList {...defaultProps} players={players} />);
-      expect(screen.getByText(/2 voted/)).toBeInTheDocument();
+      expect(screen.getByText(/2\/4 In/i)).toBeInTheDocument();
     });
 
     it("should count coffee break as a vote", () => {
@@ -226,14 +207,14 @@ describe("PlayerList", () => {
       ];
 
       render(<PlayerList {...defaultProps} players={players} />);
-      expect(screen.getByText(/2 voted/)).toBeInTheDocument();
+      expect(screen.getByText(/2\/3 In/i)).toBeInTheDocument();
     });
   });
 
   describe("empty state", () => {
     it("should handle empty players array", () => {
       render(<PlayerList {...defaultProps} players={[]} />);
-      expect(screen.getByText(/0\/0 online/)).toBeInTheDocument();
+      expect(screen.getByText(/0\/0 In/i)).toBeInTheDocument();
     });
   });
 

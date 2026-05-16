@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { create } from "zustand";
+import { create, type StoreApi } from "zustand";
 import { type CountdownSlice, createCountdownSlice } from "./countdown-slice";
 
 describe("CountdownSlice", () => {
-  let store: ReturnType<typeof create<CountdownSlice>>;
+  let store: StoreApi<CountdownSlice>;
 
   beforeEach(() => {
     store = create<CountdownSlice>()((...a) => createCountdownSlice(...a));

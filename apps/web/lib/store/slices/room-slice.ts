@@ -14,11 +14,15 @@ interface DbPlayer {
   vote: string | null;
 }
 
+function toRole(value: string): Player["role"] {
+  return value === "FACILITATOR" ? "FACILITATOR" : "MEMBER";
+}
+
 function mapPlayers(players: DbPlayer[]): Player[] {
   return players.map((p) => ({
     id: p.user_id,
     name: p.name,
-    role: p.role as Player["role"],
+    role: toRole(p.role),
     vote: p.vote,
   }));
 }

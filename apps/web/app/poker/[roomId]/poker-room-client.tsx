@@ -3,18 +3,22 @@
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useShallow } from "zustand/react/shallow";
-import { InviteBanner } from "@/components/poker/invite-banner";
 import { JoinRoomDialog } from "@/components/poker/join-room-dialog";
 import { Consensus } from "@/components/poker/metrics/consensus";
 import { Overview } from "@/components/poker/metrics/overview";
 import { SuggestedEstimate } from "@/components/poker/metrics/suggested-estimate";
 import { VoteDistribution } from "@/components/poker/metrics/vote-distribution";
+import {
+  FxCenterControls,
+  FxEyebrow,
+  FxFadeUp,
+  FxHandLabel,
+} from "@/components/poker/motion-fx";
 import { PokerCards } from "@/components/poker/poker-cards";
 import { Toolbar } from "@/components/poker/toolbar";
 import { VoteSelection } from "@/components/poker/vote-selection";
 import { trackEvent } from "@/lib/analytics";
-import { FOLD_VALUE } from "@/lib/constants/cards";
-import { useChatSync } from "@/lib/hooks/use-chat-sync";
+import { FOLD_VALUE, isRedSuit, suitFor } from "@/lib/constants/cards";
 import { usePresenceSync } from "@/lib/hooks/use-presence-sync";
 import { useRevealCountdown } from "@/lib/hooks/use-reveal-countdown";
 import { useRoomSync } from "@/lib/hooks/use-room-sync";
@@ -52,23 +56,15 @@ export function PokerRoomClient({ initialRoom }: PokerRoomClientProps) {
     })),
   );
 
-  // Subscribe to realtime updates and hydrate the store
   useRoomSync(initialRoom.id, initialRoom);
-
-  // Subscribe to chat broadcast channel
-  useChatSync(room?.id ?? initialRoom.id);
-
-  // Subscribe to presence channel for online/offline detection
   usePresenceSync(room?.id ?? initialRoom.id);
 
-  // Local countdown for facilitator (triggers toggleReveal on completion)
   const {
     countdown: localCountdown,
     isCounting: isLocalCounting,
     start: startLocalCountdown,
   } = useRevealCountdown(toggleReveal);
 
-  // Remote countdown for non-facilitators (visual only)
   const noop = useCallback(() => {}, []);
   const {
     countdown: remoteCountdown,
@@ -76,7 +72,6 @@ export function PokerRoomClient({ initialRoom }: PokerRoomClientProps) {
     start: startRemoteCountdown,
   } = useRevealCountdown(noop);
 
-  // Start remote countdown when a broadcast is received
   const remoteCountdownTriggerRef = useRef(0);
   useEffect(() => {
     if (remoteCountdownTrigger === 0) return;
@@ -85,11 +80,9 @@ export function PokerRoomClient({ initialRoom }: PokerRoomClientProps) {
     startRemoteCountdown();
   }, [remoteCountdownTrigger, startRemoteCountdown]);
 
-  // Merge local and remote countdown for display
   const countdown = localCountdown ?? remoteCountdown;
   const isCounting = isLocalCounting || isRemoteCounting;
 
-  // Redirect to home if kicked
   useEffect(() => {
     if (wasKicked) {
       setWasKicked(false);
@@ -97,18 +90,31 @@ export function PokerRoomClient({ initialRoom }: PokerRoomClientProps) {
     }
   }, [wasKicked, setWasKicked, router]);
 
-  // Use initialRoom as fallback only if not kicked
   const activeRoom = room ?? initialRoom;
-
-  const isPlayerInRoom = activeRoom.players.some((p) => p.id === currentUserId);
   const isFacilitator = activeRoom.facilitatorId === currentUserId;
-  const currentVote =
-    activeRoom.players.find((p) => p.id === currentUserId)?.vote ?? null;
-  const foldedCount = activeRoom.players.filter(
-    (p) => p.vote === FOLD_VALUE,
-  ).length;
 
-  // Memoize stats calculation to prevent recalculation on every render
+  const { isPlayerInRoom, currentVote, foldedCount, votedCount } =
+    useMemo(() => {
+      let inRoom = false;
+      let vote: string | null = null;
+      let folded = 0;
+      let voted = 0;
+      for (const p of activeRoom.players) {
+        if (p.id === currentUserId) {
+          inRoom = true;
+          vote = p.vote ?? null;
+        }
+        if (p.vote !== null) voted += 1;
+        if (p.vote === FOLD_VALUE) folded += 1;
+      }
+      return {
+        isPlayerInRoom: inRoom,
+        currentVote: vote,
+        foldedCount: folded,
+        votedCount: voted,
+      };
+    }, [activeRoom.players, currentUserId]);
+
   const stats = useMemo(
     () => (activeRoom.isRevealed ? getVoteStats(activeRoom.players) : null),
     [activeRoom.isRevealed, activeRoom.players],
@@ -146,7 +152,7 @@ export function PokerRoomClient({ initialRoom }: PokerRoomClientProps) {
       trackEvent("votes_revealed", {
         room_id: activeRoom.id,
         player_count: activeRoom.players.length,
-        voted_count: activeRoom.players.filter((p) => p.vote !== null).length,
+        voted_count: votedCount,
         fold_count: foldedCount,
       });
       startLocalCountdown();
@@ -155,7 +161,8 @@ export function PokerRoomClient({ initialRoom }: PokerRoomClientProps) {
   }, [
     activeRoom.isRevealed,
     activeRoom.id,
-    activeRoom.players,
+    activeRoom.players.length,
+    votedCount,
     foldedCount,
     toggleReveal,
     startLocalCountdown,
@@ -171,34 +178,38 @@ export function PokerRoomClient({ initialRoom }: PokerRoomClientProps) {
     resetVotes();
   }, [activeRoom.id, activeRoom.players.length, stats?.consensus, resetVotes]);
 
+  const voteSuit = suitFor(
+    currentVote && currentVote !== FOLD_VALUE ? currentVote : null,
+  );
+  const voteSuitIsRed = isRedSuit(voteSuit);
+
   return (
-    <div className="flex flex-col items-center gap-4 sm:gap-6 md:gap-8 p-3 sm:p-4 md:p-6 pb-safe-fallback max-w-4xl mx-auto">
+    <div className="flex flex-col items-stretch gap-5 sm:gap-7 md:gap-8 px-3 sm:px-6 md:px-10 pt-4 sm:pt-6 pb-safe-fallback max-w-[1080px] mx-auto w-full">
       {!isPlayerInRoom && currentUserId && (
         <JoinRoomDialog roomId={activeRoom.id} />
       )}
-      {/* Session Info */}
-      <div className="text-center px-2 py-3 sm:py-4">
-        <h1 className="text-lg sm:text-xl md:text-2xl font-semibold text-foreground break-words">
-          {activeRoom.name}
-        </h1>
-        <p
-          className="text-sm sm:text-base font-medium text-muted-foreground mt-1.5"
-          aria-live="polite"
-          aria-atomic="true"
-        >
-          {activeRoom.isRevealed
-            ? "Votes revealed!"
-            : `${activeRoom.players.filter((p) => p.vote !== null).length}/${activeRoom.players.length} voted`}
-        </p>
-        {!activeRoom.isRevealed && foldedCount > 0 && (
-          <p className="text-xs sm:text-sm text-warm-600 font-medium mt-1">
-            {foldedCount} {foldedCount === 1 ? "player" : "players"} folded —
-            needs clarification
-          </p>
-        )}
-      </div>
 
-      {/* Poker Table with radial cards */}
+      {/* Eyebrow strip above the table */}
+      <FxEyebrow>
+        <div className="flex items-center gap-2 sm:gap-3 text-[11px] sm:text-xs font-medium text-muted-foreground tracking-wide">
+          <span className="text-foreground/80 font-semibold">02</span>
+          <span aria-hidden="true">·</span>
+          <span>The Hand</span>
+          <span aria-hidden="true">·</span>
+          <span>Round —</span>
+          <span className="ml-auto text-foreground/80">
+            {activeRoom.isRevealed ? "REVEALED" : "CARDS DOWN"}
+          </span>
+        </div>
+      </FxEyebrow>
+
+      <span className="sr-only" aria-live="polite" aria-atomic="true">
+        {activeRoom.isRevealed
+          ? "Votes revealed"
+          : `${votedCount} of ${activeRoom.players.length} voted`}
+      </span>
+
+      {/* Felt table */}
       <PokerCards
         players={activeRoom.players}
         currentUserId={currentUserId}
@@ -206,42 +217,90 @@ export function PokerRoomClient({ initialRoom }: PokerRoomClientProps) {
         countdown={countdown}
       />
 
-      {/* Invite banner when alone */}
-      {activeRoom.players.length === 1 && (
-        <InviteBanner roomId={activeRoom.id} />
+      {!activeRoom.isRevealed && foldedCount > 0 && (
+        <p
+          className="text-xs sm:text-sm text-destructive text-center"
+          aria-live="polite"
+        >
+          {foldedCount} {foldedCount === 1 ? "player" : "players"} folded —
+          needs clarification
+        </p>
       )}
 
-      {/* Vote Selection (hidden when revealed) */}
+      {/* Results / metrics when revealed */}
+      {activeRoom.isRevealed && (
+        <div className="w-full space-y-4 sm:space-y-5">
+          <Overview stats={stats} />
+          <Consensus stats={stats} />
+          <div className="grid gap-4 sm:grid-cols-2 sm:gap-5">
+            <VoteDistribution stats={stats} />
+            <SuggestedEstimate stats={stats} />
+          </div>
+        </div>
+      )}
+
+      {/* Center controls */}
+      <FxCenterControls className="w-full flex justify-center">
+        <div className="w-full max-w-xl">
+          <Toolbar
+            isFacilitator={isFacilitator}
+            isRevealed={activeRoom.isRevealed}
+            isCounting={isCounting}
+            onToggleReveal={handleReveal}
+            onReset={handleReset}
+          />
+        </div>
+      </FxCenterControls>
+
+      {/* Hand block: label + selection + status line */}
       {!activeRoom.isRevealed && (
-        <div className="w-full max-w-sm md:max-w-md px-2">
+        <div className="w-full flex flex-col gap-3 sm:gap-4 mt-2 sm:mt-4">
+          <FxHandLabel>
+            <div className="text-center text-xs font-medium text-muted-foreground tracking-wide">
+              — Your hand —
+            </div>
+          </FxHandLabel>
+
           <VoteSelection
             currentVote={currentVote}
             isRevealed={activeRoom.isRevealed}
             onVote={handleVote}
           />
+
+          <FxFadeUp>
+            <p className="text-center text-xs sm:text-sm text-muted-foreground">
+              {currentVote === null && (
+                <span>Pick a card to place your bet.</span>
+              )}
+              {currentVote !== null && currentVote === FOLD_VALUE && (
+                <span>
+                  You folded —{" "}
+                  <span className="text-destructive">need more info</span>.
+                </span>
+              )}
+              {currentVote !== null && currentVote !== FOLD_VALUE && (
+                <span>
+                  You played{" "}
+                  <span className="font-semibold text-foreground">
+                    {currentVote}
+                    <span
+                      aria-hidden="true"
+                      className={
+                        voteSuitIsRed
+                          ? "text-destructive ml-0.5"
+                          : "text-muted-foreground ml-0.5"
+                      }
+                    >
+                      {voteSuit}
+                    </span>
+                  </span>{" "}
+                  — face down until reveal.
+                </span>
+              )}
+            </p>
+          </FxFadeUp>
         </div>
       )}
-
-      {/* Metrics (shown when revealed, above toolbar) */}
-      {activeRoom.isRevealed && (
-        <div className="w-full max-w-sm md:max-w-lg px-2 space-y-3 sm:space-y-4">
-          <Consensus stats={stats} />
-          <Overview stats={stats} />
-          <VoteDistribution stats={stats} />
-          <SuggestedEstimate stats={stats} />
-        </div>
-      )}
-
-      {/* Toolbar */}
-      <div className="w-full max-w-sm md:max-w-md px-2">
-        <Toolbar
-          isFacilitator={isFacilitator}
-          isRevealed={activeRoom.isRevealed}
-          isCounting={isCounting}
-          onToggleReveal={handleReveal}
-          onReset={handleReset}
-        />
-      </div>
     </div>
   );
 }

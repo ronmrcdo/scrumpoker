@@ -57,7 +57,6 @@ function setupMockChannel() {
 function initStoreWithRoom(facilitatorId = "user-1") {
   usePokerStore.setState({
     currentUserId: "user-1",
-    chatMessages: [],
     room: {
       id: "room-1",
       name: "Test Room",
@@ -120,68 +119,6 @@ describe("usePresenceSync", () => {
 
     const { onlinePlayerIds } = usePokerStore.getState();
     expect(onlinePlayerIds).toEqual(new Set(["user-1", "user-2"]));
-  });
-
-  it("should add system message when a player disconnects", () => {
-    renderHook(() => usePresenceSync("room-1"));
-
-    // First sync to populate name cache
-    mockPresenceState.mockReturnValue({
-      "user-1": [{ userId: "user-1", name: "Alice" }],
-      "user-2": [{ userId: "user-2", name: "Bob" }],
-    });
-    act(() => {
-      presenceHandlers.get("sync")?.({});
-    });
-
-    // Simulate Bob leaving
-    act(() => {
-      presenceHandlers.get("leave")?.({
-        key: "user-2",
-        leftPresences: [{ userId: "user-2", name: "Bob" }],
-      });
-    });
-
-    const messages = usePokerStore.getState().chatMessages;
-    const disconnectMsg = messages.find(
-      (m) => m.type === "System" && m.text.includes("Bob disconnected"),
-    );
-    expect(disconnectMsg).toBeDefined();
-  });
-
-  it("should add reconnect message when player rejoins within grace period", () => {
-    renderHook(() => usePresenceSync("room-1"));
-
-    // Populate name cache
-    mockPresenceState.mockReturnValue({
-      "user-1": [{ userId: "user-1", name: "Alice" }],
-      "user-2": [{ userId: "user-2", name: "Bob" }],
-    });
-    act(() => {
-      presenceHandlers.get("sync")?.({});
-    });
-
-    // Bob disconnects
-    act(() => {
-      presenceHandlers.get("leave")?.({
-        key: "user-2",
-        leftPresences: [{ userId: "user-2", name: "Bob" }],
-      });
-    });
-
-    // Bob reconnects within grace period
-    act(() => {
-      presenceHandlers.get("join")?.({
-        key: "user-2",
-        newPresences: [{ userId: "user-2", name: "Bob" }],
-      });
-    });
-
-    const messages = usePokerStore.getState().chatMessages;
-    const reconnectMsg = messages.find(
-      (m) => m.type === "System" && m.text.includes("Bob reconnected"),
-    );
-    expect(reconnectMsg).toBeDefined();
   });
 
   it("should auto-kick player after grace period when current user is facilitator", () => {
@@ -303,9 +240,10 @@ describe("usePresenceSync", () => {
   });
 
   it("should ignore own leave events", () => {
-    renderHook(() => usePresenceSync("room-1"));
+    const kickPlayer = vi.fn();
+    usePokerStore.setState({ kickPlayer });
 
-    const messagesBefore = usePokerStore.getState().chatMessages.length;
+    renderHook(() => usePresenceSync("room-1"));
 
     act(() => {
       presenceHandlers.get("leave")?.({
@@ -314,7 +252,12 @@ describe("usePresenceSync", () => {
       });
     });
 
-    // No system message should be added for self
-    expect(usePokerStore.getState().chatMessages.length).toBe(messagesBefore);
+    // Advance past grace period
+    act(() => {
+      vi.advanceTimersByTime(60_000);
+    });
+
+    // No kick should be triggered for self-leave
+    expect(kickPlayer).not.toHaveBeenCalled();
   });
 });

@@ -2,7 +2,7 @@
 
 import { cn } from "@repo/ui";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useShallow } from "zustand/react/shallow";
 import { trackEvent } from "@/lib/analytics";
 import { usePokerStore } from "@/lib/store/poker-store";
@@ -41,11 +41,12 @@ export function PlayerSidebar() {
     }
   }, [isPlayerListOpen]);
 
-  if (!room) return null;
+  const roomId = room?.id ?? "";
+  const playerCount = room?.players.length ?? 0;
+  const isFacilitator = room ? room.facilitatorId === currentUserId : false;
 
-  const isFacilitator = room.facilitatorId === currentUserId;
-
-  const handleLeave = async () => {
+  const handleLeave = useCallback(async () => {
+    if (!room) return;
     trackEvent("room_left", {
       room_id: room.id,
       player_role: isFacilitator ? "FACILITATOR" : "MEMBER",
@@ -53,7 +54,20 @@ export function PlayerSidebar() {
     });
     await leaveRoom();
     router.push("/");
-  };
+  }, [room, isFacilitator, leaveRoom, router]);
+
+  const handleKick = useCallback(
+    (playerId: string) => {
+      trackEvent("player_kicked", {
+        room_id: roomId,
+        player_count_after: Math.max(playerCount - 1, 0),
+      });
+      kickPlayer(playerId);
+    },
+    [roomId, playerCount, kickPlayer],
+  );
+
+  if (!room) return null;
 
   return (
     <>
@@ -84,13 +98,13 @@ export function PlayerSidebar() {
           if (e.key === "Escape") togglePlayerList();
         }}
         className={cn(
-          "border-r border-border bg-card shrink-0 overflow-hidden",
+          "border-r border-rule bg-card shrink-0 overflow-hidden",
           "transition-all duration-300 ease-in-out",
           // Desktop
           "md:relative md:z-0",
-          isPlayerListOpen ? "md:w-64" : "md:w-0 md:border-r-0",
+          isPlayerListOpen ? "md:w-72" : "md:w-0 md:border-r-0",
           // Mobile
-          "fixed left-0 top-[57px] bottom-0 w-[280px] z-50 md:top-0",
+          "fixed left-0 top-[57px] bottom-0 w-[300px] z-50 md:top-0",
           isPlayerListOpen
             ? "translate-x-0"
             : "-translate-x-full md:translate-x-0",
@@ -102,15 +116,10 @@ export function PlayerSidebar() {
             currentUserId={currentUserId}
             isRevealed={room.isRevealed}
             isFacilitator={isFacilitator}
+            roomId={room.id}
             onlinePlayerIds={onlinePlayerIds}
             onLeave={handleLeave}
-            onKick={(playerId) => {
-              trackEvent("player_kicked", {
-                room_id: room.id,
-                player_count_after: room.players.length - 1,
-              });
-              kickPlayer(playerId);
-            }}
+            onKick={handleKick}
           />
         </div>
       </aside>

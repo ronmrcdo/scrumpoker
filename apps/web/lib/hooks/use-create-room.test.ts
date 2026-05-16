@@ -4,7 +4,7 @@ import { useCreateRoom } from "./use-create-room";
 
 const mockPush = vi.fn();
 const mockFetchRoom = vi.fn();
-const mockCurrentUserId = vi.fn(() => "user-123");
+const mockCurrentUserId = vi.fn<() => string | null>(() => "user-123");
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: mockPush }),

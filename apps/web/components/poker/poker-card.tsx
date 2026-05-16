@@ -2,7 +2,7 @@
 
 import { cn } from "@repo/ui";
 import { useEffect, useState } from "react";
-import { FOLD_VALUE } from "@/lib/constants/cards";
+import { FOLD_VALUE, isRedSuit, suitFor } from "@/lib/constants/cards";
 
 interface PokerCardProps {
   memberName: string;
@@ -21,9 +21,11 @@ export function PokerCard({
 }: PokerCardProps) {
   const hasVoted = vote !== null;
   const isFold = vote === FOLD_VALUE;
+  const suit = suitFor(vote);
+  const isRed = isRedSuit(suit);
+  const showFace = isRevealed && hasVoted && !isFold;
   const [shouldFlip, setShouldFlip] = useState(false);
 
-  // Trigger flip animation when card is revealed
   useEffect(() => {
     if (isRevealed && hasVoted) {
       setShouldFlip(true);
@@ -32,36 +34,85 @@ export function PokerCard({
     }
   }, [isRevealed, hasVoted]);
 
+  const sizeClasses = compact
+    ? "w-11 h-16 sm:w-12 sm:h-[68px] text-base"
+    : "w-14 h-20 sm:w-16 sm:h-[88px] text-lg";
+
   return (
     <div className="flex flex-col items-center gap-1.5 sm:gap-2">
       <div
         className={cn(
-          compact
-            ? "w-10 h-14 sm:w-12 sm:h-16 rounded-md flex items-center justify-center text-sm sm:text-base font-bold shadow-soft-sm"
-            : "w-12 h-16 sm:w-14 sm:h-20 rounded-md sm:rounded-lg flex items-center justify-center text-base sm:text-lg font-bold shadow-soft-sm",
-          "transition-[transform,background-color,border-color,box-shadow,color] duration-300",
+          sizeClasses,
+          "relative rounded-lg border bg-card text-card-foreground",
+          "shadow-[0_1px_2px_rgba(0,0,0,0.04)]",
+          "transition-[transform,background-color,border-color,color] duration-300",
           shouldFlip && "animate-flip",
           !hasVoted &&
-            "border-2 border-dashed border-border bg-card text-muted-foreground",
-          isFold &&
-            "bg-warm-100 border-2 border-warm-400 text-warm-600 shadow-soft-md dark:bg-warm-950/30",
+            "border-dashed border-border bg-transparent text-muted-foreground",
+          isFold && "bg-destructive/10 border-destructive text-destructive",
           !isFold &&
             hasVoted &&
             !isRevealed &&
-            "bg-primary-500 text-white border border-primary-500 shadow-soft-md scale-105",
-          !isFold &&
-            hasVoted &&
-            isRevealed &&
-            "bg-card border-2 border-primary-500 text-primary-600 shadow-soft-md",
+            "bg-foreground border-foreground text-background",
+          hasVoted && isRevealed && !isFold && "border-border bg-card",
           isCurrentUser &&
-            hasVoted &&
             !isRevealed &&
-            "ring-2 ring-primary-300 ring-offset-1 sm:ring-offset-2 ring-offset-background",
+            "ring-2 ring-ring ring-offset-1 sm:ring-offset-2 ring-offset-background",
         )}
       >
-        <span aria-hidden="true">
-          {!hasVoted ? "?" : isFold ? "✋" : isRevealed ? vote : "✓"}
-        </span>
+        {showFace ? (
+          <>
+            <div className="absolute top-1 left-1.5 flex flex-col items-center leading-none">
+              <span className="text-xs font-semibold text-foreground">
+                {vote}
+              </span>
+              <span
+                aria-hidden="true"
+                className={cn(
+                  "text-[10px]",
+                  isRed ? "text-destructive" : "text-muted-foreground",
+                )}
+              >
+                {suit}
+              </span>
+            </div>
+            <div
+              aria-hidden="true"
+              className={cn(
+                "absolute inset-0 grid place-items-center text-2xl sm:text-3xl",
+                isRed ? "text-destructive/20" : "text-bone-3",
+              )}
+            >
+              {suit}
+            </div>
+            <div className="absolute bottom-1 right-1.5 flex flex-col items-center leading-none rotate-180">
+              <span className="text-xs font-semibold text-foreground">
+                {vote}
+              </span>
+              <span
+                aria-hidden="true"
+                className={cn(
+                  "text-[10px]",
+                  isRed ? "text-destructive" : "text-muted-foreground",
+                )}
+              >
+                {suit}
+              </span>
+            </div>
+          </>
+        ) : (
+          <div className="absolute inset-0 grid place-items-center">
+            <span
+              aria-hidden="true"
+              className={cn(
+                "font-medium",
+                !hasVoted && "text-base sm:text-lg text-muted-foreground/80",
+              )}
+            >
+              {!hasVoted ? "?" : isFold ? "✋" : ""}
+            </span>
+          </div>
+        )}
         <span className="sr-only">
           {!hasVoted
             ? "No vote yet"
@@ -75,10 +126,11 @@ export function PokerCard({
       <span
         className={cn(
           compact
-            ? "text-xs font-medium truncate max-w-[56px] sm:max-w-[68px] text-center leading-tight transition-colors duration-200"
-            : "text-xs font-medium truncate max-w-[64px] sm:max-w-[80px] text-center leading-tight transition-colors duration-200",
+            ? "text-[10px] sm:text-xs font-medium truncate max-w-[64px] sm:max-w-[72px] text-center leading-tight"
+            : "text-[11px] sm:text-xs font-medium truncate max-w-[80px] sm:max-w-[96px] text-center leading-tight",
+          "px-2 py-0.5 rounded-full border border-border bg-card",
           isCurrentUser
-            ? "text-primary-600 font-semibold"
+            ? "text-foreground font-semibold"
             : "text-muted-foreground",
         )}
       >

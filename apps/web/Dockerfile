@@ -58,7 +58,7 @@ RUN pnpm turbo build --filter=web
 # ============================================================
 # Stage 4: Runner — Minimal production image
 # ============================================================
-FROM node:22-alpine AS runner
+FROM base AS runner
 
 WORKDIR /app
 

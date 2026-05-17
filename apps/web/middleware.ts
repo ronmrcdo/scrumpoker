@@ -20,7 +20,6 @@ function safeOrigin(value: string): string {
   }
 }
 
-const TURNSTILE_ORIGIN = "https://challenges.cloudflare.com";
 const CLOUDFLARE_INSIGHTS = "https://static.cloudflareinsights.com";
 
 function buildCsp(nonce: string): string {
@@ -29,7 +28,6 @@ function buildCsp(nonce: string): string {
     `'nonce-${nonce}'`,
     "'strict-dynamic'",
     plausibleHost,
-    TURNSTILE_ORIGIN,
     CLOUDFLARE_INSIGHTS,
     process.env.NODE_ENV === "development" ? "'unsafe-eval'" : "",
   ]
@@ -41,7 +39,6 @@ function buildCsp(nonce: string): string {
     supabaseUrl,
     supabaseWs,
     plausibleHost,
-    TURNSTILE_ORIGIN,
     CLOUDFLARE_INSIGHTS,
   ]
     .filter(Boolean)
@@ -54,7 +51,6 @@ function buildCsp(nonce: string): string {
     `connect-src ${connectSrc}`,
     "font-src 'self' data:",
     "img-src 'self' data: blob: https://cdn.jsdelivr.net",
-    `frame-src ${TURNSTILE_ORIGIN}`,
     "frame-ancestors 'none'",
     "base-uri 'self'",
     "form-action 'self'",
@@ -130,6 +126,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|api/health|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };

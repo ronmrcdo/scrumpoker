@@ -6,14 +6,12 @@ const {
   mockCreateClient,
   mockLimiterCheck,
   mockValidateAntiBot,
-  mockVerifyTurnstile,
 } = vi.hoisted(() => ({
   mockRpc: vi.fn(),
   mockGetUser: vi.fn(),
   mockCreateClient: vi.fn(),
   mockLimiterCheck: vi.fn(),
   mockValidateAntiBot: vi.fn(),
-  mockVerifyTurnstile: vi.fn(),
 }));
 
 vi.mock("@/lib/supabase/server", () => ({
@@ -24,9 +22,6 @@ vi.mock("@/lib/rate-limit", () => ({
 }));
 vi.mock("@/lib/anti-bot", () => ({
   validateAntiBot: mockValidateAntiBot,
-}));
-vi.mock("@/lib/turnstile", () => ({
-  verifyTurnstileToken: mockVerifyTurnstile,
 }));
 
 import { NextRequest } from "next/server";
@@ -44,19 +39,17 @@ const validBody = {
   userName: "Alice",
   hp: "",
   formLoadedAt: Date.now() - 5_000,
-  turnstileToken: "",
 };
 
 describe("POST /api/rooms", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockLimiterCheck.mockReturnValue({
+    mockLimiterCheck.mockResolvedValue({
       allowed: true,
       remaining: 4,
       retryAfterMs: null,
     });
     mockValidateAntiBot.mockReturnValue({ passed: true });
-    mockVerifyTurnstile.mockResolvedValue({ success: true });
     mockCreateClient.mockResolvedValue({
       auth: { getUser: mockGetUser },
       rpc: mockRpc,
@@ -66,7 +59,7 @@ describe("POST /api/rooms", () => {
   });
 
   it("returns 429 when rate limited", async () => {
-    mockLimiterCheck.mockReturnValue({
+    mockLimiterCheck.mockResolvedValue({
       allowed: false,
       remaining: 0,
       retryAfterMs: 30_000,
@@ -90,7 +83,7 @@ describe("POST /api/rooms", () => {
   });
 
   it("returns 422 when anti-bot fails", async () => {
-    mockValidateAntiBot.mockReturnValue({ passed: false });
+    mockValidateAntiBot.mockReturnValue({ passed: false, reason: "honeypot" });
     const { POST } = await import("./route");
     const res = await POST(makeRequest(validBody));
     expect(res.status).toBe(422);

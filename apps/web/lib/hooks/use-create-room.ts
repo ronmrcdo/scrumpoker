@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { useCallback, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { trackEvent } from "@/lib/analytics";
@@ -23,16 +23,7 @@ export function useCreateRoom() {
   const currentUserId = usePokerStore((s) => s.currentUserId);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
-  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const formLoadedAt = useRef(Date.now());
-
-  const onTurnstileSuccess = useCallback((token: string) => {
-    setTurnstileToken(token);
-  }, []);
-
-  const onTurnstileError = useCallback(() => {
-    setTurnstileToken(null);
-  }, []);
 
   const form = useForm<CreateRoomFormData>({
     resolver: zodResolver(createRoomSchema),
@@ -53,7 +44,6 @@ export function useCreateRoom() {
           userName: data.userName,
           hp: data.hp,
           formLoadedAt: formLoadedAt.current,
-          turnstileToken: turnstileToken ?? "",
         }),
       });
 
@@ -87,7 +77,5 @@ export function useCreateRoom() {
     isSubmitting,
     isDisabled: isSubmitting || !currentUserId,
     handleSubmit: form.handleSubmit(onSubmit),
-    onTurnstileSuccess,
-    onTurnstileError,
   };
 }

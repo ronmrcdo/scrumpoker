@@ -35,32 +35,30 @@ describe("useCreateRoom", () => {
     vi.restoreAllMocks();
   });
 
-  it("should not disable button when turnstile is not configured", () => {
+  it("enables submit when authenticated", () => {
     const { result } = renderHook(() => useCreateRoom());
     expect(result.current.isDisabled).toBe(false);
   });
 
-  it("should disable button when user is not authenticated", () => {
+  it("disables submit when user is not authenticated", () => {
     mockCurrentUserId.mockReturnValue(null);
     const { result } = renderHook(() => useCreateRoom());
     expect(result.current.isDisabled).toBe(true);
   });
 
-  it("should submit to server without turnstile token and let server validate", async () => {
+  it("posts honeypot + formLoadedAt to /api/rooms and surfaces server errors", async () => {
     (globalThis.fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
       ok: false,
-      json: async () => ({ error: "Missing security token" }),
+      json: async () => ({ error: "Unable to create room" }),
     });
 
     const { result } = renderHook(() => useCreateRoom());
 
-    // Fill in form values
     act(() => {
       result.current.form.setValue("userName", "Test User");
       result.current.form.setValue("roomName", "Test Room");
     });
 
-    // Submit without turnstile token — should reach the server
     await act(async () => {
       await result.current.handleSubmit();
     });
@@ -70,14 +68,18 @@ describe("useCreateRoom", () => {
         "/api/rooms",
         expect.objectContaining({
           method: "POST",
-          body: expect.stringContaining('"turnstileToken":""'),
+          body: expect.stringContaining('"hp":""'),
         }),
       );
-      expect(result.current.formError).toBe("Missing security token");
+      const fetchMock = globalThis.fetch as ReturnType<typeof vi.fn>;
+      const init = fetchMock.mock.calls[0]?.[1] as { body: string };
+      expect(init.body).toContain('"formLoadedAt":');
+      expect(init.body).not.toContain("turnstileToken");
+      expect(result.current.formError).toBe("Unable to create room");
     });
   });
 
-  it("should submit successfully with a valid turnstile token", async () => {
+  it("redirects to the new room on success", async () => {
     (globalThis.fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
       ok: true,
       json: async () => ({ roomId: "room-abc" }),
@@ -86,12 +88,6 @@ describe("useCreateRoom", () => {
 
     const { result } = renderHook(() => useCreateRoom());
 
-    // Set turnstile token
-    act(() => {
-      result.current.onTurnstileSuccess("valid-token");
-    });
-
-    // Fill in form values
     act(() => {
       result.current.form.setValue("userName", "Test User");
       result.current.form.setValue("roomName", "Test Room");
@@ -102,28 +98,8 @@ describe("useCreateRoom", () => {
     });
 
     await waitFor(() => {
-      expect(globalThis.fetch).toHaveBeenCalledWith(
-        "/api/rooms",
-        expect.objectContaining({
-          method: "POST",
-          body: expect.stringContaining('"turnstileToken":"valid-token"'),
-        }),
-      );
+      expect(mockFetchRoom).toHaveBeenCalledWith("room-abc");
+      expect(mockPush).toHaveBeenCalledWith("/poker/room-abc");
     });
-  });
-
-  it("should clear turnstile token on error callback", () => {
-    const { result } = renderHook(() => useCreateRoom());
-
-    act(() => {
-      result.current.onTurnstileSuccess("some-token");
-    });
-
-    act(() => {
-      result.current.onTurnstileError();
-    });
-
-    // Token cleared, but button should still be enabled (disable moved to submit check)
-    expect(result.current.isDisabled).toBe(false);
   });
 });

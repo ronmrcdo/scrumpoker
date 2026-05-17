@@ -32,7 +32,7 @@ function makeRequest(body: unknown, headers: Record<string, string> = {}) {
 describe("POST /api/rooms/leave", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockLimiterCheck.mockReturnValue({
+    mockLimiterCheck.mockResolvedValue({
       allowed: true,
       remaining: 19,
       retryAfterMs: null,
@@ -46,7 +46,7 @@ describe("POST /api/rooms/leave", () => {
   });
 
   it("returns 429 when rate limit exceeded", async () => {
-    mockLimiterCheck.mockReturnValue({
+    mockLimiterCheck.mockResolvedValue({
       allowed: false,
       remaining: 0,
       retryAfterMs: 5_000,

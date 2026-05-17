@@ -1,19 +1,11 @@
 "use client";
 
-import { Turnstile } from "@marsidev/react-turnstile";
 import { Button, Input, Label } from "@repo/ui";
 import { useCreateRoom } from "@/lib/hooks/use-create-room";
 
 export function HeroForm() {
-  const {
-    form,
-    formError,
-    isSubmitting,
-    isDisabled,
-    handleSubmit,
-    onTurnstileSuccess,
-    onTurnstileError,
-  } = useCreateRoom();
+  const { form, formError, isSubmitting, isDisabled, handleSubmit } =
+    useCreateRoom();
 
   return (
     <form onSubmit={handleSubmit} className="w-full max-w-md space-y-4">
@@ -106,15 +98,6 @@ export function HeroForm() {
           {...form.register("hp")}
         />
       </div>
-      {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
-        <Turnstile
-          siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY}
-          onSuccess={onTurnstileSuccess}
-          onError={onTurnstileError}
-          onExpire={onTurnstileError}
-          options={{ theme: "auto", size: "normal" }}
-        />
-      )}
       <Button
         type="submit"
         size="lg"

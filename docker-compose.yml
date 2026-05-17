@@ -1,0 +1,58 @@
+services:
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes", "--save", "60", "1"]
+    volumes:
+      - redis-data:/data
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Upstash-compatible HTTP layer for Redis.
+  # https://github.com/hiett/serverless-redis-http
+  serverless-redis-http:
+    image: hiett/serverless-redis-http:latest
+    restart: unless-stopped
+    environment:
+      SRH_MODE: env
+      SRH_TOKEN: ${SRH_TOKEN}
+      SRH_CONNECTION_STRING: redis://redis:6379
+    networks:
+      - internal
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      args:
+        NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL}
+        NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+        NEXT_PUBLIC_PLAUSIBLE_SCRIPT_URL: ${NEXT_PUBLIC_PLAUSIBLE_SCRIPT_URL:-}
+    environment:
+      - UPSTASH_REDIS_REST_URL=http://serverless-redis-http:80
+      - UPSTASH_REDIS_REST_TOKEN=${SRH_TOKEN}
+    restart: unless-stopped
+    networks:
+      - proxy-net
+      - internal
+    depends_on:
+      serverless-redis-http:
+        condition: service_started
+
+volumes:
+  redis-data:
+
+networks:
+  proxy-net:
+    name: proxy-net
+    external: true
+  internal:
+    driver: bridge

@@ -37,7 +37,7 @@ services:
         NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY}
         NEXT_PUBLIC_PLAUSIBLE_SCRIPT_URL: ${NEXT_PUBLIC_PLAUSIBLE_SCRIPT_URL:-}
     environment:
-      - UPSTASH_REDIS_REST_URL=http://serverless-redis-http:80
+      - UPSTASH_REDIS_REST_URL=${SRH_URL}
       - UPSTASH_REDIS_REST_TOKEN=${SRH_TOKEN}
     restart: unless-stopped
     networks:

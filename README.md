@@ -8,6 +8,7 @@ Real-time planning poker for agile teams. Create a room, share the link, and est
 - [Project Structure](#project-structure)
 - [Quick Start](#quick-start)
 - [Common Commands](#common-commands)
+- [Deployment (Docker)](#deployment-docker)
 - [Documentation](#documentation)
 - [Contributing](#contributing)
 
@@ -74,9 +75,64 @@ Open [http://localhost:3000](http://localhost:3000). See the [Local Setup Guide]
 | `pnpm supabase stop` | Stop local Supabase |
 | `pnpm supabase db reset` | Reset database and re-run migrations |
 
-## Documentation
+## Deployment (Docker)
 
-- **[Local Setup](docs/local-setup.md)** — Prerequisites, installation, environment configuration, and troubleshooting
+The repository ships with a `docker-compose.yml` that builds the web app and runs two supporting services:
+
+| Service | Image | Purpose |
+|---------|-------|---------|
+| `web` | built from `apps/web/Dockerfile` | Next.js app (port 3000) |
+| `redis` | `redis:7-alpine` | Persistent Redis for rate-limit state |
+| `serverless-redis-http` | [`hiett/serverless-redis-http`](https://github.com/hiett/serverless-redis-http) | Upstash-compatible HTTP layer in front of Redis |
+
+The web app uses `@upstash/ratelimit` pointed at `serverless-redis-http`, so rate limits stay consistent across multiple web instances. If `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` are unset, the limiter falls back to an in-process store (single-instance only).
+
+### 1. Configure environment
+
+Copy the example file at the repo root and fill it in:
+
+```bash
+cp .env.example .env
+```
+
+Required values:
+
+| Variable | Description |
+|----------|-------------|
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL (baked into the client bundle at build time) |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon key |
+| `NEXT_PUBLIC_PLAUSIBLE_SCRIPT_URL` | Optional — Plausible script URL |
+| `SRH_TOKEN` | Shared secret between `web` and `serverless-redis-http` |
+
+### 2. Generate `SRH_TOKEN`
+
+`SRH_TOKEN` authenticates HTTP requests from the web app to `serverless-redis-http`. Generate a strong random value — any of these works:
+
+```bash
+# OpenSSL (recommended)
+openssl rand -hex 32
+
+# Node.js
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+
+# /dev/urandom
+head -c 32 /dev/urandom | xxd -p -c 64
+```
+
+Paste the result into `.env` as `SRH_TOKEN=...`. The same value is sent to the web container as `UPSTASH_REDIS_REST_TOKEN` automatically — you do not need to set that yourself. Rotate the token whenever you'd rotate a database password.
+
+### 3. Bring the stack up
+
+```bash
+# Pre-create the external reverse-proxy network (one-time, if it does not exist)
+docker network create proxy-net
+
+docker compose up -d --build
+```
+
+The compose file attaches `web` to both `proxy-net` (for your reverse proxy / external traffic) and an internal bridge network shared with Redis and SRH. Redis and SRH are **not** exposed on `proxy-net`.
+
+
 - **[Database Migrations](docs/migrations.md)** — Creating, running, testing, and pushing migrations
 - **[Testing](docs/testing.md)** — Test framework, writing tests, mock factories, and coverage
 

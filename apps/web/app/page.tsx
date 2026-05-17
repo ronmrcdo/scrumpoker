@@ -29,9 +29,14 @@ export default async function LandingPage() {
   const nonce = headerList.get("x-nonce") ?? undefined;
   return (
     <>
+      {/* Browsers strip the CSP nonce from the live DOM after parsing, so
+          React's hydration check sees a mismatch on every nonce'd inline
+          script. These are server-rendered static JSON-LD payloads with no
+          client-side behavior, so suppressing the warning here is safe. */}
       <script
         type="application/ld+json"
         nonce={nonce}
+        suppressHydrationWarning
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(getWebApplicationJsonLd()),
         }}
@@ -39,6 +44,7 @@ export default async function LandingPage() {
       <script
         type="application/ld+json"
         nonce={nonce}
+        suppressHydrationWarning
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(getOrganizationJsonLd()),
         }}
@@ -46,6 +52,7 @@ export default async function LandingPage() {
       <script
         type="application/ld+json"
         nonce={nonce}
+        suppressHydrationWarning
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(getFaqJsonLd()),
         }}

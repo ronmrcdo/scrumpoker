@@ -1,6 +1,5 @@
 "use client";
 
-import { Skeleton } from "@repo/ui";
 import { useEffect } from "react";
 
 import { useTokenRefresh } from "@/lib/hooks/use-token-refresh";
@@ -18,7 +17,6 @@ function TokenRefreshManager() {
 export function Providers({ children }: { children: React.ReactNode }) {
   const setCurrentUserId = usePokerStore((s) => s.setCurrentUserId);
   const setSessionInitialized = usePokerStore((s) => s.setSessionInitialized);
-  const sessionInitialized = usePokerStore((s) => s.sessionInitialized);
 
   useEffect(() => {
     async function initAuth() {
@@ -66,14 +64,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
     return () => subscription.unsubscribe();
   }, [setCurrentUserId, setSessionInitialized]);
 
-  if (!sessionInitialized)
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen gap-4">
-        <Skeleton className="h-8 w-48 rounded-md" />
-        <Skeleton className="h-4 w-32 rounded-md" />
-        <Skeleton className="h-64 w-full max-w-md rounded-lg" />
-      </div>
-    );
+  // Children render immediately so the landing page (and other public pages)
+  // appear in the server-rendered HTML for crawlers. Session-dependent UI
+  // (e.g. the "Create Room" button, JoinRoomDialog) gates itself on
+  // `currentUserId` / `sessionInitialized` from the store.
   return (
     <>
       <TokenRefreshManager />

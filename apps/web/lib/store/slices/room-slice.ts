@@ -1,6 +1,5 @@
 import type { StateCreator } from "zustand";
 
-import { MAX_PLAYERS } from "@/lib/constants/cards";
 import { createClient } from "@/lib/supabase/client";
 import type { Player, Room } from "../../types";
 import type { ConnectionSlice } from "./connection-slice";
@@ -62,7 +61,12 @@ export interface RoomSlice {
   setRoom: (room: Room | null) => void;
   setWasKicked: (kicked: boolean) => void;
   fetchRoom: (roomId: string) => Promise<Room | null>;
-  joinRoom: (roomId: string, userName: string) => Promise<string>;
+  joinRoom: (
+    roomId: string,
+    userName: string,
+    hp: string,
+    formLoadedAt: number,
+  ) => Promise<string>;
   castVote: (value: string | null) => Promise<void>;
   toggleReveal: () => Promise<void>;
   resetVotes: () => Promise<void>;
@@ -89,18 +93,19 @@ export const createRoomSlice: StateCreator<
     return room;
   },
 
-  joinRoom: async (roomId, userName) => {
+  joinRoom: async (roomId, userName, hp, formLoadedAt) => {
     const userId = get().currentUserId;
     if (!userId) throw new Error("Not authenticated");
 
-    const { error } = await supabase.rpc("join_room", {
-      p_room_id: roomId,
-      p_user_name: userName,
-      p_max_players: MAX_PLAYERS,
+    const response = await fetch("/api/rooms/join", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ roomId, userName, hp, formLoadedAt }),
     });
 
-    if (error) {
-      throw new Error(error.message);
+    if (!response.ok) {
+      const result = await response.json().catch(() => null);
+      throw new Error(result?.error ?? "Failed to join room");
     }
 
     const fullRoom = await fetchRoomWithPlayers(roomId);

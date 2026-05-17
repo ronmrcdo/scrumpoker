@@ -14,7 +14,7 @@ import {
   Users,
 } from "@repo/ui";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { trackEvent } from "@/lib/analytics";
@@ -23,6 +23,7 @@ import { userNameSchema } from "@/lib/validation";
 
 const joinSchema = z.object({
   userName: userNameSchema,
+  hp: z.string(),
 });
 
 type JoinFormData = z.infer<typeof joinSchema>;
@@ -36,10 +37,11 @@ export function JoinRoomDialog({ roomId }: JoinRoomDialogProps) {
   const joinRoom = usePokerStore((s) => s.joinRoom);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+  const formLoadedAt = useRef(Date.now());
 
   const form = useForm<JoinFormData>({
     resolver: zodResolver(joinSchema),
-    defaultValues: { userName: "" },
+    defaultValues: { userName: "", hp: "" },
   });
 
   const handleJoin = async (data: JoinFormData) => {
@@ -47,7 +49,7 @@ export function JoinRoomDialog({ roomId }: JoinRoomDialogProps) {
     setFormError(null);
 
     try {
-      await joinRoom(roomId, data.userName);
+      await joinRoom(roomId, data.userName, data.hp, formLoadedAt.current);
       trackEvent("room_joined", { room_id: roomId });
     } catch (error) {
       trackEvent("room_join_failed", {
@@ -119,6 +121,26 @@ export function JoinRoomDialog({ roomId }: JoinRoomDialogProps) {
                 {form.formState.errors.userName.message}
               </p>
             )}
+          </div>
+          {/* Honeypot — hidden from humans, traps bots */}
+          <div
+            aria-hidden="true"
+            style={{
+              position: "absolute",
+              left: "-9999px",
+              top: "-9999px",
+              width: 0,
+              height: 0,
+              overflow: "hidden",
+            }}
+          >
+            <label htmlFor="join-website">Website</label>
+            <input
+              id="join-website"
+              tabIndex={-1}
+              autoComplete="off"
+              {...form.register("hp")}
+            />
           </div>
           <DialogFooter className="flex-row gap-3 pt-4">
             <Button

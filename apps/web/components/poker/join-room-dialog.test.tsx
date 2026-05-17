@@ -59,7 +59,7 @@ describe("JoinRoomDialog", () => {
     expect(mockPush).toHaveBeenCalledWith("/");
   });
 
-  it("should call joinRoom on valid submission", async () => {
+  it("should call joinRoom with name, empty honeypot, and a formLoadedAt timestamp", async () => {
     const user = userEvent.setup();
     render(<JoinRoomDialog roomId="room-123" />);
 
@@ -67,7 +67,12 @@ describe("JoinRoomDialog", () => {
     await user.click(screen.getByRole("button", { name: "Join Room" }));
 
     await waitFor(() => {
-      expect(mockJoinRoom).toHaveBeenCalledWith("room-123", "Alice");
+      expect(mockJoinRoom).toHaveBeenCalledWith(
+        "room-123",
+        "Alice",
+        "",
+        expect.any(Number),
+      );
     });
   });
 

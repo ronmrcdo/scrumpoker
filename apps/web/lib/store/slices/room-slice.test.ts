@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { create, type StoreApi } from "zustand";
 import { createMockPlayer, createMockRoom } from "@/test/test-utils";
 import {
@@ -60,10 +60,59 @@ describe("RoomSlice", () => {
   });
 
   describe("joinRoom", () => {
+    afterEach(() => {
+      vi.unstubAllGlobals();
+    });
+
     it("throws when not authenticated", async () => {
-      await expect(store.getState().joinRoom("rid", "Alice")).rejects.toThrow(
-        /not authenticated/i,
+      await expect(
+        store.getState().joinRoom("rid", "Alice", "", Date.now()),
+      ).rejects.toThrow(/not authenticated/i);
+    });
+
+    it("posts to /api/rooms/join with hp and formLoadedAt", async () => {
+      const fetchMock = vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ ok: true }),
+      });
+      vi.stubGlobal("fetch", fetchMock);
+
+      store.getState().setCurrentUserId("me");
+      const formLoadedAt = Date.now() - 5_000;
+      await store
+        .getState()
+        .joinRoom(
+          "11111111-2222-3333-4444-555555555555",
+          "Alice",
+          "",
+          formLoadedAt,
+        );
+
+      expect(fetchMock).toHaveBeenCalledWith(
+        "/api/rooms/join",
+        expect.objectContaining({
+          method: "POST",
+          body: JSON.stringify({
+            roomId: "11111111-2222-3333-4444-555555555555",
+            userName: "Alice",
+            hp: "",
+            formLoadedAt,
+          }),
+        }),
       );
+    });
+
+    it("throws with the server error message on a non-ok response", async () => {
+      const fetchMock = vi.fn().mockResolvedValue({
+        ok: false,
+        json: async () => ({ error: "Room is full" }),
+      });
+      vi.stubGlobal("fetch", fetchMock);
+
+      store.getState().setCurrentUserId("me");
+      await expect(
+        store.getState().joinRoom("rid", "Alice", "", Date.now() - 5_000),
+      ).rejects.toThrow(/room is full/i);
     });
   });
 

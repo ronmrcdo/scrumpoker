@@ -32,7 +32,7 @@ services:
       - "traefik.enable=true"
       - "traefik.docker.network=proxy-net"
       - "traefik.http.routers.srh.rule=Host(`redis.scrumpokergame.com`)"
-      - "traefik.http.routers.srh.entrypoints=web"
+      - "traefik.http.routers.srh.entrypoints=http"
       - "traefik.http.services.srh.loadbalancer.server.port=80"
 
   web:
@@ -57,7 +57,7 @@ services:
       - "traefik.enable=true"
       - "traefik.docker.network=proxy-net"
       - "traefik.http.routers.web.rule=Host(`scrumpokergame.com`)"
-      - "traefik.http.routers.web.entrypoints=web"
+      - "traefik.http.routers.web.entrypoints=http"
       - "traefik.http.services.web.loadbalancer.server.port=3000"
 
 volumes:

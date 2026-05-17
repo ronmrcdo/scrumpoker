@@ -83,14 +83,23 @@ COPY --from=builder /app/apps/web/public ./apps/web/public
 # Copy migration files for runtime migrations
 COPY --from=pruner /app/supabase/migrations ./supabase/migrations
 
-# Install Supabase CLI (for entrypoint migrations) and seed-script runtime deps.
-# Pinning the CLI here avoids an `npx supabase ...` network round-trip on every
-# container start, which would also fail in air-gapped environments.
-RUN pnpm install --no-save \
-      supabase@2 \
-      tsx@4 \
-      dotenv@17 \
-      @supabase/supabase-js@2
+# Install Supabase CLI directly from the official GitHub release.
+# The `supabase` npm package's postinstall downloads the same binary but has
+# been unreliable on Alpine (Coolify build was failing on the postinstall),
+# so we fetch it ourselves and pin the version.
+ARG SUPABASE_CLI_VERSION=2.20.5
+ARG TARGETARCH
+RUN set -eux; \
+    case "${TARGETARCH:-amd64}" in \
+      amd64) SUPABASE_ARCH=amd64 ;; \
+      arm64) SUPABASE_ARCH=arm64 ;; \
+      *) echo "Unsupported TARGETARCH: ${TARGETARCH}" >&2; exit 1 ;; \
+    esac; \
+    curl -fsSL -o /tmp/supabase.tar.gz \
+      "https://github.com/supabase/cli/releases/download/v${SUPABASE_CLI_VERSION}/supabase_linux_${SUPABASE_ARCH}.tar.gz"; \
+    tar -xzf /tmp/supabase.tar.gz -C /usr/local/bin supabase; \
+    rm /tmp/supabase.tar.gz; \
+    supabase --version
 
 # Copy entrypoint script
 COPY --from=pruner /app/apps/web/entrypoint.sh ./entrypoint.sh

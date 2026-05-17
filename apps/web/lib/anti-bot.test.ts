@@ -21,8 +21,7 @@ describe("validateAntiBot", () => {
       expect(result.reason).toBe("honeypot");
     });
 
-    it("rejects when honeypot has only whitespace", () => {
-      // Whitespace-only is treated as empty (trimmed)
+    it("treats whitespace-only honeypot as empty", () => {
       const result = validateAntiBot({
         hp: "   ",
         formLoadedAt: Date.now() - 5_000,
@@ -32,10 +31,19 @@ describe("validateAntiBot", () => {
   });
 
   describe("timing", () => {
-    it("rejects submissions faster than 2 seconds", () => {
+    it("rejects submissions faster than 3 seconds", () => {
       const result = validateAntiBot({
         hp: "",
         formLoadedAt: Date.now() - 500,
+      });
+      expect(result.passed).toBe(false);
+      expect(result.reason).toBe("timing");
+    });
+
+    it("rejects submissions just under the 3-second threshold", () => {
+      const result = validateAntiBot({
+        hp: "",
+        formLoadedAt: Date.now() - 2_999,
       });
       expect(result.passed).toBe(false);
       expect(result.reason).toBe("timing");
@@ -70,15 +78,72 @@ describe("validateAntiBot", () => {
     });
   });
 
-  describe("combined checks", () => {
-    it("honeypot check runs before timing check", () => {
-      // Both would fail, but honeypot should be the reported reason
+  describe("stale forms", () => {
+    it("rejects submissions older than 1 hour", () => {
+      const result = validateAntiBot({
+        hp: "",
+        formLoadedAt: Date.now() - 7_200_000, // 2h ago
+      });
+      expect(result.passed).toBe(false);
+      expect(result.reason).toBe("stale");
+    });
+
+    it("accepts submissions inside the 1-hour window", () => {
+      const result = validateAntiBot({
+        hp: "",
+        formLoadedAt: Date.now() - 1_800_000, // 30m ago
+      });
+      expect(result.passed).toBe(true);
+    });
+  });
+
+  describe("clock skew", () => {
+    it("rejects submissions with a far-future formLoadedAt", () => {
+      const result = validateAntiBot({
+        hp: "",
+        formLoadedAt: Date.now() + 300_000, // 5m in the future
+      });
+      expect(result.passed).toBe(false);
+      expect(result.reason).toBe("clock-skew");
+    });
+
+    it("tolerates small future skew (<= 60s)", () => {
+      const result = validateAntiBot({
+        hp: "",
+        formLoadedAt: Date.now() + 30_000, // 30s in the future, still fails timing
+      });
+      expect(result.passed).toBe(false);
+      expect(result.reason).toBe("timing");
+    });
+  });
+
+  describe("priority ordering", () => {
+    it("honeypot check runs before any timing/stale/skew check", () => {
       const result = validateAntiBot({
         hp: "bot-value",
         formLoadedAt: Date.now(),
       });
       expect(result.passed).toBe(false);
       expect(result.reason).toBe("honeypot");
+    });
+
+    it("clock-skew check runs before stale and timing checks", () => {
+      const result = validateAntiBot({
+        hp: "",
+        formLoadedAt: Date.now() + 600_000, // 10m future
+      });
+      expect(result.passed).toBe(false);
+      expect(result.reason).toBe("clock-skew");
+    });
+
+    it("stale check runs before timing check", () => {
+      // 2h in the past → stale, not timing (timing would accept this anyway)
+      const result = validateAntiBot({
+        hp: "",
+        formLoadedAt: Date.now() - 7_200_000,
+      });
+      expect(result.passed).toBe(false);
+      expect(result.reason).toBe("stale");
     });
   });
 });

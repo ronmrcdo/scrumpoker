@@ -1,10 +1,13 @@
 /**
- * In-memory sliding window rate limiter keyed by IP address.
+ * Sliding window rate limiter keyed by IP address.
  *
- * NOTE: This works for single-process deployments (Docker, VPS). For
- * serverless/edge (Vercel Functions), each cold start gets a fresh store —
- * swap this for Redis/Upstash KV if you need distributed rate limiting.
+ * Uses Redis (via Upstash REST API or self-hosted serverless-redis-http)
+ * when `UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN` are configured,
+ * giving consistent counters across multiple app instances. Falls back to a
+ * per-process in-memory store otherwise (useful for local dev and tests).
  */
+import { Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis";
 
 export interface RateLimitResult {
   allowed: boolean;
@@ -12,28 +15,35 @@ export interface RateLimitResult {
   retryAfterMs: number | null;
 }
 
-interface RateLimitOptions {
-  windowMs?: number;
-  maxRequests?: number;
+interface RateLimiterOptions {
+  windowMs: number;
+  maxRequests: number;
+  prefix: string;
 }
 
-const DEFAULT_WINDOW_MS = 60_000; // 1 minute
-const DEFAULT_MAX_REQUESTS = 5;
+export interface RateLimiter {
+  check(key: string): Promise<RateLimitResult>;
+  reset(): void;
+  destroy(): void;
+}
+
+// ── In-memory implementation (fallback / tests) ──────────────────────────────
+
 const CLEANUP_INTERVAL_MS = 60_000;
 
-export class SlidingWindowRateLimiter {
+export class InMemoryRateLimiter implements RateLimiter {
   private store = new Map<string, number[]>();
   private windowMs: number;
   private maxRequests: number;
   private cleanupTimer: ReturnType<typeof setInterval> | null = null;
 
-  constructor(options: RateLimitOptions = {}) {
-    this.windowMs = options.windowMs ?? DEFAULT_WINDOW_MS;
-    this.maxRequests = options.maxRequests ?? DEFAULT_MAX_REQUESTS;
+  constructor(options: Pick<RateLimiterOptions, "windowMs" | "maxRequests">) {
+    this.windowMs = options.windowMs;
+    this.maxRequests = options.maxRequests;
     this.startCleanup();
   }
 
-  check(key: string): RateLimitResult {
+  async check(key: string): Promise<RateLimitResult> {
     const now = Date.now();
     const cutoff = now - this.windowMs;
 
@@ -63,7 +73,6 @@ export class SlidingWindowRateLimiter {
   }
 
   private startCleanup() {
-    // Avoid starting the interval in test environments or if already started
     if (this.cleanupTimer) return;
 
     this.cleanupTimer = setInterval(() => {
@@ -78,13 +87,11 @@ export class SlidingWindowRateLimiter {
       }
     }, CLEANUP_INTERVAL_MS);
 
-    // Allow the Node.js process to exit without waiting for cleanup
     if (this.cleanupTimer.unref) {
       this.cleanupTimer.unref();
     }
   }
 
-  /** Visible for testing — clear all entries */
   reset() {
     this.store.clear();
   }
@@ -98,14 +105,79 @@ export class SlidingWindowRateLimiter {
   }
 }
 
-/** Singleton used by the API route handler */
-export const roomCreationLimiter = new SlidingWindowRateLimiter({
-  windowMs: DEFAULT_WINDOW_MS,
-  maxRequests: DEFAULT_MAX_REQUESTS,
+// Backward-compat alias — existing tests import this name.
+export const SlidingWindowRateLimiter = InMemoryRateLimiter;
+
+// ── Redis-backed implementation (production) ─────────────────────────────────
+
+class RedisRateLimiter implements RateLimiter {
+  private limiter: Ratelimit;
+
+  constructor(redis: Redis, options: RateLimiterOptions) {
+    const windowSeconds = Math.max(1, Math.round(options.windowMs / 1_000));
+    this.limiter = new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(
+        options.maxRequests,
+        `${windowSeconds} s`,
+      ),
+      analytics: false,
+      prefix: options.prefix,
+    });
+  }
+
+  async check(key: string): Promise<RateLimitResult> {
+    const result = await this.limiter.limit(key);
+    return {
+      allowed: result.success,
+      remaining: Math.max(0, result.remaining),
+      retryAfterMs: result.success
+        ? null
+        : Math.max(result.reset - Date.now(), 0),
+    };
+  }
+
+  reset() {
+    /* No-op — Redis state is shared and persists across process restarts. */
+  }
+
+  destroy() {
+    /* No-op — the Redis client manages its own connection lifecycle. */
+  }
+}
+
+// ── Factory ──────────────────────────────────────────────────────────────────
+
+function buildRedisClient(): Redis | null {
+  const url = process.env.UPSTASH_REDIS_REST_URL;
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+  if (!url || !token) return null;
+  return new Redis({ url, token });
+}
+
+const sharedRedis = buildRedisClient();
+
+function createRateLimiter(options: RateLimiterOptions): RateLimiter {
+  if (sharedRedis) {
+    return new RedisRateLimiter(sharedRedis, options);
+  }
+  return new InMemoryRateLimiter(options);
+}
+
+export const roomCreationLimiter = createRateLimiter({
+  windowMs: 60_000,
+  maxRequests: 5,
+  prefix: "rl:room-create",
 });
 
-/** Higher-cap limiter for the leave-room beacon endpoint */
-export const leaveRoomLimiter = new SlidingWindowRateLimiter({
+export const joinRoomLimiter = createRateLimiter({
+  windowMs: 60_000,
+  maxRequests: 10,
+  prefix: "rl:room-join",
+});
+
+export const leaveRoomLimiter = createRateLimiter({
   windowMs: 10_000,
   maxRequests: 20,
+  prefix: "rl:room-leave",
 });

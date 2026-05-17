@@ -5,25 +5,19 @@ import { validateAntiBot } from "@/lib/anti-bot";
 import { getClientIp } from "@/lib/client-ip";
 import { roomCreationLimiter } from "@/lib/rate-limit";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
-import { verifyTurnstileToken } from "@/lib/turnstile";
 import { roomNameSchema, userNameSchema } from "@/lib/validation";
-
-const turnstileConfigured = Boolean(process.env.TURNSTILE_SECRET_KEY);
 
 const createRoomApiSchema = z.object({
   roomName: roomNameSchema,
   userName: userNameSchema,
   hp: z.string().max(500).default(""),
   formLoadedAt: z.number().int().positive(),
-  turnstileToken: turnstileConfigured
-    ? z.string().min(1, "Missing security token")
-    : z.string().default(""),
 });
 
 export async function POST(request: NextRequest) {
   // 1. Rate limit by IP
   const ip = getClientIp(request);
-  const rateResult = roomCreationLimiter.check(ip);
+  const rateResult = await roomCreationLimiter.check(ip);
 
   if (!rateResult.allowed) {
     return NextResponse.json(
@@ -55,7 +49,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid request" }, { status: 400 });
   }
 
-  // 3. Anti-bot checks (honeypot + timing)
+  // 3. Anti-bot checks (honeypot + timing + freshness)
   const antiBotResult = validateAntiBot({
     hp: parsed.data.hp,
     formLoadedAt: parsed.data.formLoadedAt,
@@ -66,21 +60,6 @@ export async function POST(request: NextRequest) {
       { error: "Unable to create room" },
       { status: 422 },
     );
-  }
-
-  // 3b. Verify Turnstile token when the secret is configured
-  if (turnstileConfigured) {
-    const turnstileResult = await verifyTurnstileToken(
-      parsed.data.turnstileToken,
-      ip,
-    );
-
-    if (!turnstileResult.success) {
-      return NextResponse.json(
-        { error: "Security check failed. Please try again." },
-        { status: 422 },
-      );
-    }
   }
 
   // 4. Authenticate via Supabase session cookie

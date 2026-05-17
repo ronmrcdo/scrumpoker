@@ -11,8 +11,6 @@ const envSchema = z.object({
       message: "NEXT_PUBLIC_PLAUSIBLE_SCRIPT_URL must use https://",
     })
     .optional(),
-  NEXT_PUBLIC_TURNSTILE_SITE_KEY: z.string().optional(),
-  TURNSTILE_SECRET_KEY: z.string().optional(),
 });
 
 const parsed = envSchema.safeParse({
@@ -21,8 +19,6 @@ const parsed = envSchema.safeParse({
   NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
   NEXT_PUBLIC_PLAUSIBLE_SCRIPT_URL:
     process.env.NEXT_PUBLIC_PLAUSIBLE_SCRIPT_URL,
-  NEXT_PUBLIC_TURNSTILE_SITE_KEY: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY,
-  TURNSTILE_SECRET_KEY: process.env.TURNSTILE_SECRET_KEY,
 });
 
 if (!parsed.success) {

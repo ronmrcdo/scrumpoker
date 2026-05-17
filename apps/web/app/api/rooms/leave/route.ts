@@ -7,7 +7,7 @@ import { isValidUUID } from "@/lib/validation";
 
 export async function POST(request: Request) {
   const ip = getClientIp(request);
-  const rateResult = leaveRoomLimiter.check(ip);
+  const rateResult = await leaveRoomLimiter.check(ip);
   if (!rateResult.allowed) {
     return NextResponse.json(
       { error: "Too many requests" },

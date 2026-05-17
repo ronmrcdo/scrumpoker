@@ -125,7 +125,7 @@ Paste the result into `.env` as `SRH_TOKEN=...`. The same value is sent to the w
 
 ```bash
 # Pre-create the external reverse-proxy network (one-time, if it does not exist)
-docker network create proxy-net
+docker network create coolify
 
 docker compose up -d --build
 ```

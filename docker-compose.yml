@@ -15,7 +15,7 @@ services:
 
   # Upstash-compatible HTTP layer for Redis.
   # https://github.com/hiett/serverless-redis-http
-  serverless-redis-http:
+  srh:
     image: hiett/serverless-redis-http:latest
     restart: unless-stopped
     environment:
@@ -23,14 +23,14 @@ services:
       SRH_TOKEN: ${SRH_TOKEN}
       SRH_CONNECTION_STRING: redis://redis:6379
     networks:
-      - internal
       - coolify
+      - internal
     depends_on:
       redis:
         condition: service_healthy
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.srh.rule=Host(`redis.scrumpokergame.com`)"
+      - "traefik.http.routers.srh.rule=Host(`srh.scrumpokergame.com`)"
 
   web:
     build:
@@ -48,7 +48,7 @@ services:
       - coolify
       - internal
     depends_on:
-      serverless-redis-http:
+      srh:
         condition: service_started
     labels:
       - "traefik.enable=true"

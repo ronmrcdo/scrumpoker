@@ -8,8 +8,10 @@ import { LandingHeader } from "@/components/landing/landing-header";
 import { KickedAlert } from "@/components/poker/kicked-alert";
 import {
   getFaqJsonLd,
+  getHowToJsonLd,
   getOrganizationJsonLd,
   getWebApplicationJsonLd,
+  getWebSiteJsonLd,
 } from "@/lib/structured-data";
 
 const FeaturesSection = dynamic(() =>
@@ -47,6 +49,22 @@ export default async function LandingPage() {
         suppressHydrationWarning
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(getOrganizationJsonLd()),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        nonce={nonce}
+        suppressHydrationWarning
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(getWebSiteJsonLd()),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        nonce={nonce}
+        suppressHydrationWarning
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(getHowToJsonLd()),
         }}
       />
       <script

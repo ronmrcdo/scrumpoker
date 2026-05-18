@@ -27,4 +27,33 @@ describe("robots", () => {
     const result = robots();
     expect(result.sitemap).toBe("https://scrumpokergame.com/sitemap.xml");
   });
+
+  it("declares the canonical host", () => {
+    const result = robots();
+    expect(result.host).toBe("https://scrumpokergame.com");
+  });
+
+  it.each([
+    "GPTBot",
+    "OAI-SearchBot",
+    "ChatGPT-User",
+    "ClaudeBot",
+    "anthropic-ai",
+    "PerplexityBot",
+    "Google-Extended",
+    "Applebot-Extended",
+  ])("explicitly allows AI crawler %s", (agent) => {
+    const result = robots();
+    const rules = Array.isArray(result.rules) ? result.rules : [result.rules];
+    const rule = rules.find((r) => r.userAgent === agent);
+    expect(rule).toBeDefined();
+    expect(rule?.allow).toContain("/");
+  });
+
+  it("keeps poker rooms private from AI crawlers too", () => {
+    const result = robots();
+    const rules = Array.isArray(result.rules) ? result.rules : [result.rules];
+    const aiRule = rules.find((r) => r.userAgent === "GPTBot");
+    expect(aiRule?.disallow).toContain("/poker/");
+  });
 });

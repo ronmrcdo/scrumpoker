@@ -1,7 +1,6 @@
 import {
   AlertTriangle,
   ChevronRight,
-  ExternalLink,
   Eye,
   Globe,
   Info,
@@ -33,7 +32,7 @@ const tocItems = [
   { id: "general", title: "General Disclaimer", icon: AlertTriangle },
   { id: "no-advice", title: "No Professional Advice", icon: Info },
   { id: "as-is", title: '"As-Is" Service', icon: Shield },
-  { id: "third-party", title: "Third-Party Services", icon: Globe },
+  { id: "infrastructure", title: "Infrastructure", icon: Globe },
   { id: "liability", title: "Limitation of Liability", icon: Scale },
   { id: "links", title: "External Links", icon: ChevronRight },
   { id: "accuracy", title: "Accuracy of Information", icon: Eye },
@@ -75,6 +74,12 @@ export default function DisclaimerPage() {
             Any reliance you place on the service and its outputs is strictly at
             your own risk.
           </p>
+          <LegalCallout variant="info">
+            Scrum Poker Game is operated by an individual on{" "}
+            <strong>self-hosted infrastructure</strong> as a free community
+            tool. There is no SLA, no commercial backing, and no guarantee of
+            availability, durability, or security beyond best-effort.
+          </LegalCallout>
         </LegalSectionCard>
 
         <LegalSectionCard
@@ -150,52 +155,24 @@ export default function DisclaimerPage() {
         </LegalSectionCard>
 
         <LegalSectionCard
-          id="third-party"
+          id="infrastructure"
           icon={Globe}
-          title="Third-Party Services"
+          title="Infrastructure"
         >
           <p>
-            Scrum Poker Game relies on third-party infrastructure to operate. We
-            are not responsible for the availability, performance, or data
-            handling practices of these services beyond our own configuration:
+            Scrum Poker Game runs on{" "}
+            <strong className="text-foreground">
+              infrastructure we operate directly
+            </strong>
+            , including self-hosted instances of open-source software (Supabase,
+            Plausible). We do not rely on commercial cloud or SaaS providers to
+            process your data.
           </p>
-          <ul className="ml-1 list-inside list-disc space-y-1.5">
-            <li>
-              <strong className="text-foreground">Supabase</strong> — Provides
-              database hosting, anonymous authentication, and real-time
-              communication. Service availability depends on Supabase&apos;s
-              infrastructure.{" "}
-              <a
-                href="https://supabase.com/privacy"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Supabase Privacy Policy (opens in new tab)"
-                className="inline-flex items-center gap-1 text-primary underline underline-offset-2 hover:text-primary-700 dark:hover:text-primary-300"
-              >
-                Supabase Privacy Policy
-                <ExternalLink aria-hidden="true" className="size-3 shrink-0" />
-              </a>
-            </li>
-            <li>
-              <strong className="text-foreground">Plausible Analytics</strong> —
-              Provides privacy-focused, cookie-free website analytics. No
-              personal data is collected or shared.{" "}
-              <a
-                href="https://plausible.io/privacy"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Plausible Analytics Privacy Policy (opens in new tab)"
-                className="inline-flex items-center gap-1 text-primary underline underline-offset-2 hover:text-primary-700 dark:hover:text-primary-300"
-              >
-                Plausible Privacy Policy
-                <ExternalLink aria-hidden="true" className="size-3 shrink-0" />
-              </a>
-            </li>
-          </ul>
           <p>
-            Disruptions to these third-party services may affect the
-            availability or functionality of Scrum Poker Game. We shall not be
-            held liable for any such disruptions.
+            Because we host the service ourselves, availability is best-effort.
+            The service may be affected by power, network, or hardware events at
+            our hosting location. We shall not be held liable for any resulting
+            disruptions or data loss.
           </p>
         </LegalSectionCard>
 

@@ -152,6 +152,15 @@ export default function DisclaimerPage() {
               notice.
             </li>
           </ul>
+          <LegalCallout variant="warning">
+            <strong>Not a compliance vendor.</strong> Scrum Poker Game is not
+            designed, audited, or warranted to meet any particular regulatory or
+            contractual requirement (GDPR processor obligations, HIPAA, SOC 2,
+            ISO 27001, PCI DSS, FedRAMP, etc.) that you or your organization may
+            be subject to. We do not sign Data Processing Agreements, Business
+            Associate Agreements, or vendor security questionnaires. If your use
+            case requires a vetted vendor, please do not use this service.
+          </LegalCallout>
         </LegalSectionCard>
 
         <LegalSectionCard

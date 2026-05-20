@@ -2,7 +2,6 @@ import {
   BarChart3,
   Cookie,
   Database,
-  ExternalLink,
   Eye,
   FileText,
   Globe,
@@ -44,7 +43,7 @@ const tocItems = [
   { id: "cookies", title: "Cookies & Local Storage", icon: Cookie },
   { id: "analytics", title: "Analytics", icon: BarChart3 },
   { id: "data-retention", title: "Data Retention", icon: Trash2 },
-  { id: "third-party", title: "Third-Party Services", icon: Globe },
+  { id: "infrastructure", title: "Infrastructure & Hosting", icon: Globe },
   { id: "your-rights", title: "Your Rights", icon: Shield },
   { id: "security", title: "Security", icon: Lock },
   { id: "children", title: "Children's Privacy", icon: UserX },
@@ -84,6 +83,15 @@ export default function PrivacyPolicyPage() {
             do not require account creation, email addresses, or any personal
             identifying information to use our platform. This policy explains
             what minimal data we do collect and why.
+          </p>
+          <p>
+            Our service runs on{" "}
+            <strong className="text-foreground">
+              infrastructure we operate directly
+            </strong>
+            , including self-hosted database, authentication, and analytics
+            software. Your data is not transferred to any third-party cloud
+            provider or commercial SaaS vendor.
           </p>
         </LegalSectionCard>
 
@@ -132,8 +140,12 @@ export default function PrivacyPolicyPage() {
           title="How We Use Your Information"
         >
           <p>
-            The information we collect is used solely for the following
-            purposes:
+            We process the information described above based on our{" "}
+            <strong className="text-foreground">legitimate interest</strong>{" "}
+            (GDPR Art. 6(1)(f)) in operating and securing the service, and on
+            the necessity of performing the service you request when you join a
+            room (Art. 6(1)(b)). The information is used solely for the
+            following purposes:
           </p>
           <ul className="ml-1 list-inside list-disc space-y-1.5">
             <li>
@@ -173,8 +185,9 @@ export default function PrivacyPolicyPage() {
           title="Cookies & Local Storage"
         >
           <p>
-            We use a minimal set of cookies and local storage for essential
-            functionality:
+            We use a minimal set of strictly-necessary cookies and local storage
+            entries for essential functionality. No tracking or advertising
+            cookies are used.
           </p>
           <div className="overflow-x-auto rounded-lg border border-border/50 bg-muted/20">
             <table className="w-full text-sm">
@@ -222,16 +235,6 @@ export default function PrivacyPolicyPage() {
                 </tr>
                 <tr>
                   <td className="py-2 pr-4 pl-3 font-mono text-xs">
-                    cookie-consent
-                  </td>
-                  <td className="py-2 pr-4">Local Storage</td>
-                  <td className="py-2 pr-4">
-                    Stores your cookie consent preference
-                  </td>
-                  <td className="py-2 pr-3">Persistent</td>
-                </tr>
-                <tr>
-                  <td className="py-2 pr-4 pl-3 font-mono text-xs">
                     scrumpoker-theme
                   </td>
                   <td className="py-2 pr-4">Local Storage</td>
@@ -244,40 +247,32 @@ export default function PrivacyPolicyPage() {
             </table>
           </div>
           <p>
-            Our analytics provider (Plausible) does not use cookies. You can
-            manage your storage preferences at any time through the consent
-            banner.
+            Our self-hosted Plausible analytics installation does not use
+            cookies or persistent client-side identifiers. You can clear local
+            storage at any time through your browser settings.
           </p>
         </LegalSectionCard>
 
         <LegalSectionCard id="analytics" icon={BarChart3} title="Analytics">
           <p>
-            We use{" "}
-            <strong className="text-foreground">Plausible Analytics</strong> for
-            website analytics, which is a{" "}
+            We run a{" "}
+            <strong className="text-foreground">self-hosted instance</strong> of
+            the open-source{" "}
+            <strong className="text-foreground">Plausible Analytics</strong>{" "}
+            software on our own infrastructure. Analytics data is{" "}
             <strong className="text-foreground">
-              privacy-focused, cookie-free
+              not shared with Plausible Insights OÜ
             </strong>{" "}
-            analytics tool. Plausible does not use cookies, does not collect
-            personal data, and is fully compliant with GDPR, CCPA, and PECR
-            without requiring cookie consent.
+            or any other third party.
           </p>
-          <p>Plausible collects only aggregate, anonymized data including:</p>
-          <ul className="ml-1 list-inside list-disc space-y-1.5">
-            <li>Page views and referral sources</li>
-            <li>
-              Country-level location (derived from IP, which is never stored)
-            </li>
-            <li>Browser and operating system type</li>
-            <li>Device type (desktop, mobile, tablet)</li>
-          </ul>
           <p>
-            <strong className="text-foreground">
-              No personal data is collected.
-            </strong>{" "}
-            Plausible does not track individual users across sessions, does not
-            create user profiles, and does not use fingerprinting. All data is
-            aggregated and cannot be used to identify individual visitors.
+            Our analytics installation collects only an aggregate visitor count
+            and is configured to be{" "}
+            <strong className="text-foreground">cookie-free</strong>. It does
+            not create user profiles, does not track individuals across
+            sessions, and does not use device fingerprinting. IP addresses are
+            processed transiently to derive the visitor count and are not
+            written to persistent storage.
           </p>
         </LegalSectionCard>
 
@@ -314,50 +309,36 @@ export default function PrivacyPolicyPage() {
         </LegalSectionCard>
 
         <LegalSectionCard
-          id="third-party"
+          id="infrastructure"
           icon={Globe}
-          title="Third-Party Services"
+          title="Infrastructure & Hosting"
         >
           <p>
-            We rely on the following third-party services to operate our
-            platform:
+            We operate our own infrastructure rather than relying on commercial
+            cloud or SaaS providers. The platform is powered by the following
+            open-source software, all of which we{" "}
+            <strong className="text-foreground">host ourselves</strong>:
           </p>
           <ul className="ml-1 list-inside list-disc space-y-1.5">
             <li>
-              <strong className="text-foreground">Supabase</strong> — Provides
-              our database, anonymous authentication, and real-time
-              communication infrastructure. Supabase processes session data on
-              our behalf.{" "}
-              <a
-                href="https://supabase.com/privacy"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Supabase Privacy Policy (opens in new tab)"
-                className="inline-flex items-center gap-1 text-primary underline underline-offset-2 hover:text-primary-700 dark:hover:text-primary-300"
-              >
-                Supabase Privacy Policy
-                <ExternalLink aria-hidden="true" className="size-3 shrink-0" />
-              </a>
+              <strong className="text-foreground">Supabase</strong>{" "}
+              (self-hosted) — Open-source software used for our database,
+              anonymous authentication, and real-time communication. The
+              Supabase company has no access to our data.
             </li>
             <li>
-              <strong className="text-foreground">Plausible Analytics</strong> —
-              Provides privacy-focused, cookie-free website analytics. No
-              personal data is collected or shared.{" "}
-              <a
-                href="https://plausible.io/privacy"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Plausible Analytics Privacy Policy (opens in new tab)"
-                className="inline-flex items-center gap-1 text-primary underline underline-offset-2 hover:text-primary-700 dark:hover:text-primary-300"
-              >
-                Plausible Privacy Policy
-                <ExternalLink aria-hidden="true" className="size-3 shrink-0" />
-              </a>
+              <strong className="text-foreground">Plausible Analytics</strong>{" "}
+              (self-hosted) — Open-source software used to produce an aggregate
+              visitor count. Plausible Insights OÜ has no access to our data.
             </li>
           </ul>
           <p>
-            We do not sell or share your data with any third parties for
-            advertising or marketing purposes.
+            Your data is processed entirely on infrastructure under our direct
+            control and is{" "}
+            <strong className="text-foreground">
+              not transferred to third parties
+            </strong>{" "}
+            for any purpose. We do not sell, rent, or share your data.
           </p>
         </LegalSectionCard>
 
@@ -386,7 +367,26 @@ export default function PrivacyPolicyPage() {
               <strong className="text-foreground">Right to Portability</strong>{" "}
               — Request a copy of your data in a portable format.
             </li>
+            <li>
+              <strong className="text-foreground">
+                Right to Lodge a Complaint
+              </strong>{" "}
+              — If you are in the EU, UK, or EEA, you have the right to lodge a
+              complaint with your local data protection supervisory authority if
+              you believe your rights have been infringed.
+            </li>
+            <li>
+              <strong className="text-foreground">
+                Right to Withdraw Consent / Object
+              </strong>{" "}
+              — Where processing is based on consent or legitimate interest, you
+              may withdraw consent or object to processing at any time.
+            </li>
           </ul>
+          <p>
+            We do not engage in automated decision-making or profiling within
+            the meaning of GDPR Art. 22.
+          </p>
           <p>
             Because we collect minimal, anonymous data that auto-deletes within
             24 hours, most data subject requests are satisfied automatically by

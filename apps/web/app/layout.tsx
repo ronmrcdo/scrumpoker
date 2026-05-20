@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import { JetBrains_Mono, Space_Grotesk } from "next/font/google";
 import { headers } from "next/headers";
 import Script from "next/script";
-import { CookieConsent } from "@/components/cookie-consent";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { SITE_URL } from "@/lib/config";
 import { Providers } from "./providers";
@@ -148,10 +147,7 @@ export default async function RootLayout({
           Skip to content
         </a>
         <Providers>
-          <ThemeProvider>
-            {children}
-            <CookieConsent />
-          </ThemeProvider>
+          <ThemeProvider>{children}</ThemeProvider>
         </Providers>
         {process.env.NEXT_PUBLIC_PLAUSIBLE_SCRIPT_URL && (
           <>

@@ -205,6 +205,42 @@ describe("RoomSlice", () => {
     });
   });
 
+  describe("leaveRoom", () => {
+    it("clears the room and calls the leave_room RPC", async () => {
+      const room = createMockRoom();
+      store.getState().setRoom(room);
+
+      await store.getState().leaveRoom();
+
+      expect(rpcMock).toHaveBeenCalledWith("leave_room", {
+        p_room_id: room.id,
+      });
+      expect(store.getState().room).toBeNull();
+    });
+
+    // Regression: leaving deletes the player's own row, which looks identical
+    // to a kick on the realtime channel. Without an explicit intent flag the
+    // leaver was redirected to /?kicked=true instead of the home page.
+    it("marks the leave as intentional so it is not mistaken for a kick", async () => {
+      store.getState().setRoom(createMockRoom());
+      expect(store.getState().isLeaving).toBe(false);
+
+      await store.getState().leaveRoom();
+
+      expect(store.getState().isLeaving).toBe(true);
+      expect(store.getState().wasKicked).toBe(false);
+    });
+
+    it("clears the intentional-leave flag when entering a room", async () => {
+      store.getState().setRoom(createMockRoom());
+      await store.getState().leaveRoom();
+      expect(store.getState().isLeaving).toBe(true);
+
+      store.getState().setRoom(createMockRoom());
+      expect(store.getState().isLeaving).toBe(false);
+    });
+  });
+
   describe("kickPlayer", () => {
     it("removes the player from the local state immediately", () => {
       const a = createMockPlayer({ id: "a" });

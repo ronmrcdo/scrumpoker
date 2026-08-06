@@ -58,6 +58,12 @@ export async function fetchRoomWithPlayers(
 export interface RoomSlice {
   room: Room | null;
   wasKicked: boolean;
+  /**
+   * True while the user is deliberately leaving. Leaving and being kicked both
+   * delete the player's own row, so the realtime channel cannot tell them
+   * apart — this flag is what distinguishes them.
+   */
+  isLeaving: boolean;
   setRoom: (room: Room | null) => void;
   setWasKicked: (kicked: boolean) => void;
   fetchRoom: (roomId: string) => Promise<Room | null>;
@@ -82,8 +88,10 @@ export const createRoomSlice: StateCreator<
 > = (set, get) => ({
   room: null,
   wasKicked: false,
+  isLeaving: false,
 
-  setRoom: (room) => set({ room }),
+  // Entering a room clears any leave intent left over from a previous room.
+  setRoom: (room) => set(room ? { room, isLeaving: false } : { room }),
 
   setWasKicked: (kicked) => set({ wasKicked: kicked }),
 
@@ -207,6 +215,9 @@ export const createRoomSlice: StateCreator<
     const { room } = get();
     if (!room) return;
 
+    // Set before the RPC: the realtime DELETE for our own row can arrive
+    // before this resolves, and it must not be read as a kick.
+    set({ isLeaving: true });
     await supabase.rpc("leave_room", { p_room_id: room.id });
     set({ room: null });
   },

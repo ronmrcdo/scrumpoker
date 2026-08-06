@@ -97,12 +97,16 @@ export function useRoomSync(roomId: string, initialRoom: Room) {
           filter: `room_id=eq.${roomId}`,
         },
         async (payload) => {
-          // Check if current user was kicked
+          // Our own row disappearing means we either left or were kicked.
+          // Read the flag from the store rather than the closure — the leave
+          // may have started after this subscription was created.
           if (
             payload.eventType === "DELETE" &&
             payload.old?.user_id === currentUserId
           ) {
-            setWasKicked(true);
+            if (!usePokerStore.getState().isLeaving) {
+              setWasKicked(true);
+            }
             setRoom(null);
             return;
           }

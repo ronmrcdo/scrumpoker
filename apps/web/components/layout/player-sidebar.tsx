@@ -52,7 +52,12 @@ export function PlayerSidebar() {
       player_role: isFacilitator ? "FACILITATOR" : "MEMBER",
       player_count: room.players.length,
     });
-    await leaveRoom();
+    try {
+      await leaveRoom();
+    } catch {
+      // Ignore — we navigate away regardless. The player is cleaned up by
+      // presence/beacon anyway, and stranding them in the room is worse.
+    }
     router.push("/");
   }, [room, isFacilitator, leaveRoom, router]);
 

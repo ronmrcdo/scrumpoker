@@ -15,6 +15,8 @@ services:
 
   # Upstash-compatible HTTP layer for Redis.
   # https://github.com/hiett/serverless-redis-http
+  # Internal-only: `web` reaches it at http://srh:80 over the `internal`
+  # network, so it is deliberately not published through Traefik.
   srh:
     image: hiett/serverless-redis-http:latest
     restart: unless-stopped
@@ -23,14 +25,10 @@ services:
       SRH_TOKEN: ${SRH_TOKEN}
       SRH_CONNECTION_STRING: redis://redis:6379
     networks:
-      - coolify
       - internal
     depends_on:
       redis:
         condition: service_healthy
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.srh.rule=Host(`srh.scrumpokergame.com`)"
 
   web:
     build:
@@ -41,7 +39,8 @@ services:
         NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY}
         NEXT_PUBLIC_PLAUSIBLE_SCRIPT_URL: ${NEXT_PUBLIC_PLAUSIBLE_SCRIPT_URL:-}
     environment:
-      - UPSTASH_REDIS_REST_URL=${UPSTASH_REDIS_REST_URL}
+      # Reach SRH over the internal network by default — no Traefik/DNS hop.
+      - UPSTASH_REDIS_REST_URL=${UPSTASH_REDIS_REST_URL:-http://srh:80}
       - UPSTASH_REDIS_REST_TOKEN=${SRH_TOKEN}
     restart: unless-stopped
     networks:

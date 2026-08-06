@@ -79,6 +79,36 @@ describe("useCreateRoom", () => {
     });
   });
 
+  // Regression: a bare 500 with an empty body made response.json() throw
+  // "Unexpected end of JSON input", which leaked to the user as the form error.
+  it("surfaces a readable error when the response body is not JSON", async () => {
+    (globalThis.fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
+      ok: false,
+      status: 500,
+      json: async () => {
+        throw new SyntaxError("Unexpected end of JSON input");
+      },
+    });
+
+    const { result } = renderHook(() => useCreateRoom());
+
+    act(() => {
+      result.current.form.setValue("userName", "Test User");
+      result.current.form.setValue("roomName", "Test Room");
+    });
+
+    await act(async () => {
+      await result.current.handleSubmit();
+    });
+
+    await waitFor(() => {
+      expect(result.current.formError).toBe(
+        "Failed to create room. Please try again.",
+      );
+    });
+    expect(mockPush).not.toHaveBeenCalled();
+  });
+
   it("redirects to the new room on success", async () => {
     (globalThis.fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
       ok: true,

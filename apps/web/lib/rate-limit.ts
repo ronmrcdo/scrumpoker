@@ -30,6 +30,7 @@ export interface RateLimiter {
 // ── In-memory implementation (fallback / tests) ──────────────────────────────
 
 const CLEANUP_INTERVAL_MS = 60_000;
+const FAILURE_LOG_INTERVAL_MS = 60_000;
 
 export class InMemoryRateLimiter implements RateLimiter {
   private store = new Map<string, number[]>();
@@ -110,8 +111,16 @@ export const SlidingWindowRateLimiter = InMemoryRateLimiter;
 
 // ── Redis-backed implementation (production) ─────────────────────────────────
 
-class RedisRateLimiter implements RateLimiter {
+/**
+ * Redis is best-effort: it makes counters consistent across instances, but it
+ * is not a correctness dependency. If the REST endpoint is unreachable or
+ * misconfigured, `limit()` rejects — so every call is guarded and degrades to
+ * the per-process in-memory limiter instead of taking the route down.
+ */
+export class RedisRateLimiter implements RateLimiter {
   private limiter: Ratelimit;
+  private fallback: InMemoryRateLimiter;
+  private lastFailureLoggedAt = 0;
 
   constructor(redis: Redis, options: RateLimiterOptions) {
     const windowSeconds = Math.max(1, Math.round(options.windowMs / 1_000));
@@ -124,25 +133,43 @@ class RedisRateLimiter implements RateLimiter {
       analytics: false,
       prefix: options.prefix,
     });
+    this.fallback = new InMemoryRateLimiter(options);
   }
 
   async check(key: string): Promise<RateLimitResult> {
-    const result = await this.limiter.limit(key);
-    return {
-      allowed: result.success,
-      remaining: Math.max(0, result.remaining),
-      retryAfterMs: result.success
-        ? null
-        : Math.max(result.reset - Date.now(), 0),
-    };
+    try {
+      const result = await this.limiter.limit(key);
+      return {
+        allowed: result.success,
+        remaining: Math.max(0, result.remaining),
+        retryAfterMs: result.success
+          ? null
+          : Math.max(result.reset - Date.now(), 0),
+      };
+    } catch (error) {
+      this.logFailure(error);
+      return this.fallback.check(key);
+    }
+  }
+
+  /** Throttled so a sustained Redis outage cannot flood the logs. */
+  private logFailure(error: unknown) {
+    const now = Date.now();
+    if (now - this.lastFailureLoggedAt < FAILURE_LOG_INTERVAL_MS) return;
+    this.lastFailureLoggedAt = now;
+    console.error(
+      "[rate-limit] Redis unavailable, falling back to in-memory limiting:",
+      error instanceof Error ? error.message : error,
+    );
   }
 
   reset() {
-    /* No-op — Redis state is shared and persists across process restarts. */
+    this.fallback.reset();
   }
 
   destroy() {
-    /* No-op — the Redis client manages its own connection lifecycle. */
+    /* The Redis client manages its own connection lifecycle. */
+    this.fallback.destroy();
   }
 }
 

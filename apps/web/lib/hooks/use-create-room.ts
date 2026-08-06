@@ -47,10 +47,14 @@ export function useCreateRoom() {
         }),
       });
 
-      const result = await response.json();
+      // An error response may carry no body at all (e.g. a bare 500), so never
+      // let a parse failure surface to the user as the error message.
+      const result = await response.json().catch(() => null);
 
-      if (!response.ok) {
-        throw new Error(result.error ?? "Failed to create room");
+      if (!response.ok || !result?.roomId) {
+        throw new Error(
+          result?.error ?? "Failed to create room. Please try again.",
+        );
       }
 
       await fetchRoom(result.roomId);

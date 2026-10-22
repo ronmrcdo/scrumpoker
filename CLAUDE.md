@@ -334,7 +334,7 @@ pnpm format-and-lint   # Verify code quality
 ## Important Notes
 
 - **Package Manager**: Must use `pnpm` (version 10.19.0+)
-- **Node Version**: Requires Node.js 18+
+- **Node Version**: Requires Node.js 22.23.4+
 - **Turborepo Cache**: Uses `.turbo` for build caching
 - **Port Conflicts**: Web (3000), Supabase API (54321), Supabase DB (54322), Supabase Studio (54323)
 - **No ESLint**: Project uses Biome exclusively
